@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Afacad:ital,wght@0,400..700;1,400..700&display=swap');
+@import "tailwindcss";
+
+@layer utilities {
+  @keyframes floatY {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-30px);
+    }
+  }
+
+  .animate-float {
+    animation: floatY 2s ease-in-out infinite;
+  }
+
+  @keyframes trans {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  .animate-trans {
+    animation: trans 2s ease-in-out infinite;
+  }
+
+  @keyframes pulseScale {
+
+    0%,
+    100% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(.9);
+    }
+  }
+
+  .animate-pulse-scale {
+    animation: pulseScale 2s ease-in-out infinite;
+  }
+}
+
+:root {
+  --gradient-1: #FDFDFD;
+  --gradient-2: #C1D0FF;
+  --button-gradient-1: #4672FF;
+  --button-gradient-2: #59FFDE;
+  --red: #E60B28;
+  --button-light: #ECECEC;
+  --success: #2EBD85;
+  --bg-color: #1560ff;
+  --border-color: #6E6A6A;
+  --border-light: #D8DCE1;
+  --link-color: #014cec;
+  --tab-color: #575757;
+  --text-color: #6E6E6E;
+  --primary: #F8FAFF;
+  --logout: #A80606;
+  --delete: #FFD5D5;
+  --btn-disable: #B0B0B0;
+}
+
+/*   
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --gradient-1: red;
+      --gradient-2: yellow;
+    }
+  } */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Afacad", sans-serif !important;
+}
+
+.css-13cymwt-control,
+.css-t3ipsp-control,
+.css-t3ipsp-control:hover {
+  padding: .325rem 1rem;
+  border-radius: 12px !important;
+  border: 1px solid oklch(87% 0 0) !important
+}
+
+.css-hlgwow {
+  padding: 0
+}
+
+.css-1xc3v61-indicatorContainer {
+  padding-right: 0 !important;
+}
+
+.css-1dimb5e-singleValue {
+  text-align: left;
+}
+
+#headlessui-portal-root {
+
+  z-index: 9;
+}
+
+.top_banner {
+  background: url('./assets/images/top_banner.png');
+
+}
+
+.map-globe {
+  background: url('./assets/images/map-globe.png');
+}
+
+.system_box {
+  flex: 0 0 25%;
+}
