@@ -17,7 +17,7 @@ const Withdraw = () => {
 
   // ✅ Fetch wallet balance
   useEffect(() => {
-    getData("/user/userBalance?type=WALLET", {})
+    getData("/user/userBalance?type=INCOME", {})
       .then((res) => {
         setBalance(res.data?.data || 0);
       })

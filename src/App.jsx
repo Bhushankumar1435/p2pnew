@@ -35,20 +35,20 @@ import Teams from "./pages/Profile/Teams";
 import History from "./components/History";
 import ActivateAccount from "./components/ActivateAccount";
 import Withdraw from "./components/Withdraw";
+import Income from "./components/Income";
 
 // Guards
 import AuthGuard from "./components/AuthGuard";
-import SubAdminAuthGuard from "./subadmin/SubAdminAuthGuard";
+import SubAdminAuthGuard from "./subadmin/subadminauth/SubAdminAuthGuard";
 import AdminAuthGuard from "./Admin/AdminAuthGuard";
 
 // Sub-Admin Pages
-import SubAdminLogin from "./subadmin/SubAdminLogin";
+import SubAdminLogin from "./subadmin/subadminauth/SubAdminLogin";
 import SubAdminDashboard from "./subadmin/SubAdminDashboard";
 // import ManageDeals from "./subadmin/ManageDeals";
 
 // Admin Pages
-import AdminRegister from "./Admin/AdminRegister";
-import AdminLogin from "./admin/AdminLogin";
+import AdminLogin from "./admin/adminauth/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
 
 
@@ -58,7 +58,6 @@ import AdminDashboard from "./admin/AdminDashboard";
 import "react-toastify/dist/ReactToastify.css";
 import "swiper/css";
 import "swiper/css/pagination";
-import Income from "./components/Income";
 
 const App = () => {
   return (
@@ -102,8 +101,7 @@ const App = () => {
       </Route>
 
       {/*  Sub-Admin Routes */}
-      <Route path="/subadmin/login" element={<SubAdminLogin />} />
-      {/* <Route path="/subadmin/managedeals" element={<ManageDeals />} /> */}
+      <Route path="/subadminauth/login" element={<SubAdminLogin />} />
       <Route
         path="/subadmin/dashboard"
         element={
@@ -115,7 +113,6 @@ const App = () => {
 
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/register" element={<AdminRegister />} />
       <Route
         path="/admin/dashboard"
         element={

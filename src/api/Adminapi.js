@@ -7,18 +7,8 @@ const API_BASE = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
  🟢 ADMIN AUTH & ACCOUNT APIS
 ------------------------------------------------------ */
 
-// 🔹 Register (Sign Up)
-export async function AdminRegister(data) {
-  const res = await fetch(`${API_BASE}admin/create`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
 // 🔹 Login
-export async function AdminLogin(data) {
+export async function AdminSignin(data) {
   const res = await fetch(`${API_BASE}admin/signin`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -68,34 +58,24 @@ export async function AdminChangePassword(data) {
 }
 
 // 🔹 Get Admin Profile
-export async function AdminProfile() {
-  const TOKEN = localStorage.getItem("admin_token");
-  const res = await fetch(`${API_BASE}admin/profile`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${TOKEN}`,
-    },
-  });
-  return handleResponse(res);
-}
+// export async function AdminProfile() {
+//   const TOKEN = localStorage.getItem("admin_token");
+//   const res = await fetch(`${API_BASE}admin/profile`, {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${TOKEN}`,
+//     },
+//   });
+//   return handleResponse(res);
+// }
 
-// 🔹 Dashboard Data
-export async function getAdminDashboard() {
-  const TOKEN = localStorage.getItem("admin_token");
-  const res = await fetch(`${API_BASE}admin/dashboard`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${TOKEN}`,
-    },
-  });
-  return handleResponse(res);
-}
 
 /* -----------------------------------------------------
  🧩 Helper: Response Handler
 ------------------------------------------------------ */
+
+
 async function handleResponse(res) {
   try {
     const data = await res.json();
@@ -112,4 +92,16 @@ async function handleResponse(res) {
       message: err.message || "Unexpected error occurred",
     };
   }
+}
+
+export async function getAdminDashboard() {
+  const TOKEN = localStorage.getItem("admin_token");
+  const res = await fetch(`${BASE_URL}admin/dashboard`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${TOKEN}`,
+    },
+  });
+  return res.json();
 }

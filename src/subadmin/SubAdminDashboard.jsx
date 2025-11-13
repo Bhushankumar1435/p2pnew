@@ -1,46 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSubAdminDashboard } from "../api/SubAdminapi";
 import { Menu, X } from "lucide-react";
+import { getSubAdminDashboard } from "../api/SubAdminapi";
 
 const SubAdminDashboard = () => {
   const navigate = useNavigate();
-  const [totalUsers, setTotalUsers] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [dashboardData, setDashboardData] = useState({});
   const [deals, setDeals] = useState([]);
   const [dealsLoading, setDealsLoading] = useState(false);
   const [allDeals, setAllDeals] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedDeal, setSelectedDeal] = useState(null);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(3);
+  const [totalPages, setTotalPages] = useState(1);
+
 
   const handleLogout = () => {
     localStorage.removeItem("sub_admin_token");
     navigate("/subadmin/login");
   };
 
-  // Fetch dashboard stats
+  // ===== Fetch Dashboard Data =====
   useEffect(() => {
+    console.log("SubAdminDashboard mounted ✅");
+
     const fetchDashboardData = async () => {
       try {
+        console.log("Fetching subadmin dashboard data...");
         const response = await getSubAdminDashboard();
+        console.log("Response:", response);
+
         if (response.success) {
-          setTotalUsers(response.data?.totalUsers || response.totalUsers || 0);
+          setDashboardData(response.data || {});
         }
-      } catch (error) {
-        console.error("Dashboard fetch error:", error);
+      } catch (err) {
+        console.error("Error fetching subadmin dashboard:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchDashboardData();
   }, []);
 
   const BASE_URL = import.meta.env.VITE_API_URL || "";
   const API_BASE = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
 
-  // Fetch all deals
+  // ===== Fetch Orders (Deals) =====
   useEffect(() => {
     if (activeTab === "deals") {
       const fetchDeals = async () => {
@@ -49,17 +59,28 @@ const SubAdminDashboard = () => {
           const token = localStorage.getItem("sub_admin_token");
           if (!token) return;
 
-          const res = await fetch(`${API_BASE}sub-admin/requestOrders`, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          // 👇 Send pagination params to backend
+          const res = await fetch(
+            `${API_BASE}sub-admin/requestOrders?page=${page}&limit=${limit}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
           const data = await res.json();
-          let orders = data?.data?.orders || data?.orders || [];
+          const orders = data?.data?.orders || data?.orders || [];
+
           if (Array.isArray(orders)) {
             setAllDeals(orders);
             setDeals(orders);
+
+            // 👇 Dynamically calculate total pages
+            const totalCount = data?.data?.count || data?.count
+            const pages = Math.ceil(totalCount / limit);
+            setTotalPages(pages || 1);
           }
         } catch (err) {
           console.error("Error fetching deals:", err);
@@ -67,10 +88,14 @@ const SubAdminDashboard = () => {
           setDealsLoading(false);
         }
       };
+
       fetchDeals();
     }
-  }, [activeTab, API_BASE]);
+  }, [activeTab, page, API_BASE]);
 
+
+
+  // ===== Order Actions =====
   const handleActionBySubAdmin = async (orderId, action) => {
     try {
       const token = localStorage.getItem("sub_admin_token");
@@ -103,14 +128,17 @@ const SubAdminDashboard = () => {
         className={`fixed lg:static z-50 inset-y-0 left-0 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white w-64 shadow-md`}
       >
+        {/* Mobile Header */}
         <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b">
           <h2 className="text-lg font-semibold">Menu</h2>
           <button onClick={() => setSidebarOpen(false)}>
             <X size={24} />
           </button>
         </div>
+
+        {/* Sidebar Content */}
         <div className="flex flex-col h-full p-6">
-          <h2 className="text-2xl font-bold mb-8 text-center">Sub Admin</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">Sub-Admin Panel</h2>
           <nav className="flex flex-col space-y-3">
             <button
               onClick={() => {
@@ -149,10 +177,21 @@ const SubAdminDashboard = () => {
       </div>
 
       {/* ===== Main Content ===== */}
-      <div className="flex-1 flex flex-col items-center justify-start text-center px-4 py-10">
+      <div className="flex-1 flex flex-col items-center justify-start text-center px-4 py-10 relative">
+        {/* Mobile Menu Button */}
+        <button
+          className="lg:hidden absolute top-4 left-4 p-2 bg-white rounded-md shadow"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu size={22} />
+        </button>
+
+        {/* ===== Dashboard ===== */}
         {activeTab === "dashboard" && (
           <>
-            <h1 className="text-3xl font-bold mb-10">Sub-Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-10 lg:mt-0 mt-6">
+              Sub-Admin Dashboard
+            </h1>
             {loading ? (
               <p>Loading...</p>
             ) : (
@@ -160,23 +199,25 @@ const SubAdminDashboard = () => {
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Total Users</h2>
                   <p className="text-3xl font-bold text-blue-600">
-                    {totalUsers}
+                    {dashboardData.totalUsers || 0}
+                  </p>
+                </div>
+                <div className="bg-white rounded-xl p-6 shadow-md text-center">
+                  <h2 className="text-xl font-semibold mb-2">Total Orders</h2>
+                  <p className="text-3xl font-semibold text-green-600">
+                    {dashboardData.totalOrders || 46}
                   </p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Active Deals</h2>
-                  <p className="text-3xl font-semibold text-green-600">46</p>
-                </div>
-                <div className="bg-white rounded-xl p-6 shadow-md text-center">
-                  <h2 className="text-xl font-semibold mb-2">
-                    Pending Withdrawal
-                  </h2>
-                  <p className="text-3xl font-semibold text-red-600">7</p>
+                  <p className="text-3xl font-semibold text-purple-600">
+                    {dashboardData.activeDeals || 9}
+                  </p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
                   <p className="text-3xl font-semibold text-orange-600">
-                    $12,760
+                    ${dashboardData.totalRevenue || 13275}
                   </p>
                 </div>
               </div>
@@ -188,7 +229,7 @@ const SubAdminDashboard = () => {
         {activeTab === "deals" && (
           <>
             <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-6xl mb-6">
-              <h1 className="text-3xl font-bold mb-4 sm:mb-0 text-blue-700">
+              <h1 className="text-3xl font-bold mb-4 sm:mb-0 lg:mt-0 mt-6">
                 Manage Orders
               </h1>
               <div className="flex gap-3">
@@ -246,6 +287,7 @@ const SubAdminDashboard = () => {
                 <table className="min-w-full border text-sm">
                   <thead className="bg-blue-50 text-center">
                     <tr>
+                      <th className="py-2 px-3 border">S.No</th>
                       <th className="py-2 px-3 border">Status</th>
                       <th className="py-2 px-3 border">Buyer</th>
                       <th className="py-2 px-3 border">Seller</th>
@@ -256,29 +298,20 @@ const SubAdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {deals.map((deal) => (
-                      <tr
-                        key={deal._id}
-                        className="hover:bg-gray-50 text-center"
-                      >
+                    {deals.map((deal, index) => (
+                      <tr key={deal._id} className="hover:bg-gray-50 text-center">
+                        <td className="py-2 px-3 border font-medium">{(page - 1) * limit + (index + 1)}</td>
                         <td className="py-2 px-3 border">{deal.status}</td>
-                        <td className="py-2 px-3 border">
-                          {deal.buyer?.userId || "—"}
-                        </td>
-                        <td className="py-2 px-3 border">
-                          {deal.seller?.userId || "—"}
-                        </td>
-                        <td className="py-2 px-3 border">
-                          {deal.tokenAmount}
-                        </td>
-                        <td className="py-2 px-3 border">
-                          {deal.fiatAmount}
-                        </td>
+                        <td className="py-2 px-3 border">{deal.buyer?.userId || "—"}</td>
+                        <td className="py-2 px-3 border">{deal.seller?.userId || "—"}</td>
+                        <td className="py-2 px-3 border">{deal.tokenAmount}</td>
+                        <td className="py-2 px-3 border">{deal.fiatAmount}</td>
                         <td className="py-2 px-3 border">
                           {deal.buyerReceipt ? (
                             <a
                               href={deal.buyerReceipt}
                               target="_blank"
+                              rel="noopener noreferrer"
                               className="text-blue-600 underline"
                             >
                               {deal.buyerReceipt.length > 20
@@ -289,8 +322,7 @@ const SubAdminDashboard = () => {
                             "—"
                           )}
                         </td>
-                        <td className="py-2 px-3 border flex justify-center gap-2">
-                          {/* Always show More Details */}
+                        <td className="py-2 px-3 border flex justify-center flex-wrap gap-2">
                           <button
                             onClick={() => setSelectedDeal(deal)}
                             className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -298,28 +330,22 @@ const SubAdminDashboard = () => {
                             More Details
                           </button>
 
-                          {/* Accept / Failed only for confirmed & failed filters */}
-                          {(activeFilter === "confirmed" ||
-                            activeFilter === "failed") && (
-                              <>
-                                <button
-                                  onClick={() =>
-                                    handleActionBySubAdmin(deal._id, "COMPLETED")
-                                  }
-                                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                                >
-                                  Accept
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    handleActionBySubAdmin(deal._id, "REJECTED")
-                                  }
-                                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                                >
-                                  Failed
-                                </button>
-                              </>
-                            )}
+                          {(activeFilter === "confirmed" || activeFilter === "failed") && (
+                            <>
+                              <button
+                                onClick={() => handleActionBySubAdmin(deal._id, "COMPLETED")}
+                                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                onClick={() => handleActionBySubAdmin(deal._id, "REJECTED")}
+                                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                              >
+                                Failed
+                              </button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -328,6 +354,34 @@ const SubAdminDashboard = () => {
               ) : (
                 <p>No orders found</p>
               )}
+              <div className="flex justify-between items-center gap-4 mt-6">
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  className={`px-4 py-2 rounded-lg shadow-md ${page === 1
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-700 text-white hover:bg-gray-800"
+                    }`}
+                >
+                  ← Prev
+                </button>
+
+                <span className="text-gray-700 font-medium">
+                  Page {page} of {totalPages}
+                </span>
+
+                <button
+                  disabled={page === totalPages}
+                  onClick={() => setPage((prev) => prev + 1)}
+                  className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-700 text-white hover:bg-gray-800"
+                    }`}
+                >
+                  Next →
+                </button>
+              </div>
+
             </div>
           </>
         )}

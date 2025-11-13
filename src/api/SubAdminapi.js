@@ -56,17 +56,17 @@ export async function subAdminResetPassword(data) {
 }
 
 // 🔹 Get Sub-Admin Profile
-export async function subAdminProfile() {
-  const TOKEN = localStorage.getItem('sub_admin_token');
-  const res = await fetch(`${API_BASE}sub-admin/profile`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${TOKEN}`,
-    },
-  });
-  return handleResponse(res);
-}
+// export async function subAdminProfile() {
+//   const TOKEN = localStorage.getItem('sub_admin_token');
+//   const res = await fetch(`${API_BASE}sub-admin/profile`, {
+//     method: 'GET',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': `Bearer ${TOKEN}`,
+//     },
+//   });
+//   return handleResponse(res);
+// }
 
 /** ---------- 🧩 Helper Function ---------- **/
 
@@ -86,13 +86,18 @@ async function handleResponse(res) {
 
 
 export async function getSubAdminDashboard() {
-  const TOKEN = localStorage.getItem("sub_admin_token");
-  const res = await fetch(`${BASE_URL}sub-admin/dashboard`, {
+  const token = localStorage.getItem("sub_admin_token");
+  if (!token) {
+    console.error("No sub-admin token found");
+    return { success: false, message: "Unauthorized" };
+  }
+  const res = await fetch(`${API_BASE}sub-admin/dashboard`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${TOKEN}`,
+      Authorization: `Bearer ${token}`,
     },
   });
-  return res.json();
+  const data = await res.json();
+  return data;
 }
