@@ -5,9 +5,6 @@ const API_BASE = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
 
 /** ---------- 🟢 Sub-Admin Auth APIs ---------- **/
 
-// 🔹 Register Sub-Admin
-
-
 // 🔹 Login Sub-Admin
 export async function subAdminLogin(data) {
   const res = await fetch(`${API_BASE}sub-admin/signin`, {

@@ -5,59 +5,69 @@ import { Link } from 'react-router-dom';
 import { t } from '../components/i18n';
 import Profiledata from './Profile/profileData';
 import MyAds from './Profile/myAds';
-// import Deposite from './Saller/Deposite';
 import { FaCrown, FaShareAlt, FaCog } from 'react-icons/fa';
 import { getData } from '../api/protectedApi';
 import Teams from './Profile/Teams';
-import { myDeals } from '../api/api';
+import { myDeals } from '../api/api'; // assuming this can handle query params
 
 const Profile = () => {
   const [profile, setProfileData] = useState(null);
-  const [ads, setAds] = useState([]); // ✅ all ads
-  // const [depositeList, setDepositeList] = useState(false);
+  const [ads, setAds] = useState([]);
   const [activeTab, setActiveTab] = useState('info');
+  const [loading, setLoading] = useState(false);
 
-  // Fetch Profile
+  // ✅ Fetch Profile
   useEffect(() => {
     getData('/user/userProfile', {})
       .then((res) => {
         console.log('📦 Profile API Response:', res.data);
-        setProfileData(res.data.data.data);
+        setProfileData(res.data?.data?.data || null);
       })
       .catch((err) => console.error('❌ Profile fetch error:', err));
   }, []);
 
-  // Fetch Ads (MyDeals)
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const res = await myDeals();
-        console.log('🪧 MyDeals API response:', res);
+  // ✅ Fetch Ads with Query Params
+  const fetchAds = async () => {
+    try {
+      setLoading(true);
+      // 👇 Pass query parameters (limit + page)
+      const res = await getData('/user/myDeals', { limit: 10, page: 1 });
+      console.log('🪧 MyDeals API response:', res);
 
-        // ✅ handle different response shapes
-        if (res?.success && Array.isArray(res.data)) {
-          setAds(res.data);
-        } else if (Array.isArray(res)) {
-          setAds(res);
-        } else {
-          console.warn('⚠️ Unexpected ads format:', res);
-          setAds([]);
-        }
-      } catch (error) {
-        console.error('❌ Error fetching ads:', error);
-        setAds([]);
-      }
-    };
+      // ✅ Handle all possible data shapes
+      const fetched =
+        Array.isArray(res?.data?.data)
+          ? res.data.data
+          : Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res)
+          ? res
+          : [];
 
-    fetchAds();
-  }, []);
+      console.log('✅ Deals extracted:', fetched);
+      setAds(fetched);
+    } catch (error) {
+      console.error('❌ Error fetching ads:', error);
+      setAds([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Dynamic Tabs with ads count
+  // ✅ Fetch once + auto refresh every 10 seconds
+  // useEffect(() => {
+  //   fetchAds();
+  //   const interval = setInterval(fetchAds, 10000); // 🔄 refresh every 10s
+  //   return () => clearInterval(interval);
+  // }, []);
+
+  // ✅ Dynamic ads count
+  const adsCount = Array.isArray(ads) ? ads.length : 0;
+
   const tabs = [
     { key: 'info', label: 'Info' },
     { key: 'team', label: 'Team' },
-    { key: 'ads', label: `Ads (${ads.length})` },
-    // { key: 'deposit', label: 'Deposit' },
+    { key: 'ads', label: `Ads (${adsCount})` },
   ];
 
   return (
@@ -131,16 +141,12 @@ const Profile = () => {
             <div className="mt-4 text-sm text-gray-700 px-4">
               {activeTab === 'info' && <Profiledata data={profile?.data} />}
               {activeTab === 'team' && <Teams />}
-              {activeTab === 'ads' && <MyAds ads={ads} />} {/* ✅ Show ads */}
-              {/* {activeTab === 'deposit' && (
-                <>
-                  <Link onClick={() => setDepositeList(true)}>Deposit</Link>
-                  <Deposite
-                    isOpen={depositeList}
-                    onClose={() => setDepositeList(false)}
-                  />
-                </>
-              )} */}
+              {activeTab === 'ads' &&
+                (loading ? (
+                  <p className="text-center text-gray-500">Loading ads...</p>
+                ) : (
+                  <MyAds ads={ads} />
+                ))}
             </div>
           </div>
         </div>
