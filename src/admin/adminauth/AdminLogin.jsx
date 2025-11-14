@@ -222,12 +222,6 @@ const AdminLogin = () => {
                 </button>
               </p>
 
-              {/* <p className="mt-2">
-                Don’t have an account?{' '}
-                <Link className="font-semibold text-[var(--link-color)]" to="/admin/register">
-                  Register
-                </Link>
-              </p> */}
             </form>
           )}
 

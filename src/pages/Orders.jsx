@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CopyIcon from "../assets/images/copy_icon.png";
-
-const BASE_URL = "http://192.168.1.34:8800/api";
+import { getData } from "../api/protectedApi"; 
 
 const Orders = () => {
   const [tab, setTab] = useState("all_orders");
@@ -11,88 +10,43 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch Orders Function
+  // ✅ FETCH ORDERS
   const fetchOrders = async (params = {}) => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
-      console.log("🔹 Token from localStorage:", token);
+      const res = await getData("/user/orderHistory", params);
 
-      if (!token) {
-        alert("No token found — please log in again.");
-        setOrders([]);
-        setLoading(false);
-        return;
-      }
+      console.log("🔥 API RAW RESPONSE:", res.data);
 
-      const query = new URLSearchParams(params).toString();
-      const url = `${BASE_URL}/user/orderHistory${query ? `?${query}` : ""}`;
-      console.log("🔹 Fetching from URL:", url);
-
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      console.log("🔹 HTTP Status:", res.status);
-
-      if (res.status === 401) {
-        alert("Session expired. Please log in again.");
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-        return;
-      }
-
-      // If not OK, log raw text for debugging
-      if (!res.ok) {
-        const rawText = await res.text();
-        console.error("❌ Non-OK response:", rawText);
-        throw new Error(`HTTP error ${res.status}`);
-      }
-
-      const data = await res.json();
-      console.log("✅ API Response Data:", data);
-
-      if (data.success && data.data?.orders) {
-        console.log("✅ Orders fetched successfully:", data.data.orders);
-        setOrders(data.data.orders);
+      if (res.data.success && Array.isArray(res.data.data.orders)) {
+        setOrders(res.data.data.orders);
       } else {
-        console.warn("⚠️ No orders or API returned error:", data.message);
         setOrders([]);
       }
     } catch (err) {
-      console.error("🔥 Error fetching orders:", err);
+      console.error("❌ Error fetching orders:", err);
       setOrders([]);
-    } finally {
-      setLoading(false);
-      console.log("🔹 Fetch Orders Complete");
     }
+
+    setLoading(false);
   };
 
-  // ✅ Fetch when tab changes
+  // ✅ FETCH on tab change
   useEffect(() => {
-    if (tab === "all_orders") {
-      fetchOrders();
-    } else if (tab === "processing") {
-      fetchOrders({ status: "PROCESSING" });
-    } else if (tab === "pl-statement") {
-      fetchOrders({ status: "COMPLETED" });
-    } else if(tab === "accepted"){
-      fetchOrders({ status: "ACCEPTED"})
-    } 
+    if (tab === "all_orders") fetchOrders();
+    if (tab === "processing") fetchOrders({ status: "PROCESSING" });
+    if (tab === "pl-statement") fetchOrders({ status: "COMPLETED" });
+    if (tab === "accepted") fetchOrders({ status: "ACCEPTED" });
   }, [tab]);
 
-  // ✅ Filtered Orders Logic
+  // ✅ FILTER LOGIC (fixed for REJECTED)
   const filteredOrders =
     tab === "all_orders"
-      ? filter === "cancelled"
-        ? orders.filter((order) => order.status === "CANCELLED")
-        : filter === "completed"
-        ? orders.filter((order) => order.status === "COMPLETED")
+      ? filter === "completed"
+        ? orders.filter((o) => o.status === "COMPLETED")
+        : filter === "cancelled"
+        ? orders.filter((o) => o.status === "CANCELLED" || o.status === "REJECTED")
         : orders
       : orders;
 
@@ -104,6 +58,7 @@ const Orders = () => {
 
           <div className="w-full bg-[var(--primary)] rounded-t-xl relative z-[1] overflow-auto">
             <div className="w-full pt-3">
+
               {/* ✅ Tabs */}
               <div className="flex border-b border-[var(--border-light)] px-4 gap-4 mb-4">
                 {[
@@ -144,7 +99,7 @@ const Orders = () => {
                 </div>
               )}
 
-              {/* ✅ Orders List */}
+              {/* ✅ ORDERS LIST */}
               <div className="w-full px-4">
                 {loading && (
                   <p className="text-center text-gray-500 py-10">
@@ -173,41 +128,56 @@ const Orders = () => {
   );
 };
 
-// ✅ OrderCard Component
+// =========================================================
+// ✅ ORDER CARD COMPONENT
+// =========================================================
+
 const OrderCard = ({ order }) => {
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
     alert("Copied to clipboard!");
   };
 
+  const getStatusColor = () => {
+    switch (order.status) {
+      case "COMPLETED":
+        return "bg-green-100 text-green-700";
+      case "PROCESSING":
+        return "bg-yellow-100 text-yellow-700";
+      case "ACCEPTED":
+        return "bg-blue-100 text-blue-600";
+      case "REJECTED":
+      case "CANCELLED":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-200 text-gray-700";
+    }
+  };
+
+  const getStatusTextColor = () => {
+    switch (order.status) {
+      case "COMPLETED":
+        return "text-green-600";
+      case "PROCESSING":
+        return "text-yellow-600";
+      case "ACCEPTED":
+        return "text-blue-600";
+      case "REJECTED":
+      case "CANCELLED":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
+    }
+  };
+
   return (
     <div className="border border-gray-200 rounded-lg p-3 mb-3 shadow-sm bg-white">
       <div className="flex justify-between items-center mb-2">
-        <span
-          className={`font-semibold ${
-            order.status === "COMPLETED"
-              ? "text-green-600"
-              : order.status === "PROCESSING"
-              ? "text-yellow-600"
-              : order.status === "ACCEPTED"
-              ? "text-blue-600"
-              : "text-red-600"
-          }`}
-        >
+        <span className={`font-semibold ${getStatusTextColor()}`}>
           {order.deal?.token}/{order.deal?.fiat}
         </span>
 
-        <span
-          className={`px-2 py-0.5 text-xs rounded-md ${
-            order.status === "COMPLETED"
-              ? "bg-green-100 text-green-700"
-              : order.status === "PROCESSING"
-              ? "bg-yellow-100 text-yellow-700"
-              : order.status === "ACCEPTED"
-              ? "bg-blue-100 text-blue-600"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
+        <span className={`px-2 py-0.5 text-xs rounded-md ${getStatusColor()}`}>
           {order.status}
         </span>
       </div>
@@ -217,42 +187,29 @@ const OrderCard = ({ order }) => {
         <span className="text-black font-medium">{order.tokenAmount}</span>
       </div>
 
-      {/* <div className="flex justify-between mb-1">
-        <span className="text-gray-600 text-sm">Fiat Amount</span>
-        <span className="text-black font-medium">{order.fiatAmount}</span>
-      </div> */}
-
       <div className="flex justify-between mb-1">
         <span className="text-gray-600 text-sm">Price</span>
         <span className="text-black font-medium">{order.deal?.price}</span>
       </div>
 
-     
-
-      {/* <div className="flex justify-between mb-1">
-        <span className="text-gray-600 text-sm">Payment Method</span>
-        <span className="text-black font-medium">
-          {order.deal?.paymentMethods?.join(", ")}
-        </span>
-      </div> */}
-
       <div className="flex justify-between items-center mb-1">
         <span className="text-gray-600 text-sm">Hash</span>
         <span
           className="text-blue-600 cursor-pointer flex items-center gap-1"
-          onClick={() => handleCopy(order.hash)}
+          onClick={() => handleCopy(order.hash || "No Hash")}
         >
-          {order.hash?.substring(0, 10)}...
+          {order.hash ? order.hash.substring(0, 10) : "No Hash"}...
           <img src={CopyIcon} alt="copy" className="w-4 h-4" />
         </span>
       </div>
+
       <div className="flex justify-between items-center mb-1">
-        <span className="text-gray-600 text-sm">id</span>
+        <span className="text-gray-600 text-sm">ID</span>
         <span
           className="text-blue-600 cursor-pointer flex items-center gap-1"
           onClick={() => handleCopy(order._id)}
         >
-          {order._id?.substring(0, 10)}...
+          {order._id.substring(0, 10)}...
           <img src={CopyIcon} alt="copy" className="w-4 h-4" />
         </span>
       </div>

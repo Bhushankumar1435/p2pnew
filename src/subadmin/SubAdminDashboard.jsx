@@ -5,19 +5,29 @@ import { getSubAdminDashboard } from "../api/SubAdminapi";
 
 const SubAdminDashboard = () => {
   const navigate = useNavigate();
+
+  // General/UI state
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Dashboard stats
   const [dashboardData, setDashboardData] = useState({});
+
+  // Deals state + pagination
   const [deals, setDeals] = useState([]);
+  const [allDeals, setAllDeals] = useState([]); // raw page data
   const [dealsLoading, setDealsLoading] = useState(false);
-  const [allDeals, setAllDeals] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedDeal, setSelectedDeal] = useState(null);
-  const [page, setPage] = useState(1);
-  const [limit] = useState(3);
-  const [totalPages, setTotalPages] = useState(1);
 
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit] = useState(3); // items per page
+  const [totalPages, setTotalPages] = useState(1); // computed from backend count
+
+  const BASE_URL = import.meta.env.VITE_API_URL || "";
+  const API_BASE = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
 
   const handleLogout = () => {
     localStorage.removeItem("sub_admin_token");
@@ -26,79 +36,110 @@ const SubAdminDashboard = () => {
 
   // ===== Fetch Dashboard Data =====
   useEffect(() => {
-    console.log("SubAdminDashboard mounted ✅");
-
+    let mounted = true;
     const fetchDashboardData = async () => {
       try {
-        console.log("Fetching subadmin dashboard data...");
         const response = await getSubAdminDashboard();
-        console.log("Response:", response);
-
-        if (response.success) {
+        if (!mounted) return;
+        if (response?.success) {
           setDashboardData(response.data || {});
+        } else {
+          // optionally handle non-success case
+          console.warn("getSubAdminDashboard returned no success:", response);
         }
       } catch (err) {
         console.error("Error fetching subadmin dashboard:", err);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
     fetchDashboardData();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const BASE_URL = import.meta.env.VITE_API_URL || "";
-  const API_BASE = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
-
-  // ===== Fetch Orders (Deals) =====
+  // Reset to page 1 when user switches to deals tab (common UX)
   useEffect(() => {
     if (activeTab === "deals") {
-      const fetchDeals = async () => {
-        setDealsLoading(true);
-        try {
-          const token = localStorage.getItem("sub_admin_token");
-          if (!token) return;
-
-          // 👇 Send pagination params to backend
-          const res = await fetch(
-            `${API_BASE}sub-admin/requestOrders?page=${page}&limit=${limit}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          const data = await res.json();
-          const orders = data?.data?.orders || data?.orders || [];
-
-          if (Array.isArray(orders)) {
-            setAllDeals(orders);
-            setDeals(orders);
-
-            // 👇 Dynamically calculate total pages
-            const totalCount = data?.data?.count || data?.count
-            const pages = Math.ceil(totalCount / limit);
-            setTotalPages(pages || 1);
-          }
-        } catch (err) {
-          console.error("Error fetching deals:", err);
-        } finally {
-          setDealsLoading(false);
-        }
-      };
-
-      fetchDeals();
+      setPage(1);
     }
-  }, [activeTab, page, API_BASE]);
+  }, [activeTab]);
 
+  // ===== Fetch Deals (paginated) =====
+  useEffect(() => {
+    if (activeTab !== "deals") return;
 
+    let mounted = true;
+    const fetchDeals = async () => {
+      setDealsLoading(true);
+      try {
+        const token = localStorage.getItem("sub_admin_token");
+        if (!token) {
+          // If token missing, redirect to login (optional)
+          navigate("/subadmin/login");
+          return;
+        }
+
+        // Request page & limit from backend
+        const res = await fetch(
+          `${API_BASE}sub-admin/requestOrders?page=${page}&limit=${limit}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (!mounted) return;
+
+        // Backend shape may vary. We try a few common fields.
+        const orders = data?.data?.orders || data?.orders || [];
+        const totalCount =
+          data?.data?.count ?? data?.data?.total ?? data?.count ?? data?.total ?? null;
+
+        // Set deals (page data)
+        if (Array.isArray(orders)) {
+          setAllDeals(orders);
+          setDeals(orders);
+        } else {
+          setAllDeals([]);
+          setDeals([]);
+        }
+
+        // Compute total pages from count if available
+        if (typeof totalCount === "number") {
+          const pages = Math.max(1, Math.ceil(totalCount / limit));
+          setTotalPages(pages);
+        } else {
+          // If backend didn't return total, we cannot compute accurate totalPages.
+          // Keep totalPages as at least 1; optionally you can derive from response length:
+          setTotalPages(Math.max(1, Math.ceil((orders?.length || 0) / limit)));
+        }
+      } catch (err) {
+        console.error("Error fetching deals:", err);
+      } finally {
+        if (mounted) setDealsLoading(false);
+      }
+    };
+
+    fetchDeals();
+
+    return () => {
+      mounted = false;
+    };
+  }, [activeTab, page, limit, API_BASE, navigate]);
 
   // ===== Order Actions =====
   const handleActionBySubAdmin = async (orderId, action) => {
     try {
       const token = localStorage.getItem("sub_admin_token");
+      if (!token) return navigate("/subadmin/login");
+
       const res = await fetch(`${API_BASE}sub-admin/manageOrder`, {
         method: "POST",
         headers: {
@@ -107,16 +148,18 @@ const SubAdminDashboard = () => {
         },
         body: JSON.stringify({ id: orderId, action }),
       });
+
       const result = await res.json();
       if (result.success) {
         alert(`Order ${action} successfully!`);
-        setAllDeals((prev) =>
-          prev.map((d) => (d._id === orderId ? { ...d, status: action } : d))
-        );
+        // update local state (optimistic)
+        setAllDeals((prev) => prev.map((d) => (d._id === orderId ? { ...d, status: action } : d)));
+        setDeals((prev) => prev.map((d) => (d._id === orderId ? { ...d, status: action } : d)));
       } else {
         alert(result.message || "Failed to perform action.");
       }
     } catch (error) {
+      console.error("manageOrder error:", error);
       alert("Server error while performing action.");
     }
   };
@@ -124,14 +167,14 @@ const SubAdminDashboard = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* ===== Sidebar ===== */}
-      <div
+      <aside
         className={`fixed lg:static z-50 inset-y-0 left-0 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white w-64 shadow-md`}
       >
         {/* Mobile Header */}
         <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b">
           <h2 className="text-lg font-semibold">Menu</h2>
-          <button onClick={() => setSidebarOpen(false)}>
+          <button onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">
             <X size={24} />
           </button>
         </div>
@@ -145,9 +188,7 @@ const SubAdminDashboard = () => {
                 setActiveTab("dashboard");
                 setSidebarOpen(false);
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "dashboard"
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-100 text-gray-700"
+              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "dashboard" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"
                 }`}
             >
               Dashboard
@@ -157,14 +198,13 @@ const SubAdminDashboard = () => {
                 setActiveTab("deals");
                 setSidebarOpen(false);
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "deals"
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-100 text-gray-700"
+              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "deals" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"
                 }`}
             >
               Manage Orders
             </button>
           </nav>
+
           <div className="mt-auto">
             <button
               onClick={handleLogout}
@@ -174,247 +214,253 @@ const SubAdminDashboard = () => {
             </button>
           </div>
         </div>
-      </div>
+      </aside>
 
       {/* ===== Main Content ===== */}
-      <div className="flex-1 flex flex-col items-center justify-start text-center px-4 py-10 relative">
+      <main className="flex-1 flex flex-col items-center justify-start text-center px-4 py-10 relative">
         {/* Mobile Menu Button */}
         <button
           className="lg:hidden absolute top-4 left-4 p-2 bg-white rounded-md shadow"
           onClick={() => setSidebarOpen(true)}
+          aria-label="Open sidebar"
         >
           <Menu size={22} />
         </button>
 
-        {/* ===== Dashboard ===== */}
+        {/* Dashboard View */}
         {activeTab === "dashboard" && (
-          <>
-            <h1 className="text-3xl font-bold mb-10 lg:mt-0 mt-6">
-              Sub-Admin Dashboard
-            </h1>
+          <section className="w-full max-w-6xl">
+            <h1 className="text-3xl font-bold mb-10 lg:mt-0 mt-6 text-left">Sub-Admin Dashboard</h1>
+
             {loading ? (
               <p>Loading...</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Total Users</h2>
-                  <p className="text-3xl font-bold text-blue-600">
-                    {dashboardData.totalUsers || 0}
-                  </p>
+                  <p className="text-3xl font-bold text-blue-600">{dashboardData.totalUsers || 0}</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Total Orders</h2>
-                  <p className="text-3xl font-semibold text-green-600">
-                    {dashboardData.totalOrders || 46}
-                  </p>
+                  <p className="text-3xl font-semibold text-green-600">{dashboardData.totalOrders ?? 0}</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Active Deals</h2>
-                  <p className="text-3xl font-semibold text-purple-600">
-                    {dashboardData.activeDeals || 9}
-                  </p>
+                  <p className="text-3xl font-semibold text-purple-600">{dashboardData.activeDeals ?? 0}</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
-                  <p className="text-3xl font-semibold text-orange-600">
-                    ${dashboardData.totalRevenue || 13275}
-                  </p>
+                  <p className="text-3xl font-semibold text-orange-600">${dashboardData.totalRevenue ?? 0}</p>
                 </div>
               </div>
             )}
-          </>
+          </section>
         )}
 
-        {/* ===== Deals Tab ===== */}
+        {/* Deals View */}
         {activeTab === "deals" && (
-          <>
-            <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-6xl mb-6">
-              <h1 className="text-3xl font-bold mb-4 sm:mb-0 lg:mt-0 mt-6">
-                Manage Orders
-              </h1>
-              <div className="flex gap-3">
+          <section className="w-full max-w-6xl">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 lg:mt-0 mt-6">
+              <h1 className="text-3xl font-bold text-left ">Manage Orders</h1>
+
+              <div className="flex gap-3 flex-wrap">
                 <button
                   onClick={() => {
                     setDeals(allDeals);
                     setActiveFilter("all");
                   }}
-                  className={`px-4 py-2 rounded-lg shadow-md transition ${activeFilter === "all"
-                    ? "bg-gray-700 text-white"
-                    : "bg-gray-500 text-white hover:bg-gray-600"
-                    }`}
+                  className={`px-4 py-2 rounded-lg shadow-md transition ${activeFilter === "all" ? "bg-gray-700 text-white" : "bg-gray-500 text-white hover:bg-gray-600"}`}
                 >
                   All Orders
                 </button>
+
                 <button
                   onClick={() => {
-                    setDeals(
-                      allDeals.filter(
-                        (d) => d.status?.toUpperCase() === "CONFIRMED"
-                      )
-                    );
+                    setDeals(allDeals.filter((d) => d.status?.toUpperCase() === "CONFIRMED"));
                     setActiveFilter("confirmed");
                   }}
-                  className={`px-4 py-2 rounded-lg shadow-md transition ${activeFilter === "confirmed"
-                    ? "bg-green-700 text-white"
-                    : "bg-green-600 text-white hover:bg-green-700"
-                    }`}
+                  className={`px-4 py-2 rounded-lg shadow-md transition ${activeFilter === "confirmed" ? "bg-green-700 text-white" : "bg-green-600 text-white hover:bg-green-700"}`}
                 >
                   Confirmed Orders
                 </button>
+
                 <button
                   onClick={() => {
-                    setDeals(
-                      allDeals.filter(
-                        (d) => d.status?.toUpperCase() === "FAILED"
-                      )
-                    );
+                    setDeals(allDeals.filter((d) => d.status?.toUpperCase() === "FAILED"));
                     setActiveFilter("failed");
                   }}
-                  className={`px-4 py-2 rounded-lg shadow-md transition ${activeFilter === "failed"
-                    ? "bg-red-700 text-white"
-                    : "bg-red-600 text-white hover:bg-red-700"
-                    }`}
+                  className={`px-4 py-2 rounded-lg shadow-md transition ${activeFilter === "failed" ? "bg-red-700 text-white" : "bg-red-600 text-white hover:bg-red-700"}`}
                 >
                   Failed Orders
                 </button>
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-6xl text-left overflow-x-auto">
+            <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-md overflow-x-auto">
+              {/* Responsive table / cards */}
               {dealsLoading ? (
                 <p>Loading deals...</p>
               ) : deals.length > 0 ? (
-                <table className="min-w-full border text-sm">
-                  <thead className="bg-blue-50 text-center">
-                    <tr>
-                      <th className="py-2 px-3 border">S.No</th>
-                      <th className="py-2 px-3 border">Status</th>
-                      <th className="py-2 px-3 border">Buyer</th>
-                      <th className="py-2 px-3 border">Seller</th>
-                      <th className="py-2 px-3 border">Token</th>
-                      <th className="py-2 px-3 border">Fiat</th>
-                      <th className="py-2 px-3 border">Receipt</th>
-                      <th className="py-2 px-3 border">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <>
+                  {/* Desktop Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="min-w-full border text-sm">
+                      <thead className="bg-blue-50 text-center">
+                        <tr>
+                          <th className="py-2 px-3 border">S.No</th>
+                          <th className="py-2 px-3 border">Status</th>
+                          <th className="py-2 px-3 border">Buyer</th>
+                          <th className="py-2 px-3 border">Seller</th>
+                          <th className="py-2 px-3 border">Token</th>
+                          <th className="py-2 px-3 border">Fiat</th>
+                          <th className="py-2 px-3 border">Receipt</th>
+                          <th className="py-2 px-3 border">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {deals.map((deal, index) => (
+                          <tr key={deal._id} className="hover:bg-gray-50 text-center">
+                            <td className="py-2 px-3 border font-medium">{(page - 1) * limit + (index + 1)}</td>
+                            <td className="py-2 px-3 border">{deal.status}</td>
+                            <td className="py-2 px-3 border">{deal.buyer?.userId || "—"}</td>
+                            <td className="py-2 px-3 border">{deal.seller?.userId || "—"}</td>
+                            <td className="py-2 px-3 border">{deal.tokenAmount}</td>
+                            <td className="py-2 px-3 border">{deal.fiatAmount}</td>
+                            <td className="py-2 px-3 border">
+                              {deal.buyerReceipt ? (
+                                <a href={deal.buyerReceipt} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                                  {deal.buyerReceipt.length > 20 ? `${deal.buyerReceipt.slice(0, 10)}...${deal.buyerReceipt.slice(-10)}` : deal.buyerReceipt}
+                                </a>
+                              ) : (
+                                "—"
+                              )}
+                            </td>
+                            <td className="py-2 px-3 border flex justify-center flex-wrap gap-2">
+                              <button onClick={() => setSelectedDeal(deal)} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                More Details
+                              </button>
+
+                              {(activeFilter === "confirmed" || activeFilter === "failed") && (
+                                <>
+                                  <button onClick={() => handleActionBySubAdmin(deal._id, "COMPLETED")} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
+                                    Accept
+                                  </button>
+                                  <button onClick={() => handleActionBySubAdmin(deal._id, "REJECTED")} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
+                                    Failed
+                                  </button>
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile Cards */}
+                  <div className="md:hidden flex flex-col gap-4">
                     {deals.map((deal, index) => (
-                      <tr key={deal._id} className="hover:bg-gray-50 text-center">
-                        <td className="py-2 px-3 border font-medium">{(page - 1) * limit + (index + 1)}</td>
-                        <td className="py-2 px-3 border">{deal.status}</td>
-                        <td className="py-2 px-3 border">{deal.buyer?.userId || "—"}</td>
-                        <td className="py-2 px-3 border">{deal.seller?.userId || "—"}</td>
-                        <td className="py-2 px-3 border">{deal.tokenAmount}</td>
-                        <td className="py-2 px-3 border">{deal.fiatAmount}</td>
-                        <td className="py-2 px-3 border">
+                      <div key={deal._id} className="border rounded-xl p-4 bg-gray-50 shadow">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-bold">#{(page - 1) * limit + (index + 1)}</h3>
+                          <span className="px-2 py-1 text-xs rounded bg-blue-200 text-blue-700">{deal.status}</span>
+                        </div>
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="">
+                            <p className="text-sm"><strong>Buyer:</strong> {deal.buyer?.userId || "—"}</p>
+                            <p className="text-sm"><strong>Seller:</strong> {deal.seller?.userId || "—"}</p>
+                          </div>
+                          <div className="">
+                            <p className="text-sm"><strong>Token:</strong> {deal.tokenAmount}</p>
+                            <p className="text-sm"><strong>Fiat:</strong> {deal.fiatAmount}</p>
+                          </div>
+                        </div>
+                        <p className="mt-2 text-sm">
+                          <strong>Receipt:</strong>{" "}
                           {deal.buyerReceipt ? (
-                            <a
-                              href={deal.buyerReceipt}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 underline"
-                            >
-                              {deal.buyerReceipt.length > 20
-                                ? `${deal.buyerReceipt.slice(0, 10)}...${deal.buyerReceipt.slice(-10)}`
-                                : deal.buyerReceipt}
-                            </a>
+                            <a href={deal.buyerReceipt} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Receipt</a>
                           ) : (
                             "—"
                           )}
-                        </td>
-                        <td className="py-2 px-3 border flex justify-center flex-wrap gap-2">
-                          <button
-                            onClick={() => setSelectedDeal(deal)}
-                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                          >
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <button onClick={() => setSelectedDeal(deal)} className="w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700">
                             More Details
                           </button>
-
-                          {(activeFilter === "confirmed" || activeFilter === "failed") && (
-                            <>
-                              <button
-                                onClick={() => handleActionBySubAdmin(deal._id, "COMPLETED")}
-                                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                              >
-                                Accept
-                              </button>
-                              <button
-                                onClick={() => handleActionBySubAdmin(deal._id, "REJECTED")}
-                                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                              >
-                                Failed
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+
+                  {/* Pagination Controls */}
+                  <div className="flex justify-between items-center gap-4 mt-6">
+
+                    <button
+                      disabled={page === 1}
+                      onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                      className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
+                       ${page === 1
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-700 text-white hover:bg-gray-800"
+                        }`}
+                    >
+                      <span className="md:hidden">←</span>
+                      <span className="hidden md:inline">← Prev</span>
+                    </button>
+
+                    <span className="text-gray-700 font-medium ">
+                      Page {page} of {totalPages}
+                    </span>
+
+                    <button
+                      disabled={page >= totalPages}
+                      onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                      className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
+                          ${page >= totalPages
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "bg-gray-700 text-white hover:bg-gray-800"
+                        }`}
+                    >
+                      <span className="md:hidden">→</span>
+                      <span className="hidden md:inline">Next →</span>
+                    </button>
+
+                  </div>
+
+                </>
               ) : (
-                <p>No orders found</p>
+                <p className="text-center text-gray-500">No orders found</p>
               )}
-              <div className="flex justify-between items-center gap-4 mt-6">
-                <button
-                  disabled={page === 1}
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                  className={`px-4 py-2 rounded-lg shadow-md ${page === 1
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-white hover:bg-gray-800"
-                    }`}
-                >
-                  ← Prev
-                </button>
-
-                <span className="text-gray-700 font-medium">
-                  Page {page} of {totalPages}
-                </span>
-
-                <button
-                  disabled={page === totalPages}
-                  onClick={() => setPage((prev) => prev + 1)}
-                  className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-white hover:bg-gray-800"
-                    }`}
-                >
-                  Next →
-                </button>
-              </div>
-
             </div>
-          </>
+          </section>
         )}
-      </div>
+      </main>
 
-      {/* ===== Modal ===== */}
+      {/* ===== Modal: Selected Deal ===== */}
       {selectedDeal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-lg w-11/12 max-w-lg p-6 relative">
-            <button
-              onClick={() => setSelectedDeal(null)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-black"
-            >
-              ✕
-            </button>
-            <h2 className="text-2xl font-semibold mb-4 text-center">
-              Order Details
-            </h2>
-            <div className="space-y-3">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 relative overflow-y-auto max-h-[90vh]">
+            <button onClick={() => setSelectedDeal(null)} className="absolute top-3 right-3 text-gray-500 hover:text-black">✕</button>
+            <h2 className="text-2xl font-semibold mb-4 text-center">Order Details</h2>
+
+            <div className="space-y-3 text-sm sm:text-base">
               <div>
                 <h3 className="font-semibold text-gray-700">Buyer Info</h3>
                 <p><strong>ID:</strong> {selectedDeal.buyer?.userId || "—"}</p>
                 <p><strong>Name:</strong> {selectedDeal.buyer?.name || "—"}</p>
                 <p><strong>Email:</strong> {selectedDeal.buyer?.email || "—"}</p>
-                <p><strong>Ph. Number:</strong> {selectedDeal.buyer?.phoneNumber || "—"}</p>
+                <p><strong>Phone:</strong> {selectedDeal.buyer?.phoneNumber || "—"}</p>
               </div>
+
               <div>
                 <h3 className="font-semibold text-gray-700 mt-3">Seller Info</h3>
                 <p><strong>ID:</strong> {selectedDeal.seller?.userId || "—"}</p>
                 <p><strong>Name:</strong> {selectedDeal.seller?.name || "—"}</p>
                 <p><strong>Email:</strong> {selectedDeal.seller?.email || "—"}</p>
-                <p><strong>Ph. Number:</strong> {selectedDeal.seller?.phoneNumber || "—"}</p>
+                <p><strong>Phone:</strong> {selectedDeal.seller?.phoneNumber || "—"}</p>
               </div>
+
               <div>
                 <h3 className="font-semibold text-gray-700 mt-3">Deal Info</h3>
                 <p><strong>Token Amount:</strong> {selectedDeal.tokenAmount}</p>

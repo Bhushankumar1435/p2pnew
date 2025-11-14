@@ -150,9 +150,9 @@ const Login = () => {
                 </button>
               </div>
               <p>Don’t have an account? <Link className='font-semibold text-[var(--link-color)]' to="/signup">Register Now</Link></p>
-              <div className='w-full flex items-center relative bg-transparent after:absolute after:top-1/2 after:left-0 after:w-full after:h-[1px] after:border-t-1 after:border-dashed border-neutral-100/10 justify-center z-1 after:-z[1]'>
+              {/* <div className='w-full flex items-center relative bg-transparent after:absolute after:top-1/2 after:left-0 after:w-full after:h-[1px] after:border-t-1 after:border-dashed border-neutral-100/10 justify-center z-1 after:-z[1]'>
                 <span className='bg-white py-1 px-4 relative z-[1]'>Or</span>
-              </div>
+              </div> */}
 
 
               {/* <div className="space-y-3 px-6">

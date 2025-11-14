@@ -50,6 +50,7 @@ import SubAdminDashboard from "./subadmin/SubAdminDashboard";
 // Admin Pages
 import AdminLogin from "./admin/adminauth/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
+import AddSubAdmin from "./admin/AddSubAdmin";
 
 
 
@@ -112,12 +113,20 @@ const App = () => {
       />
 
       {/* Admin Routes */}
-      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/adminauth/login" element={<AdminLogin />} />
       <Route
         path="/admin/dashboard"
         element={
           <AdminAuthGuard>
             <AdminDashboard />
+          </AdminAuthGuard>
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <AdminAuthGuard>
+            <AddSubAdmin />
           </AdminAuthGuard>
         }
       />
