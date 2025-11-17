@@ -1,16 +1,28 @@
-import React from 'react';
-import ComingSoon from '../../components/ComingSoon';
+import React, { useState } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
 export default function Account() {
+  const [walletAddress, setWalletAddress] = useState('');
+
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      document.getElementById('walletInput').value = text;
+      setWalletAddress(text); // update state
     } catch (err) {
       console.error('Failed to read clipboard: ', err);
     }
+  };
+
+  const handleSave = () => {
+    if (!walletAddress) {
+      alert('Please enter a wallet address');
+      return;
+    }
+
+    // Add API call or local storage save here
+    console.log('Wallet address saved:', walletAddress);
+    alert('Wallet address saved successfully!');
   };
 
   return (
@@ -20,8 +32,6 @@ export default function Account() {
           <Header />
           <div className='w-full bg-[var(--primary)] rounded-t-xl relative z-[1]'>
             <div className='w-full pt-3'>
-
-
               <h1 className="text-base font-semibold px-4 pb-3 border-b border-gray-400">
                 Wallet Address
               </h1>
@@ -33,6 +43,8 @@ export default function Account() {
                     id="walletInput"
                     className="w-full px-4 py-3 text-sm focus:outline-none"
                     placeholder="Enter your wallet address"
+                    value={walletAddress} // bind state
+                    onChange={(e) => setWalletAddress(e.target.value)}
                   />
                   <button
                     type="button"
@@ -42,12 +54,14 @@ export default function Account() {
                     Paste
                   </button>
                 </div>
-                <button className="w-full py-2 text-white font-semibold rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 transition">
+                <button
+                  className="w-full py-2 text-white font-semibold rounded-md bg-gradient-to-r from-blue-600 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 transition"
+                  onClick={handleSave} // add handler
+                >
                   Save
                 </button>
               </div>
-
-              {/* Withdraw Section */}
+               {/* Withdraw Section */}
               {/* <div className="mt-8 bg-white rounded-xl shadow-md border border-gray-200 mx-4">
                 <div className="px-6 py-4 border-b">
                   <h2 className="text-sm font-semibold text-gray-800">Withdraw</h2>
@@ -62,7 +76,6 @@ export default function Account() {
                   </button>
                 </div>
               </div> */}
-
             </div>
           </div>
         </div>
@@ -71,5 +84,3 @@ export default function Account() {
     </div>
   );
 }
-
-

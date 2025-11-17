@@ -39,10 +39,10 @@ const Profile = () => {
         Array.isArray(res?.data?.data)
           ? res.data.data
           : Array.isArray(res?.data)
-          ? res.data
-          : Array.isArray(res)
-          ? res
-          : [];
+            ? res.data
+            : Array.isArray(res)
+              ? res
+              : [];
 
       console.log('✅ Deals extracted:', fetched);
       setAds(fetched);
@@ -105,12 +105,12 @@ const Profile = () => {
                           className="h-4 w-4"
                         />
                       </h2>
-                      <span className="text-xs bg-[#FFF6D5] text-black font-normal px-2 py-1 rounded mt-1 inline-block">
+                      {/* <span className="text-xs bg-[#FFF6D5] text-black font-normal px-2 py-1 rounded mt-1 inline-block">
                         Professional Crypto Exchange
                       </span>
                       <div className="text-sm mt-1 flex items-center gap-2">
                         <FaCrown className="text-yellow-500" />
-                      </div>
+                      </div> */}
                     </>
                   )}
                 </div>
@@ -123,11 +123,10 @@ const Profile = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`py-2 px-1 text-black relative text-nowrap ${
-                    activeTab === tab.key
+                  className={`py-2 px-1 text-black relative text-nowrap ${activeTab === tab.key
                       ? 'font-semibold'
                       : 'text-gray-500'
-                  }`}
+                    }`}
                 >
                   {tab.label}
                   {activeTab === tab.key && (

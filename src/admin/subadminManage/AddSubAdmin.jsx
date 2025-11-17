@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
-
-const API_BASE = import.meta.env.VITE_API_URL; 
+import { AddSubAdminApi } from "../../api/Adminapi";   // ✅ Correct import
 
 const AddSubAdmin = () => {
   const navigate = useNavigate();
@@ -16,10 +14,12 @@ const AddSubAdmin = () => {
 
   const [loading, setLoading] = useState(false);
 
+  // Handle Input Change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -28,43 +28,21 @@ const AddSubAdmin = () => {
       return;
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      const token = localStorage.getItem("admin_token");
-      if (!token) {
-        toast.error("Unauthorized! Please login again.");
-        navigate("/admin/login");
-        return;
-      }
+    const res = await AddSubAdminApi(form); // ✅ Updated API call
 
-      const res = await fetch(`${API_BASE}admin/addSubAdmin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (!data.success) {
-        toast.error(data.message || "Failed to create Sub-Admin");
-        return;
-      }
-
-      toast.success(data.message || "Sub-Admin created successfully!");
-
-      // redirect
-      setTimeout(() => navigate("/admin/subadmin/list"), 700);
-
-    } catch (err) {
-      console.error("Add SubAdmin error:", err);
-      toast.error("Something went wrong!");
-    } finally {
+    if (!res.success) {
+      toast.error(res.message || "Failed to create Sub-Admin");
       setLoading(false);
+      return;
     }
+
+    toast.success(res.message || "Sub-Admin created successfully!");
+
+    setTimeout(() => navigate("/admin/subadminList"), 700); // ✅ Better redirect
+
+    setLoading(false);
   };
 
   return (
@@ -113,12 +91,13 @@ const AddSubAdmin = () => {
           type="submit"
           disabled={loading}
           className={`w-full py-3 rounded-lg text-white font-semibold transition ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
           {loading ? "Creating..." : "Create Sub-Admin"}
         </button>
-
       </form>
     </div>
   );

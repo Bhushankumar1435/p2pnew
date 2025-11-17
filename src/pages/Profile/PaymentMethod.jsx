@@ -40,12 +40,12 @@ const PaymentMethod = () => {
                   <span className='text-base font-normal'>{t('UPIDetails')}</span>
                   <div className="pointer-events-none flex items-center text-gray-500 gap-2">
                     {/* <button className='text-xs flex items-center text-black leading-5 px-3 bg-[var(--delete)] rounded-full'>{t('Delete')}</button> */}
-                    <img src={checkIcon} />
+                    {/* <img src={checkIcon} /> */}
                   </div>
                  
                 </Link>
               </div>
-              <div className=''>
+              {/* <div className=''>
                 <h2>Bank Details</h2>
                 <p> Name : {data?.name}</p>
                 <p>Bank Name : {data?.bankName}</p>
@@ -53,7 +53,7 @@ const PaymentMethod = () => {
                 <p>IFSC Code : {data?.ifscCode}</p>
                 <p>UPI : {data?.upi}</p>
 
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

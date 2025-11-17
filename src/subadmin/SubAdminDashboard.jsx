@@ -23,7 +23,7 @@ const SubAdminDashboard = () => {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const [limit] = useState(3); // items per page
+  const [limit] = useState(10); // items per page
   const [totalPages, setTotalPages] = useState(1); // computed from backend count
 
   const BASE_URL = import.meta.env.VITE_API_URL || "";

@@ -1,107 +1,122 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+// ✅ Read API base URL from env
+const API_BASE = import.meta.env.VITE_API_URL;
 
-// ✅ Ensure BASE_URL ends with a trailing slash
-const API_BASE = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
+// --------------------------------------------
+// 🟦 Request Wrappers
+// --------------------------------------------
 
-/* -----------------------------------------------------
- 🟢 ADMIN AUTH & ACCOUNT APIS
------------------------------------------------------- */
-
-// 🔹 Login
-export async function AdminSignin(data) {
-  const res = await fetch(`${API_BASE}admin/signin`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
-// 🔹 Verify Signin (OTP)
-export async function AdminVerifySignin(data) {
-  const res = await fetch(`${API_BASE}admin/verifySignin`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
-// 🔹 Resend OTP
-export async function AdminResendOtp(data) {
-  const res = await fetch(`${API_BASE}admin/resendOtp`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
-// 🔹 Forgot Password
-export async function AdminForgotPassword(data) {
-  const res = await fetch(`${API_BASE}admin/forgotPassword`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
-// 🔹 Change / Reset Password
-export async function AdminChangePassword(data) {
-  const res = await fetch(`${API_BASE}admin/changePassword`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
-// 🔹 Get Admin Profile
-// export async function AdminProfile() {
-//   const TOKEN = localStorage.getItem("admin_token");
-//   const res = await fetch(`${API_BASE}admin/profile`, {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${TOKEN}`,
-//     },
-//   });
-//   return handleResponse(res);
-// }
-
-
-/* -----------------------------------------------------
- 🧩 Helper: Response Handler
------------------------------------------------------- */
-
-
-async function handleResponse(res) {
+// 🔹 POST wrapper
+async function adminPost(endpoint, data, auth = false) {
   try {
-    const data = await res.json();
+    const headers = { "Content-Type": "application/json" };
 
-    if (!res.ok) {
-      throw new Error(data.message || "API request failed");
+    if (auth) {
+      const token = localStorage.getItem("admin_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
     }
 
-    return data;
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    const json = await res.json();
+    return json;
   } catch (err) {
-    console.error("API Error:", err);
-    return {
-      success: false,
-      message: err.message || "Unexpected error occurred",
-    };
+    return { success: false, message: err.message };
   }
 }
 
-export async function getAdminDashboard() {
-  const TOKEN = localStorage.getItem("admin_token");
-  const res = await fetch(`${BASE_URL}admin/dashboard`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${TOKEN}`,
-    },
-  });
-  return res.json();
+// 🔹 GET wrapper
+async function adminGet(endpoint, auth = false) {
+  try {
+    const headers = { "Content-Type": "application/json" };
+
+    if (auth) {
+      const token = localStorage.getItem("admin_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      method: "GET",
+      headers,
+    });
+
+    const json = await res.json();
+    return json;
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
 }
+
+// --------------------------------------------
+//  ADMIN AUTH APIS
+// --------------------------------------------
+
+// Login
+export const AdminSignin = (data) => adminPost("admin/signin", data);
+
+
+// Verify OTP
+export const AdminVerifySignin = (data) => adminPost("admin/verifySignin", data);
+
+
+// Resend OTP
+export const AdminResendOtp = (data) => adminPost("admin/resendOtp", data);
+
+
+// Forgot Password
+export const AdminForgotPassword = (data) => adminPost("admin/forgotPassword", data);
+
+
+// change password
+export const AdminChangePassword = (data) =>
+  adminPost("admin/changePassword", data);
+
+
+
+
+
+// --------------------------------------------
+// ADMIN DASHBOARD
+// --------------------------------------------
+export const getAdminDashboard = () => adminGet("admin/dashboard", true);
+
+
+
+
+
+// --------------------------------------------
+//  SUB ADMIN APIS
+// --------------------------------------------
+
+// Add Sub Admin
+export const AddSubAdminApi = (data) =>
+  adminPost("admin/addSubAdmin", data, true);
+
+// Sub Admin List
+export const GetSubAdminListApi = () =>
+  adminGet("admin/Sub-Admins", true);
+
+// Sub Admin Requests
+export const GetSubAdminsRequestsApi = () =>
+  adminGet("admin/subAdminRequests", true);
+
+
+
+// --------------------------------------------
+//  ADMIN USERS LIST
+// --------------------------------------------
+export const GetAdminUsersApi = (page = 1, limit = 10) =>
+  adminGet(`admin/users?page=${page}&limit=${limit}`, true);
+
+export const GetUserBankDetailsApi = (userId) =>
+  adminGet(`admin/bankDetails?userId=${userId}`, true);
+
+
+export const GetAdminDealsApi = (page = 1, limit = 10) =>
+  adminGet(`admin/deals?page=${page}&limit=${limit}`, true);
+
+export const GetAdminTicketHistoryApi = (page, limit) =>
+  adminGet(`admin/ticketHistory?page=${page}&limit=${limit}`, true);

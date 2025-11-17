@@ -50,7 +50,7 @@ import SubAdminDashboard from "./subadmin/SubAdminDashboard";
 // Admin Pages
 import AdminLogin from "./admin/adminauth/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
-import AddSubAdmin from "./admin/AddSubAdmin";
+import AddSubAdmin from "./admin/subadminManage/AddSubAdmin";
 
 
 
