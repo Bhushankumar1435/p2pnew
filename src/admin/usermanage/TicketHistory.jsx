@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { GetAdminTicketHistoryApi } from "../../api/Adminapi";
+import { ToastContainer, toast } from 'react-toastify';
+
+import { GetAdminTicketHistoryApi, ManageAdminTicketApi } from "../../api/Adminapi";
 
 const TicketHistory = () => {
     const [tickets, setTickets] = useState([]);
@@ -15,10 +17,8 @@ const TicketHistory = () => {
 
     const fetchTickets = async () => {
         setLoading(true);
-
         try {
             const res = await GetAdminTicketHistoryApi(page, limit);
-
             if (res.success) {
                 setTickets(res.data.tickets || []);
                 const total = res.data.count || 1;
@@ -31,8 +31,23 @@ const TicketHistory = () => {
         }
     };
 
+    const handleStatusChange = async (ticketId, newStatus) => {
+        try {
+            const res = await ManageAdminTicketApi(ticketId, { status: newStatus });
+            if (res.success) {
+                fetchTickets(); // Refresh tickets after update
+            } else {
+                alert("Failed to update ticket");
+            }
+        } catch (err) {
+            console.error("Error updating ticket:", err);
+        }
+    };
+
     return (
         <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
+                  <ToastContainer position="top-right" autoClose={3000} />
+
             <h2 className="text-2xl font-bold mb-4">Ticket History</h2>
 
             {loading ? (
@@ -50,6 +65,7 @@ const TicketHistory = () => {
                                     <th className="py-2 px-3 border">Subject</th>
                                     <th className="py-2 px-3 border">Status</th>
                                     <th className="py-2 px-3 border">Created At</th>
+                                    <th className="py-2 px-3 border">Action</th>
                                 </tr>
                             </thead>
 
@@ -65,25 +81,38 @@ const TicketHistory = () => {
                                             <td className="py-2 px-3 border">{t.subject}</td>
                                             <td className="py-2 px-3 border">
                                                 <span
-                                                    className={`px-2 py-1 rounded text-xs ${t.status === "OPEN"
+                                                    className={`px-2 py-1 rounded text-xs ${
+                                                        t.status === "OPEN"
                                                             ? "bg-yellow-200 text-yellow-700"
                                                             : t.status === "CLOSED"
                                                                 ? "bg-green-200 text-green-700"
                                                                 : "bg-gray-300 text-gray-700"
-                                                        }`}
+                                                    }`}
                                                 >
                                                     {t.status}
                                                 </span>
                                             </td>
-
                                             <td className="py-2 px-3 border">
                                                 {new Date(t.createdAt).toLocaleString()}
+                                            </td>
+                                            <td className="py-2 px-3 border">
+                                                <select
+                                                    value={t.status}
+                                                    onChange={(e) =>
+                                                        handleStatusChange(t._id, e.target.value)
+                                                    }
+                                                    className="border rounded px-2 py-1 text-sm"
+                                                >
+                                                    <option value="OPEN">OPEN</option>
+                                                    <option value="IN_PROGRESS">IN_PROGRESS</option>
+                                                    <option value="CLOSED">CLOSED</option>
+                                                </select>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="6" className="py-4 text-center text-gray-500">
+                                        <td colSpan="7" className="py-4 text-center text-gray-500">
                                             No tickets found.
                                         </td>
                                     </tr>
@@ -112,13 +141,27 @@ const TicketHistory = () => {
                                     <strong>Created:</strong>{" "}
                                     {new Date(t.createdAt).toLocaleString()}
                                 </p>
+
+                                {/* Mobile Status Change */}
+                                <div className="mt-2">
+                                    <select
+                                        value={t.status}
+                                        onChange={(e) =>
+                                            handleStatusChange(t._id, e.target.value)
+                                        }
+                                        className="border rounded px-2 py-1 text-sm w-full"
+                                    >
+                                        <option value="OPEN">OPEN</option>
+                                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                                        <option value="CLOSED">CLOSED</option>
+                                    </select>
+                                </div>
                             </div>
                         ))}
                     </div>
 
                     {/* ----------------------- Pagination ----------------------- */}
                     <div className="flex justify-between items-center gap-4 mt-6">
-
                         <button
                             disabled={page === 1}
                             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

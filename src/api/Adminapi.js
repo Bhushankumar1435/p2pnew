@@ -111,12 +111,45 @@ export const GetSubAdminsRequestsApi = () =>
 export const GetAdminUsersApi = (page = 1, limit = 10) =>
   adminGet(`admin/users?page=${page}&limit=${limit}`, true);
 
+export const GetUserDetailsApi = (type, userId) =>
+  adminGet(`admin/userDetails?type=${type}&id=${userId}`, true);
+
 export const GetUserBankDetailsApi = (userId) =>
   adminGet(`admin/bankDetails?userId=${userId}`, true);
 
+export const GetUserIncomeApi = (userId) =>
+  adminGet(`admin/income?userId=${userId}`, true);
 
+export const GetUserWalletApi = (userId) =>
+  adminGet(`admin/wallet?userId=${userId}`, true);
+
+export const GetUserDepositApi = (userId) =>
+  adminGet(`admin/deposit?userId=${userId}`, true);
+
+export const GetUserWithdrawApi = (userId) =>
+  adminGet(`admin/withdraw?userId=${userId}`, true);
+
+export const GetUserDealsApi = (userId) =>
+  adminGet(`admin/deals?userId=${userId}`, true);
+
+export const GetUserOrdersApi = (userId) =>
+  adminGet(`admin/orders?userId=${userId}`, true);
+
+export const GetUserTeamApi = (userId) =>
+  adminGet(`admin/team?userId=${userId}`, true);
+
+export const BlockUnblockUserApi = (userId, action) =>
+  adminPost(`admin/blockUser?userId=${userId}&action=${action}`, {}, true);
+
+
+// --------------------------------------------
+//  ADMIN DEALS & TICKETS
+// --------------------------------------------
 export const GetAdminDealsApi = (page = 1, limit = 10) =>
   adminGet(`admin/deals?page=${page}&limit=${limit}`, true);
 
 export const GetAdminTicketHistoryApi = (page, limit) =>
   adminGet(`admin/ticketHistory?page=${page}&limit=${limit}`, true);
+
+export const ManageAdminTicketApi = (ticketId, data) =>
+  adminPost(`admin/manageTicket?ticketId=${ticketId}`, data, true);

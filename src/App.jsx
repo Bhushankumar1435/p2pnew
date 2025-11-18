@@ -45,15 +45,17 @@ import AdminAuthGuard from "./Admin/AdminAuthGuard";
 // Sub-Admin Pages
 import SubAdminLogin from "./subadmin/subadminauth/SubAdminLogin";
 import SubAdminDashboard from "./subadmin/SubAdminDashboard";
-// import ManageDeals from "./subadmin/ManageDeals";
 
 // Admin Pages
 import AdminLogin from "./admin/adminauth/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
 import AddSubAdmin from "./admin/subadminManage/AddSubAdmin";
-
-
-
+import UserDetails from "./admin/usermanage/UserDetails";
+import SubAdminList from "./admin/subadminManage/SubAdminList";
+import SubAdminrequest from "./admin/subadminManage/SubAdminrequest";
+import ManageDeals from "./admin/usermanage/ManageDeals";
+import TicketHistory from "./admin/usermanage/TicketHistory";
+import UserList from "./admin/usermanage/Userlist";
 
 
 import "react-toastify/dist/ReactToastify.css";
@@ -73,7 +75,7 @@ const App = () => {
       <Route path="/register-success" element={<RegisterSuccess />} />
       <Route path="/forgot_password" element={<ForgotPassword />} />
 
-      {/*  Protected User Routes */}
+      {/* Protected User Routes */}
       <Route element={<AuthGuard />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/deal-detail" element={<DealDetail />} />
@@ -101,7 +103,7 @@ const App = () => {
         <Route path="/income" element={<Income />} />
       </Route>
 
-      {/*  Sub-Admin Routes */}
+      {/* Sub-Admin Routes */}
       <Route path="/subadminauth/login" element={<SubAdminLogin />} />
       <Route
         path="/subadmin/dashboard"
@@ -114,23 +116,14 @@ const App = () => {
 
       {/* Admin Routes */}
       <Route path="/adminauth/login" element={<AdminLogin />} />
-      <Route
-        path="/admin/dashboard"
-        element={
-          <AdminAuthGuard>
-            <AdminDashboard />
-          </AdminAuthGuard>
-        }
-      />
-      <Route
-        path="/admin/dashboard"
-        element={
-          <AdminAuthGuard>
-            <AddSubAdmin />
-          </AdminAuthGuard>
-        }
-      />
-
+      <Route path="/admin/dashboard" element={<AdminAuthGuard><AdminDashboard /></AdminAuthGuard>} />
+      <Route path="/admin/add-subadmin" element={<AdminAuthGuard><AddSubAdmin /></AdminAuthGuard>} />
+      <Route path="/admin/userDetails" element={<AdminAuthGuard><UserDetails /></AdminAuthGuard>} />
+      <Route path="/admin/SubAdmin-list" element={<AdminAuthGuard><SubAdminList /></AdminAuthGuard>} />
+      <Route path="/admin/subAdminrequest" element={<AdminAuthGuard><SubAdminrequest /></AdminAuthGuard>} />
+      <Route path="/admin/manageDeals" element={<AdminAuthGuard> <ManageDeals />  </AdminAuthGuard>} />
+      <Route path="/admin/tickethistory" element={<AdminAuthGuard><TicketHistory /></AdminAuthGuard>} />
+      <Route path="/admin/Userlist" element={<AdminAuthGuard><UserList /> </AdminAuthGuard>} />
     </Routes>
   );
 };

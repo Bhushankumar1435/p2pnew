@@ -50,3 +50,60 @@ const CountdownTimer = ({ expireAt, label }) => {
 };
 
 export default CountdownTimer;
+
+
+// import React, { useState, useEffect, useRef } from 'react';
+
+// const CountdownTimer = ({ expireAt, label, status }) => {
+//   const calculateRemainingSeconds = () => {
+//     const expireTime = new Date(expireAt).getTime();
+//     const now = new Date().getTime();
+//     return Math.max(Math.floor((expireTime - now) / 1000), 0);
+//   };
+
+//   const formatTime = (totalSeconds) => {
+//     const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+//     const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+//     const seconds = String(totalSeconds % 60).padStart(2, '0');
+//     return `${hours}:${minutes}:${seconds}`;
+//   };
+
+//   const [remaining, setRemaining] = useState(calculateRemainingSeconds());
+//   const intervalRef = useRef(null);
+
+//   useEffect(() => {
+//     if (remaining <= 0 || status === 'DONE' || status === 'REJECTED') return;
+
+//     intervalRef.current = setInterval(() => {
+//       setRemaining(prev => {
+//         if (prev <= 1) {
+//           clearInterval(intervalRef.current);
+//           return 0;
+//         }
+//         return prev - 1;
+//       });
+//     }, 1000);
+
+//     return () => clearInterval(intervalRef.current);
+//   }, [remaining, status]);
+
+//   // Hide timer if deal is done/rejected or time is up
+//   if (remaining === 0 || status === 'DONE' || status === 'REJECTED') return null;
+
+//   return (
+//     <div className="rounded-b-xl w-full max-w-xs overflow-auto">
+//       <div className="text-sm font-medium mb-1">{label}</div>
+//       <div className="flex items-center gap-1.5">
+//         <p className='text-gray-800'>Expires In :</p>
+//         <div className="text-center text-lg font-medium tracking-widest text-red-600">
+//           {formatTime(remaining)}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CountdownTimer;
+
+{/* <CountdownTimer expireAt={deal.expireAt} label="Deal Timer" status={deal.status} /> */}
+

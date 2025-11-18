@@ -31,7 +31,7 @@ const SubAdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("sub_admin_token");
-    navigate("/subadmin/login");
+    navigate("/subadminauth/login");
   };
 
   // ===== Fetch Dashboard Data =====

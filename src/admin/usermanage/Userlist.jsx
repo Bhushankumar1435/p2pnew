@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { GetAdminUsersApi, GetUserBankDetailsApi } from "../../api/Adminapi";
+import { GetAdminUsersApi } from "../../api/Adminapi";
+import { useNavigate } from "react-router-dom";
 
 const UserList = () => {
+    const navigate = useNavigate();
+
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -9,213 +12,184 @@ const UserList = () => {
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
+    // Popup
     const [modalOpen, setModalOpen] = useState(false);
-    const [bankDetails, setBankDetails] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
 
+    const TABS = [
+        "BANK",
+        "INCOME",
+        "WALLET",
+        "DEPOSIT",
+        "WITHDRAW",
+        "DEAL",
+        "ORDER",
+        "TEAM",
+    ];
+
+    // Fetch users
     const fetchUsers = async () => {
         setLoading(true);
         try {
             const res = await GetAdminUsersApi(page, limit);
-
             if (res.success) {
                 setUsers(res.data.users || []);
-                const total = res.data.count || 1;
-                setTotalPages(Math.ceil(total / limit));
+                setTotalPages(Math.ceil(res.data.count / limit));
             }
         } catch (err) {
-            console.error("User list error:", err);
-        } finally {
-            setLoading(false);
+            console.error("User fetch error:", err);
         }
-    };
-
-    const fetchBankDetails = async (userId) => {
-        try {
-            const res = await GetUserBankDetailsApi(userId);
-            if (res.success) {
-                setBankDetails(res.data || {});
-                setModalOpen(true);
-            } else {
-                alert("Bank details not found");
-            }
-        } catch (err) {
-            console.error("Bank Details Error:", err);
-        }
+        setLoading(false);
     };
 
     useEffect(() => {
         fetchUsers();
     }, [page]);
 
+    // Open popup exactly beside clicked "View"
+    const openPopup = (event, userId) => {
+        const rect = event.target.getBoundingClientRect();
+
+        const popupWidth = 220; // width of your popup (adjust if needed)
+        const gap = 10; // space between button and popup
+
+        setPopupPosition({
+            x: rect.left - popupWidth - gap,  // LEFT SIDE of the View button
+            y: rect.top + window.scrollY      // same vertical alignment
+        });
+
+        setSelectedUser(userId);
+        setModalOpen(true);
+    };
+
+
+    // Navigate to user details page
+    const goToDetailsPage = (type) => {
+        navigate(`/admin/userDetails?type=${type}&id=${selectedUser}`);
+        setModalOpen(false);
+    };
+
     return (
-        <div className="max-w-5xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
+        <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
             <h2 className="text-2xl font-bold mb-4">User List</h2>
 
             {loading ? (
-                <p>Loading users...</p>
+                <p>Loading…</p>
             ) : (
-                <>
-                    {/* Desktop Table */}
-                    <div className="hidden md:block overflow-x-auto">
-                        <table className="min-w-full border text-sm">
-                            <thead className="bg-gray-100 text-center">
-                                <tr>
-                                    <th className="py-2 px-3 border">S. No.</th>
-                                    <th className="py-2 px-3 border">User ID</th>
-                                    <th className="py-2 px-3 border">Name</th>
-                                    <th className="py-2 px-3 border">Email</th>
-                                    <th className="py-2 px-3 border">Phone</th>
-                                    <th className="py-2 px-3 border">Country</th>
-                                    <th className="py-2 px-3 border">Status</th>
-                                    <th className="py-2 px-3 border">Created At</th>
-                                    <th className="py-2 px-3 border">More</th>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full border text-sm">
+                        <thead className="bg-gray-100 text-center">
+                            <tr>
+                                <th className="py-2 px-3 border">S.No</th>
+                                <th className="py-2 px-3 border">User ID</th>
+                                <th className="py-2 px-3 border">Name</th>
+                                <th className="py-2 px-3 border">Email</th>
+                                <th className="py-2 px-3 border">Phone</th>
+                                <th className="py-2 px-3 border">Status</th>
+                                <th className="py-2 px-3 border">View</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {users.map((u, index) => (
+                                <tr key={u._id} className="text-center hover:bg-gray-50">
+                                    <td className="border py-2">
+                                        {(page - 1) * limit + index + 1}
+                                    </td>
+                                    <td className="border py-2">{u.userId}</td>
+                                    <td className="border py-2">{u.name}</td>
+                                    <td className="border py-2">{u.email}</td>
+                                    <td className="border py-2">{u.phoneNumber}</td>
+
+                                    <td className="border py-2">
+                                        {u.isBlocked ? (
+                                            <span className="text-red-600 font-bold">Blocked</span>
+                                        ) : (
+                                            <span className="text-green-600 font-bold">Active</span>
+                                        )}
+                                    </td>
+
+                                    <td className="border py-2">
+                                        <button
+                                            onClick={(e) => openPopup(e, u._id)}
+                                            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                        >
+                                            View
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
-
-                            <tbody>
-                                {users.length > 0 ? (
-                                    users.map((u, index) => (
-                                        <tr key={u._id} className="hover:bg-gray-50 text-center">
-                                            <td className="py-2 px-3 border">
-                                                {(page - 1) * limit + (index + 1)}
-                                            </td>
-                                            <td className="py-2 px-3 border">{u.userId}</td>
-                                            <td className="py-2 px-3 border">{u.name}</td>
-                                            <td className="py-2 px-3 border">{u.email}</td>
-                                            <td className="py-2 px-3 border">{u.phoneNumber}</td>
-                                            <td className="py-2 px-3 border">{u.country}</td>
-
-                                            <td className="py-2 px-3 border">
-                                                {u.isBlocked ? (
-                                                    <span className="text-red-600 font-semibold">Blocked</span>
-                                                ) : (
-                                                    <span className="text-green-600 font-semibold">Active</span>
-                                                )}
-                                            </td>
-
-                                            <td className="py-2 px-3 border">
-                                                {new Date(u.createdAt).toLocaleDateString()}
-                                            </td>
-
-                                            <td className="py-2 px-3 border">
-                                                <button
-                                                    onClick={() => fetchBankDetails(u._id)}
-                                                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                                                >
-                                                    View
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="9" className="p-4 text-gray-500">
-                                            No Users Found
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Mobile Cards */}
-                    <div className="md:hidden flex flex-col gap-4">
-                        {users.map((u, index) => (
-                            <div key={u._id} className="border p-4 rounded-xl shadow bg-gray-50">
-                                <div className="flex justify-between mb-3">
-                                    <h3 className="font-bold">#{(page - 1) * limit + (index + 1)}</h3>
-                                    <span
-                                        className={`px-2 py-1 text-xs rounded ${u.isBlocked
-                                                ? "bg-red-200 text-red-700"
-                                                : "bg-green-200 text-green-700"
-                                            }`}
-                                    >
-                                        {u.isBlocked ? "Blocked" : "Active"}
-                                    </span>
-                                </div>
-
-                                <p className="text-sm"><strong>User ID:</strong> {u.userId}</p>
-                                <p className="text-sm"><strong>Name:</strong> {u.name}</p>
-                                <p className="text-sm"><strong>Email:</strong> {u.email}</p>
-                                <p className="text-sm"><strong>Phone:</strong> {u.phoneNumber}</p>
-                                <p className="text-sm"><strong>Country:</strong> {u.country}</p>
-                                <p className="text-sm mt-1">
-                                    <strong>Joined:</strong> {new Date(u.createdAt).toLocaleDateString()}
-                                </p>
-
-                                <button
-                                    onClick={() => fetchBankDetails(u._id)}
-                                    className="w-full bg-blue-600 text-white px-3 py-2 mt-3 rounded hover:bg-blue-700"
-                                >
-                                    View Bank Details
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="flex justify-between items-center gap-4 mt-6">
-
-                        <button
-                            disabled={page === 1}
-                            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
-                       ${page === 1
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-gray-700 text-white hover:bg-gray-800"
-                                }`}
-                        >
-                            <span className="md:hidden">←</span>
-                            <span className="hidden md:inline">← Prev</span>
-                        </button>
-
-                        <span className="text-gray-700 font-medium ">
-                            Page {page} of {totalPages}
-                        </span>
-
-                        <button
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
-                          ${page >= totalPages
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-gray-700 text-white hover:bg-gray-800"
-                                }`}
-                        >
-                            <span className="md:hidden">→</span>
-                            <span className="hidden md:inline">Next →</span>
-                        </button>
-
-                    </div>
-                </>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             )}
 
-            {/* Bank Details Modal */}
+            {/* ---------- POPUP EXACTLY BESIDE THE BUTTON ---------- */}
             {modalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-                    <div className="bg-white p-6 rounded-xl w-96 shadow-lg">
-                        <h3 className="text-xl font-bold mb-4">Bank Details</h3>
-
-                        {bankDetails ? (
-                            <ul className="space-y-2 text-sm">
-                                <li><strong>Account Holder:</strong> {bankDetails.name}</li>
-                                <li><strong>Bank:</strong> {bankDetails.bankName}</li>
-                                <li><strong>Account No:</strong> {bankDetails.accountNumber}</li>
-                                <li><strong>IFSC:</strong> {bankDetails.ifsc}</li>
-                            </ul>
-                        ) : (
-                            <p>No Bank Details Found</p>
-                        )}
+                <div
+                    className="fixed z-50"
+                    style={{
+                        top: popupPosition.y,
+                        left: popupPosition.x,
+                    }}
+                >
+                    <div className="bg-white w-56 rounded-xl p-3 shadow-xl border relative">
 
                         <button
-                            className="mt-5 bg-red-500 text-white px-4 py-2 rounded-lg w-full"
                             onClick={() => setModalOpen(false)}
+                            className="absolute top-1 right-2 text-gray-500 hover:text-black"
                         >
-                            Close
+                            ✕
                         </button>
+
+                        <h3 className="text-sm font-bold mb-2">Select Details</h3>
+
+                        <div className="flex flex-col gap-2">
+                            {TABS.map((t) => (
+                                <button
+                                    key={t}
+                                    onClick={() => goToDetailsPage(t)}
+                                    className="bg-gray-200 hover:bg-gray-300 text-xs py-1 rounded"
+                                >
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}
+
+            {/* Pagination */}
+            <div className="flex justify-between items-center gap-4 mt-6">
+                <button
+                    disabled={page === 1}
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                    className={`px-4 py-2 rounded-lg shadow-md 
+                        ${page === 1
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-gray-700 text-white hover:bg-gray-800"
+                        }`}
+                >
+                    ← Prev
+                </button>
+
+                <span className="text-gray-700 font-medium">
+                    Page {page} of {totalPages}
+                </span>
+
+                <button
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                    className={`px-4 py-2 rounded-lg shadow-md 
+                        ${page >= totalPages
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-gray-700 text-white hover:bg-gray-800"
+                        }`}
+                >
+                    Next →
+                </button>
+            </div>
         </div>
     );
 };

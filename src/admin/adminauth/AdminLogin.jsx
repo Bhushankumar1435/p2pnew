@@ -6,7 +6,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-// ⬇️ Import functions that now use adminPost wrapper
 import {
   AdminSignin,
   AdminVerifySignin,
@@ -178,7 +177,7 @@ const AdminLogin = () => {
 
   return (
     <div className="max-w-[600px] mx-auto">
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="min-h-screen px-6 py-4 flex flex-col items-center justify-between bg-white text-black">
 
         <div className="w-full text-center">
@@ -217,7 +216,7 @@ const AdminLogin = () => {
                   className="w-full px-4 py-2 pr-10 border rounded-md"
                 />
                 <div
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                  className="absolute right-3 top-3/4 transform -translate-y-1/2 cursor-pointer text-gray-500"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}

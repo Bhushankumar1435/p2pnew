@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { AddSubAdminApi } from "../../api/Adminapi";   // ✅ Correct import
+import { toast, ToastContainer } from "react-toastify";
+import { AddSubAdminApi } from "../../api/Adminapi";   
 
 const AddSubAdmin = () => {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const AddSubAdmin = () => {
 
     setLoading(true);
 
-    const res = await AddSubAdminApi(form); // ✅ Updated API call
+    const res = await AddSubAdminApi(form);
 
     if (!res.success) {
       toast.error(res.message || "Failed to create Sub-Admin");
@@ -40,17 +40,16 @@ const AddSubAdmin = () => {
 
     toast.success(res.message || "Sub-Admin created successfully!");
 
-    setTimeout(() => navigate("/admin/subadminList"), 700); // ✅ Better redirect
+    setTimeout(() => navigate("/admin/subadmin-list"), 700);
 
     setLoading(false);
   };
 
   return (
     <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-md mt-10">
+      <ToastContainer position="top-right" autoClose={3000} />
       <h2 className="text-2xl font-bold mb-6 text-center">Add Sub-Admin</h2>
-
       <form onSubmit={handleSubmit} className="space-y-4">
-
         <div>
           <label className="block text-sm font-medium mb-1">Full Name</label>
           <input

@@ -3,6 +3,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CopyIcon from "../assets/images/copy_icon.png";
 import { getData } from "../api/protectedApi"; 
+import { ToastContainer, toast } from 'react-toastify';
+
 
 const Orders = () => {
   const [tab, setTab] = useState("all_orders");
@@ -52,6 +54,8 @@ const Orders = () => {
 
   return (
     <div className="max-w-[600px] mx-auto w-full bg-[var(--primary)]">
+            <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="min-h-screen flex flex-col items-center bg-white text-black">
         <div className="h-[calc(100vh_-_56px)] overflow-auto w-full bg-[var(--primary)]">
           <Header />
