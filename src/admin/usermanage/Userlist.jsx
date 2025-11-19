@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { GetAdminUsersApi } from "../../api/Adminapi";
 import { useNavigate } from "react-router-dom";
+import { postData } from "../../api/protectedApi"; 
 
 const UserList = () => {
     const navigate = useNavigate();
@@ -12,7 +13,6 @@ const UserList = () => {
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
-    // Popup
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -50,24 +50,38 @@ const UserList = () => {
     // Open popup exactly beside clicked "View"
     const openPopup = (event, userId) => {
         const rect = event.target.getBoundingClientRect();
-
-        const popupWidth = 220; // width of your popup (adjust if needed)
-        const gap = 10; // space between button and popup
+        const popupWidth = 220;
+        const gap = 10;
 
         setPopupPosition({
-            x: rect.left - popupWidth - gap,  // LEFT SIDE of the View button
-            y: rect.top + window.scrollY      // same vertical alignment
+            x: rect.left - popupWidth - gap,
+            y: rect.top + window.scrollY
         });
 
         setSelectedUser(userId);
         setModalOpen(true);
     };
 
-
     // Navigate to user details page
     const goToDetailsPage = (type) => {
         navigate(`/admin/userDetails?type=${type}&id=${selectedUser}`);
         setModalOpen(false);
+    };
+
+    // Block/Unblock user
+    const toggleBlockUser = async (userId, isBlocked) => {
+        try {
+            const action = isBlocked ? "unblock" : "block";
+            const res = await postData(`/admin/unblockUser`, { userId }); 
+            if (res.data.success) {
+                alert(`User ${action}ed successfully!`);
+                fetchUsers(); 
+            } else {
+                alert(res.data.message || `Failed to ${action} user`);
+            }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
@@ -86,27 +100,41 @@ const UserList = () => {
                                 <th className="py-2 px-3 border">Name</th>
                                 <th className="py-2 px-3 border">Email</th>
                                 <th className="py-2 px-3 border">Phone</th>
-                                <th className="py-2 px-3 border">Status</th>
-                                <th className="py-2 px-3 border">View</th>
+                                <th className="py-2 px-3 border border-b-0">Status</th>
+                                <th className="py-2 px-3 border">More Details</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             {users.map((u, index) => (
                                 <tr key={u._id} className="text-center hover:bg-gray-50">
-                                    <td className="border py-2">
-                                        {(page - 1) * limit + index + 1}
-                                    </td>
+                                    <td className="border py-2">{(page - 1) * limit + index + 1}</td>
                                     <td className="border py-2">{u.userId}</td>
                                     <td className="border py-2">{u.name}</td>
                                     <td className="border py-2">{u.email}</td>
                                     <td className="border py-2">{u.phoneNumber}</td>
 
-                                    <td className="border py-2">
+                                    <td className="border-t py-2 flex justify-center items-center gap-2">
                                         {u.isBlocked ? (
-                                            <span className="text-red-600 font-bold">Blocked</span>
+                                            <>
+                                                <span className="text-red-600 font-bold">Blocked</span>
+                                                <button
+                                                    onClick={() => toggleBlockUser(u._id, true)}
+                                                    className="text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                                >
+                                                    Unblock
+                                                </button>
+                                            </>
                                         ) : (
-                                            <span className="text-green-600 font-bold">Active</span>
+                                            <>
+                                                <span className="text-green-600 font-bold">Active</span>
+                                                <button
+                                                    onClick={() => toggleBlockUser(u._id, false)}
+                                                    className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                                                >
+                                                    Block
+                                                </button>
+                                            </>
                                         )}
                                     </td>
 
@@ -135,7 +163,6 @@ const UserList = () => {
                     }}
                 >
                     <div className="bg-white w-56 rounded-xl p-3 shadow-xl border relative">
-
                         <button
                             onClick={() => setModalOpen(false)}
                             className="absolute top-1 right-2 text-gray-500 hover:text-black"
@@ -165,11 +192,11 @@ const UserList = () => {
                 <button
                     disabled={page === 1}
                     onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                    className={`px-4 py-2 rounded-lg shadow-md 
-                        ${page === 1
+                    className={`px-4 py-2 rounded-lg shadow-md ${
+                        page === 1
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                             : "bg-gray-700 text-white hover:bg-gray-800"
-                        }`}
+                    }`}
                 >
                     ← Prev
                 </button>
@@ -181,11 +208,11 @@ const UserList = () => {
                 <button
                     disabled={page >= totalPages}
                     onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                    className={`px-4 py-2 rounded-lg shadow-md 
-                        ${page >= totalPages
+                    className={`px-4 py-2 rounded-lg shadow-md ${
+                        page >= totalPages
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                             : "bg-gray-700 text-white hover:bg-gray-800"
-                        }`}
+                    }`}
                 >
                     Next →
                 </button>

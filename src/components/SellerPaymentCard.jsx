@@ -18,27 +18,36 @@ const BuyerPaymentCard = ({ id, closeSellerForm }) => {
       .catch((err) => console.error(err));
   }, [id]);
 
-  const updateOrderStatus = async (status) => {
-    const showStatus = status === 'CONFIRMED' ? 'Confirm' : 'Reject';
-    const confirmed = window.confirm(`Are you sure you want to ${showStatus} this order?`);
+const updateOrderStatus = async (status) => {
+  const showStatus = status === 'CONFIRMED' ? 'Confirm' : 'Reject';
+  const confirmed = window.confirm(`Are you sure you want to ${showStatus} this order?`);
 
-    if (!confirmed) return;
+  if (!confirmed) return;
 
-    try {
-      const resp = await postData('user/confirmCurrency', { id, status });
-      if (resp.data.success) {
-        toast.success(resp.data.message);
-        setTimeout(() => {
-          closeSellerForm();
-        }, 3000);
-      } else {
-        toast.error(resp.data.message || 'Failed to update status');
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong!');
+  try {
+    const resp = await postData('/user/confirmCurrency', { id, status });
+
+    console.log("API Response:", resp);
+
+    // Safety fix: ensure resp is always an object
+    const success = resp?.success ?? false;
+    const message = resp?.message ?? "Something went wrong";
+
+    if (success) {
+      toast.success(message);
+      setTimeout(() => {
+        closeSellerForm();
+      }, 1500);
+    } else {
+      toast.error(message);
     }
-  };
+
+  } catch (err) {
+    console.error("Caught Error:", err);
+    toast.error(err?.message || "Something went wrong");
+  }
+};
+
 
   if (!dealDetail) return null;
 

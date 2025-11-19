@@ -37,11 +37,7 @@ const Settings = () => {
   // ✅ Move settingsItems here to access currentLang and changeLanguage
   const settingsItems = [
     {
-      icon: React.createElement("img", {
-        src: AccountIcon,
-        alt: "Account",
-        className: "w-5 h-5"
-      }),
+      icon: React.createElement("img", {src: AccountIcon, alt: "Account",className: "w-5 h-5"}),
       label: t("AccountManagement"),
       link: "/account"
     },

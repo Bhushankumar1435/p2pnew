@@ -38,9 +38,9 @@ export default function Account() {
 
   const menuItems = [
     { label: "Activate", path: "/activateaccount" },
-    { label: "History", path: "/history" },
+    { label: "Wallet", path: "/history" },
     { label: "Deposit", path: "deposit" },
-    { label: "Bonus", path: "/bonus" },
+    // { label: "Bonus", path: "/bonus" },
     { label: "Withdraw", path: "/withdraw" },
     { label: "Income", path: "/Income" },
   ];
