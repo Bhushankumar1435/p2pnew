@@ -5,70 +5,91 @@ import { toast, ToastContainer } from "react-toastify";
 
 import Timer from "./Timer";
 import ExchangeIcon from "../assets/images/exchnage.png";
-import DealModal from "./DealModal";
 import BuyerPaymentCard from "../components/BuyerPaymentCard";
 import UsdtIcon from "../assets/images/usdt.png";
 
 const Deal = () => {
   const [dealList, setDealList] = useState([]);
-  const [currentDeal, setCurrentDetail] = useState(false);
+  const [currentDeal, setCurrentDeal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isBuyerFormOpen, setIsBuyerFormOpen] = useState(false);
   const [dealDetail, setDealDetail] = useState({});
   const [currentDealId, setCurrentDealId] = useState(null);
 
+  const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
   const navigate = useNavigate();
 
   // =======================
-  // Fetch Deals Function
+  // FETCH DEALS
   // =======================
-  const fetchDeals = () => {
-    getData("/user/allDeals", {})
-      .then((res) => {
-        const d = res?.data?.data;
+  const fetchDeals = async (pageToLoad = 1) => {
+    try {
+      const res = await getData("/user/allDeals", { page: pageToLoad, limit: 10 });
+      const d = res?.data?.data;
+      if (!d) return;
 
-        if (!d) return;
-
-        if (d.dealStatus === false) {
-          setDealList(d.deals || []);
-          setCurrentDetail(false);
+      if (d.dealStatus === false) {
+        const newDeals = d.deals || [];
+        if (pageToLoad === 1) {
+          setDealList(newDeals);
         } else {
-          setCurrentDetail(d.deal || false);
-          setDealList([]);
+          setDealList((prev) => [...prev, ...newDeals]);
         }
-      })
-      .catch((err) => console.error(err));
+
+        setHasMore(newDeals.length >= 10); // If < 10 deals, stop loading
+        setCurrentDeal(false);
+      } else {
+        setCurrentDeal(d.deal || false);
+        setDealList([]);
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingMore(false);
+    }
   };
 
-  // Fetch on mount
   useEffect(() => {
-    fetchDeals();
+    fetchDeals(1); // initial load
   }, []);
 
   // =======================
-  // Auto-Refresh Every 5s
+  // Infinite scroll
   // =======================
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchDeals();
-    }, 5000);
+    const onScroll = () => {
+      if (loadingMore || !hasMore) return;
 
-    return () => clearInterval(interval);
-  }, []);
+      if (
+        window.innerHeight + document.documentElement.scrollTop + 100 >=
+        document.documentElement.scrollHeight
+      ) {
+        setLoadingMore(true);
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchDeals(nextPage);
+      }
+    };
 
-  // OPEN MODAL
-  const showDealDetails = (deal) => {
-    setDealDetail(deal);
-    setIsOpen(true);
-  };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [page, hasMore, loadingMore]);
 
-  // BUYER PAYMENT FORM CLOSE
-  const hideBuyerPaymentCard = () => {
-    setIsBuyerFormOpen(false);
+  // =======================
+  // Utility: Show backend messages safely
+  // =======================
+  const showBackendMessage = (res, fallback = "Something went wrong") => {
+    const message =
+      res?.message ?? res?.data?.message ?? res?.data ?? fallback;
+    return message;
   };
 
   // =======================
-  // PICK DEAL
+  // Pick Deal
   // =======================
   const handleDeal = async (dealId) => {
     const confirmed = window.confirm("Are you sure you want to pick this deal?");
@@ -77,18 +98,18 @@ const Deal = () => {
     try {
       const res = await postData("/user/pickDeal", { id: dealId });
 
-      if (res?.success) {
-        toast.success("Deal picked successfully!");
+      if (res?.success === true) {
+        toast.success(showBackendMessage(res, "Deal picked successfully"));
         setIsOpen(false);
-
-        // Refresh after action
-        fetchDeals();
-      } else {
-        toast.error(res?.data?.message || "Failed to pick deal.");
+        fetchDeals(1);
+        setPage(1);
+        return;
       }
+
+      toast.error(showBackendMessage(res, "Failed to pick deal"));
     } catch (err) {
       console.error(err);
-      toast.error("Failed to pick deal. Please try again.");
+      toast.error("Request failed. Try again.");
     }
   };
 
@@ -96,12 +117,9 @@ const Deal = () => {
     <>
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* ======================= */}
-      {/* Active / Current Deal */}
-      {/* ======================= */}
+      {/* Current Active Deal */}
       {currentDeal && (
-        <div className="border border-[var(--bg-color)] pt-2 px-4 pb-4 rounded-xl relative">
-
+        <div className="border border-[var(--bg-color)] pt-2 px-4 pb-4 rounded-xl relative mb-4">
           <div className="flex justify-between items-center mb-1">
             <div className="flex items-center">
               <img src={UsdtIcon} className="w-5 h-5" alt="usdt" />
@@ -121,7 +139,6 @@ const Deal = () => {
                 ₹{currentDeal?.deal?.price}
                 <span className="text-sm text-gray-500">/USDT</span>
               </div>
-
               <div className="text-xs text-gray-500">
                 Quantity: {currentDeal?.deal?.availableAmount} <br />
                 Payable: {currentDeal?.fiatAmount} ₹
@@ -161,17 +178,16 @@ const Deal = () => {
         </div>
       )}
 
-      {/* Buyer Payment Card */}
       {isBuyerFormOpen && (
-        <BuyerPaymentCard id={currentDealId} closeBuyerForm={hideBuyerPaymentCard} />
+        <BuyerPaymentCard
+          id={currentDealId}
+          closeBuyerForm={() => setIsBuyerFormOpen(false)}
+        />
       )}
 
-      {/* ======================= */}
       {/* Deal Modal */}
-      {/* ======================= */}
       {isOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-
           <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
             <button
               onClick={() => setIsOpen(false)}
@@ -181,22 +197,21 @@ const Deal = () => {
             </button>
 
             <div className="flex flex-col items-center">
-
               <div className="flex justify-between items-center w-full border-b pb-3 mb-4">
-                <h2 className="text-base font-medium">
-                  {dealDetail?.seller?.name}
-                </h2>
+                <h2 className="text-base font-medium">{dealDetail?.seller?.name}</h2>
               </div>
 
-              <div className="flex justify-between items-center gap-3 mb-4">
-                <div className="flex items-center gap-2 bg-[var(--button-light)] px-3 py-2 rounded-lg text-sm flex-1">
+              <div className="w-full flex justify-between items-center gap-3 mb-4">
+                <div className="flex items-center justify-center gap-2 bg-[var(--button-light)] px-3 py-2 rounded-lg text-sm flex-1">
                   <span className="text-black font-semibold">From</span>
-                  <span className="text-black">₹ Rupees</span>
+                  <span className="text-black flex items-center ">
+                    <span className="block">₹</span> Rupees
+                  </span>
                 </div>
 
                 <img src={ExchangeIcon} alt="exchange" />
 
-                <div className="flex items-center gap-3 bg-[var(--button-light)] px-3 py-2 rounded-lg text-sm flex-1">
+                <div className="flex items-center justify-center gap-3 bg-[var(--button-light)] px-3 py-2 rounded-lg text-sm flex-1">
                   <span className="text-black font-semibold">To</span>
                   <span className="flex items-center gap-1">
                     <img className="h-4 w-4" src={UsdtIcon} alt="usdt" />
@@ -205,7 +220,6 @@ const Deal = () => {
                 </div>
               </div>
 
-              {/* Amount */}
               <div className="w-full mb-2 flex justify-between">
                 <label className="text-sm text-gray-600">Amount</label>
                 <span className="text-black text-sm">
@@ -228,18 +242,15 @@ const Deal = () => {
               </button>
             </div>
           </div>
-
         </div>
       )}
 
-      {/* ======================= */}
       {/* All Deals List */}
-      {/* ======================= */}
       {dealList.length > 0 &&
         dealList.map((deal, index) => (
           <div
             key={index}
-            className="border-b border-[var(--border-light)] pt-0 px-4 pb-4 hover:border-blue-500 hover:rounded-md"
+            className="border-b border-[var(--border-light)] pt-0 px-4 pb-4 hover:border-2 hover:border-blue-500 hover:rounded-md"
           >
             <div className="flex justify-between items-center mb-1">
               <div className="flex items-center">
@@ -250,9 +261,7 @@ const Deal = () => {
               </div>
             </div>
 
-            <div className="text-xs text-gray-600 mb-2">
-              Deal - #{deal._id}
-            </div>
+            <div className="text-xs text-gray-600 mb-2">Deal - #{deal._id}</div>
 
             <div className="flex justify-between items-end">
               <div>
@@ -268,7 +277,10 @@ const Deal = () => {
               </div>
 
               <button
-                onClick={() => showDealDetails(deal)}
+                onClick={() => {
+                  setDealDetail(deal);
+                  setIsOpen(true);
+                }}
                 className="bg-[var(--red)] text-white text-sm px-4 py-[6px] rounded"
               >
                 Deal
@@ -276,6 +288,11 @@ const Deal = () => {
             </div>
           </div>
         ))}
+
+      {/* Bottom Loader */}
+      {loadingMore && (
+        <div className="text-center py-4 text-gray-500">Loading more deals...</div>
+      )}
     </>
   );
 };

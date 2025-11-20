@@ -68,18 +68,18 @@ export default function History() {
                     </div> */}
                     <div className="w-full flex flex-col gap-2">
                       <div className="w-full flex justify-between items-center">
-                        <button className="bg-gray-100 text-red-600 font-medium px-2 py-1 rounded-md hover:bg-red-100">
+                        <button className=" text-red-600 font-medium  rounded-md hover:bg-red-100">
                           {activity.transactionType}
                         </button>
-                        <p className="text-2xl font-semibold text-black mt-1">
-                          {activity.amount}{" "}
+                        <p className="text-xl font-semibold text-black mt-1">
+                          {activity.amount}{"/"}
                           <span className="text-sm font-normal text-gray-500">
                             {activity.token || "USDT"}
                           </span>
                         </p>
                       </div>
                       <div className="w-full flex justify-between items-center">
-                        <button className="border border-black text-black font-medium px-2 rounded-md hover:bg-black hover:text-white transition">
+                        <button className=" text-black font-medium  rounded-md hover:bg-black hover:text-white transition">
                           Details
                         </button>
                         <p className="text-sm text-gray-600 mt-1">

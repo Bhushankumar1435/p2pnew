@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { FaMoneyCheckAlt, FaWallet, FaChartLine, FaUsers, FaHandshake, FaTicketAlt, FaUserPlus, FaCogs, FaMoneyBillWave } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getAdminDashboard } from "../api/Adminapi";
 import AddSubAdmin from "./subadminManage/AddSubAdmin";
@@ -9,6 +10,10 @@ import SubadminDeposit from "./subadminManage/SubadminDeposit";
 import Userlist from "./usermanage/Userlist";
 import ManageDeals from "./usermanage/ManageDeals";
 import TicketHistory from "./usermanage/TicketHistory";
+import TransferFund from "./TransferFund/TransferFund";
+import WalletHistory from "./TransferFund/WalletHistory";
+import IncomeHistory from "./TransferFund/IncomeHistory";
+import WithdrawOrders from "./TransferFund/WithdrawOrders";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +24,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showSubMenu, setShowSubMenu] = useState(false);
   const [showUserSubMenu, setShowUserSubMenu] = useState(false);
+  const [transferFundMenu, setTransferFundMenu] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
@@ -83,6 +89,7 @@ const AdminDashboard = () => {
                 onClick={() => {
                   setShowSubMenu(!showSubMenu);
                   setShowUserSubMenu(false);
+                  setTransferFundMenu(false);
                 }}
                 className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition 
                 ${showSubMenu ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
@@ -97,25 +104,33 @@ const AdminDashboard = () => {
                 <div className="pl-4 space-y-2 mt-2">
                   <button
                     onClick={() => setActiveTab("addSubAdmin")}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100" >
-                    ➕ Add Sub-Admin
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaUserPlus /> Add Sub-Admin
                   </button>
+
                   <button
                     onClick={() => setActiveTab("subAdminList")}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100" >
-                    📋 Sub-Admin List
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaUsers /> Sub-Admin List
                   </button>
+
                   <button
                     onClick={() => setActiveTab("subAdminRequests")}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100" >
-                    ⚙️ Sub-Admin Request
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaCogs /> Sub-Admin Requests
                   </button>
+
                   <button
                     onClick={() => setActiveTab("subDepositTxn")}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100" >
-                    💰 Deposit Transactions
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaMoneyBillWave /> Deposit Transactions
                   </button>
                 </div>
+
               )}
             </div>
             {/* User Admin Menu */}
@@ -125,6 +140,8 @@ const AdminDashboard = () => {
                 onClick={() => {
                   setShowUserSubMenu(!showUserSubMenu);
                   setShowSubMenu(false);
+                  setTransferFundMenu(false);
+
                 }}
                 className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition 
                 ${showUserSubMenu ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}  >
@@ -132,24 +149,77 @@ const AdminDashboard = () => {
                 {showUserSubMenu ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
               </button>
               {showUserSubMenu && (
+
                 <div className="pl-4 space-y-2 mt-2">
                   <button
                     onClick={() => setActiveTab("userList")}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100"   >
-                    📋 User List
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaUsers /> User List
                   </button>
-                  
+
                   <button
                     onClick={() => setActiveTab("manageDeals")}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100" >
-                    🤝 Deals
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaHandshake /> Deals
                   </button>
+
                   <button
                     onClick={() => setActiveTab("ticketHistory")}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100" >
-                    🎟 Ticket History
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaTicketAlt /> Ticket History
+                  </button>
+
+                </div>
+
+              )}
+            </div>
+            <div>
+              <button
+                onClick={() => {
+                  setTransferFundMenu(!transferFundMenu);
+                  setShowSubMenu(false);
+                  setShowUserSubMenu(false);
+                }}
+                className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition 
+                ${transferFundMenu ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}  >
+                Transfer Fund
+                {transferFundMenu ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              </button>
+              {transferFundMenu && (
+
+                <div className="pl-4 space-y-2 mt-2">
+                  <button
+                    onClick={() => setActiveTab("transferfund")}
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaMoneyCheckAlt /> Transfer Fund
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("wallethistory")}
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaWallet /> Wallet History
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("incomehistory")}
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaChartLine /> Income History
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("withdraworders")}
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <FaTicketAlt /> Withdraw Orders
                   </button>
                 </div>
+
               )}
             </div>
 
@@ -202,12 +272,14 @@ const AdminDashboard = () => {
 
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Active Deals</h2>
-                  <p className="text-3xl font-bold">46</p>
+                  <p className="text-3xl font-bold">{dashboardData.activeDeals || 0}</p>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
-                  <p className="text-3xl font-bold">$12,760</p>
+                  <p className="text-3xl font-bold">
+                    ${dashboardData.totalRevenue?.toLocaleString() || 0}
+                  </p>
                 </div>
 
               </div>
@@ -234,6 +306,16 @@ const AdminDashboard = () => {
 
         {activeTab === "ticketHistory" && <TicketHistory />}
 
+
+        {/* Transfer-Fund */}
+
+        {activeTab === "transferfund" && <TransferFund />}
+
+        {activeTab === "wallethistory" && <WalletHistory />}
+
+        {activeTab === "incomehistory" && <IncomeHistory />}
+
+        {activeTab === "withdraworders" && <WithdrawOrders />}
 
       </div>
     </div>

@@ -15,9 +15,7 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState('info');
   const [loading, setLoading] = useState(false);
 
-  // ================================
   // FETCH PROFILE
-  // ================================
   useEffect(() => {
     getData('/user/userProfile', {})
       .then((res) => {
@@ -26,38 +24,32 @@ const Profile = () => {
       .catch((err) => console.error('❌ Profile fetch error:', err));
   }, []);
 
-  // ================================
   // FETCH MY DEALS
-  // ================================
- const fetchAds = async () => {
-  try {
-    setLoading(true);
+  const fetchAds = async () => {
+    try {
+      setLoading(true);
 
-    const res = await getData('/user/myDeals', { limit: 50, page: 1 });
+      const res = await getData('/user/myDeals', { limit: 50, page: 1 });
 
-    const deals = res?.data?.data?.deals || [];
-    const count = res?.data?.data?.count || 0;
+      const deals = res?.data?.data?.deals || [];
+      const count = res?.data?.data?.count || 0;
 
-    console.log("Deals:", deals);
-    console.log("Count:", count);
+      console.log("Deals:", deals);
+      console.log("Count:", count);
 
-    setAds(deals); 
-  } catch (error) {
-    console.error("Deals error:", error);
-    setAds([]);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      setAds(deals);
+    } catch (error) {
+      console.error("Deals error:", error);
+      setAds([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchAds();
   }, []);
 
-  // ================================
-  // ADS COUNT
-  // ================================
   const tabs = useMemo(
     () => [
       { key: "info", label: "Info" },
@@ -94,19 +86,24 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* NAME */}
+                {/* USER NAME + USER ID */}
                 <div className="w-full mt-3 px-4">
                   {!profile ? (
                     <p className="text-gray-500">Loading...</p>
                   ) : (
                     <>
                       <h2 className="font-semibold text-lg flex items-center gap-1">
-                        {t('hello')} {profile?.name}
+                        <div className="w-full flex justify-between items-center">
+                        <div className="flex gap-2 items-center">
+                        {t}  {profile?.name}    
                         <img
                           src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png"
                           alt="verified"
                           className="h-4 w-4"
-                        />
+                        /></div>
+
+                        {t("Id - ")}{profile?.userId}
+                        </div>
                       </h2>
                     </>
                   )}

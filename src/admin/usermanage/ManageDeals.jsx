@@ -14,22 +14,30 @@ const ManageDeals = () => {
   }, [page]);
 
   const fetchDeals = async () => {
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const res = await GetAdminDealsApi(page, limit);
+  try {
+    const res = await GetAdminDealsApi(page, limit);
 
-      if (res.success) {
-        setDeals(res.data.deals || []);
-        const total = res.data.count || 1;
-        setTotalPages(Math.ceil(total / limit));
+    if (res.success) {
+      const newDeals = res.data.deals || [];
+
+      if (page === 1) {
+        setDeals(newDeals);       // reset first page
+      } else {
+        setDeals((prev) => [...prev, ...newDeals]); // append next pages
       }
-    } catch (err) {
-      console.error("Deals Error:", err);
-    } finally {
-      setLoading(false);
+
+      const total = res.data.count || 1;
+      setTotalPages(Math.ceil(total / limit));
     }
-  };
+  } catch (err) {
+    console.error("Deals Error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">

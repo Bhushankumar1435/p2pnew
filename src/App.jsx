@@ -56,6 +56,10 @@ import SubAdminrequest from "./admin/subadminManage/SubAdminrequest";
 import ManageDeals from "./admin/usermanage/ManageDeals";
 import TicketHistory from "./admin/usermanage/TicketHistory";
 import UserList from "./admin/usermanage/Userlist";
+import TransferFund from "./admin/TransferFund/TransferFund";
+import WalletHistory from "./admin/TransferFund/WalletHistory";
+import IncomeHistory from "./admin/TransferFund/IncomeHistory";
+import WithdrawOrders from "./admin/TransferFund/WithdrawOrders";
 
 
 import "react-toastify/dist/ReactToastify.css";
@@ -124,6 +128,10 @@ const App = () => {
       <Route path="/admin/manageDeals" element={<AdminAuthGuard> <ManageDeals />  </AdminAuthGuard>} />
       <Route path="/admin/tickethistory" element={<AdminAuthGuard><TicketHistory /></AdminAuthGuard>} />
       <Route path="/admin/Userlist" element={<AdminAuthGuard><UserList /> </AdminAuthGuard>} />
+      <Route path="/admin/transferfund" element={<AdminAuthGuard><TransferFund /> </AdminAuthGuard>} />
+      <Route path="/admin/wallethistory" element={<AdminAuthGuard><WalletHistory /> </AdminAuthGuard>} />
+      <Route path="/admin/incomehistory" element={<AdminAuthGuard><IncomeHistory /> </AdminAuthGuard>} />
+      <Route path="/admin/withdraworders" element={<AdminAuthGuard><WithdrawOrders /> </AdminAuthGuard>} />
     </Routes>
   );
 };

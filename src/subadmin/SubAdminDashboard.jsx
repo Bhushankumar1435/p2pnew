@@ -44,7 +44,6 @@ const SubAdminDashboard = () => {
         if (response?.success) {
           setDashboardData(response.data || {});
         } else {
-          // optionally handle non-success case
           console.warn("getSubAdminDashboard returned no success:", response);
         }
       } catch (err) {
@@ -60,7 +59,7 @@ const SubAdminDashboard = () => {
     };
   }, []);
 
-  // Reset to page 1 when user switches to deals tab (common UX)
+  // Reset to page 1 when user switches to deals tab
   useEffect(() => {
     if (activeTab === "deals") {
       setPage(1);
@@ -77,12 +76,10 @@ const SubAdminDashboard = () => {
       try {
         const token = localStorage.getItem("sub_admin_token");
         if (!token) {
-          // If token missing, redirect to login (optional)
           navigate("/subadmin/login");
           return;
         }
 
-        // Request page & limit from backend
         const res = await fetch(
           `${API_BASE}sub-admin/requestOrders?page=${page}&limit=${limit}`,
           {
@@ -94,15 +91,12 @@ const SubAdminDashboard = () => {
         );
 
         const data = await res.json();
-
         if (!mounted) return;
 
-        // Backend shape may vary. We try a few common fields.
         const orders = data?.data?.orders || data?.orders || [];
         const totalCount =
           data?.data?.count ?? data?.data?.total ?? data?.count ?? data?.total ?? null;
 
-        // Set deals (page data)
         if (Array.isArray(orders)) {
           setAllDeals(orders);
           setDeals(orders);
@@ -111,13 +105,10 @@ const SubAdminDashboard = () => {
           setDeals([]);
         }
 
-        // Compute total pages from count if available
         if (typeof totalCount === "number") {
           const pages = Math.max(1, Math.ceil(totalCount / limit));
           setTotalPages(pages);
         } else {
-          // If backend didn't return total, we cannot compute accurate totalPages.
-          // Keep totalPages as at least 1; optionally you can derive from response length:
           setTotalPages(Math.max(1, Math.ceil((orders?.length || 0) / limit)));
         }
       } catch (err) {
@@ -128,7 +119,6 @@ const SubAdminDashboard = () => {
     };
 
     fetchDeals();
-
     return () => {
       mounted = false;
     };
@@ -152,9 +142,8 @@ const SubAdminDashboard = () => {
       const result = await res.json();
       if (result.success) {
         alert(`Order ${action} successfully!`);
-        // update local state (optimistic)
-        setAllDeals((prev) => prev.map((d) => (d._id === orderId ? { ...d, status: action } : d)));
-        setDeals((prev) => prev.map((d) => (d._id === orderId ? { ...d, status: action } : d)));
+        // REFRESH PAGE AFTER ACTION
+        window.location.reload();
       } else {
         alert(result.message || "Failed to perform action.");
       }
@@ -249,8 +238,8 @@ const SubAdminDashboard = () => {
                   <p className="text-3xl font-semibold text-purple-600">{dashboardData.activeDeals ?? 0}</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
-                  <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
-                  <p className="text-3xl font-semibold text-orange-600">${dashboardData.totalRevenue ?? 0}</p>
+                  <h2 className="text-xl font-semibold mb-2">Total Deals</h2>
+                  <p className="text-3xl font-semibold text-orange-600">{dashboardData.totalDeals ?? 0}</p>
                 </div>
               </div>
             )}
@@ -297,7 +286,6 @@ const SubAdminDashboard = () => {
             </div>
 
             <div className="bg-white p-4 sm:p-8 rounded-2xl shadow-md overflow-x-auto">
-              {/* Responsive table / cards */}
               {dealsLoading ? (
                 <p>Loading deals...</p>
               ) : deals.length > 0 ? (
@@ -314,7 +302,7 @@ const SubAdminDashboard = () => {
                           <th className="py-2 px-3 border">Token</th>
                           <th className="py-2 px-3 border">Fiat</th>
                           <th className="py-2 px-3 border">Receipt</th>
-                          <th className="py-2 px-3 border">Actions</th>
+                          <th className="py-2 px-3 border border-b-0">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -335,7 +323,7 @@ const SubAdminDashboard = () => {
                                 "—"
                               )}
                             </td>
-                            <td className="py-2 px-3 border flex justify-center flex-wrap gap-2">
+                            <td className="py-2 px-3 flex border-t justify-center flex-wrap gap-2">
                               <button onClick={() => setSelectedDeal(deal)} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
                                 More Details
                               </button>
@@ -395,39 +383,26 @@ const SubAdminDashboard = () => {
 
                   {/* Pagination Controls */}
                   <div className="flex justify-between items-center gap-4 mt-6">
-
                     <button
                       disabled={page === 1}
                       onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                      className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
-                       ${page === 1
-                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          : "bg-gray-700 text-white hover:bg-gray-800"
-                        }`}
+                      className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
                     >
                       <span className="md:hidden">←</span>
                       <span className="hidden md:inline">← Prev</span>
                     </button>
 
-                    <span className="text-gray-700 font-medium ">
-                      Page {page} of {totalPages}
-                    </span>
+                    <span className="text-gray-700 font-medium ">Page {page} of {totalPages}</span>
 
                     <button
                       disabled={page >= totalPages}
                       onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                      className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
-                          ${page >= totalPages
-                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          : "bg-gray-700 text-white hover:bg-gray-800"
-                        }`}
+                      className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page >= totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
                     >
                       <span className="md:hidden">→</span>
                       <span className="hidden md:inline">Next →</span>
                     </button>
-
                   </div>
-
                 </>
               ) : (
                 <p className="text-center text-gray-500">No orders found</p>

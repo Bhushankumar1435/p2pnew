@@ -6,7 +6,7 @@ const API_BASE = import.meta.env.VITE_API_URL;
 // --------------------------------------------
 
 // 🔹 POST wrapper
-async function adminPost(endpoint, data, auth = false) {
+export async function adminPost(endpoint, data, auth = false) {
   try {
     const headers = { "Content-Type": "application/json" };
 
@@ -139,7 +139,7 @@ export const GetUserTeamApi = (userId) =>
   adminGet(`admin/team?userId=${userId}`, true);
 
 export const BlockUnblockUserApi = (userId, action) =>
-  adminPost(`admin/blockUser?userId=${userId}&action=${action}`, {}, true);
+  adminPost("admin/blockUser", { id: userId, action }, true);
 
 
 // --------------------------------------------
