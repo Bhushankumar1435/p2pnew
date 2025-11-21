@@ -51,7 +51,7 @@ const TicketHistory = () => {
             <h2 className="text-2xl font-bold mb-4">Ticket History</h2>
 
             {loading ? (
-                <p>Loading tickets...</p>
+                <p className="text-2xl font-semibold">Loading tickets...</p>
             ) : (
                 <>
                     {/* ----------------------- Desktop Table ----------------------- */}

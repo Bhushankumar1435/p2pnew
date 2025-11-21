@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-// 🌍 Public Pages
+// Public Pages
 import Splash from "./Splash";
 import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
@@ -11,7 +11,7 @@ import VerifySignup from "./Auth/VerifySignUp";
 import ForgotPassword from "./Auth/ForgotPassword";
 import RegisterSuccess from "./Auth/RegisterSuccess";
 
-// 🧍 User Pages
+// User Pages
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Profile/Settings";
@@ -60,11 +60,8 @@ import TransferFund from "./admin/TransferFund/TransferFund";
 import WalletHistory from "./admin/TransferFund/WalletHistory";
 import IncomeHistory from "./admin/TransferFund/IncomeHistory";
 import WithdrawOrders from "./admin/TransferFund/WithdrawOrders";
-
-
-import "react-toastify/dist/ReactToastify.css";
-import "swiper/css";
-import "swiper/css/pagination";
+import DepositHistory from "./admin/TransferFund/DepositHistory";
+import AdminLayout from "./admin/AdminLayout";
 
 const App = () => {
   return (
@@ -120,18 +117,28 @@ const App = () => {
 
       {/* Admin Routes */}
       <Route path="/adminauth/login" element={<AdminLogin />} />
-      <Route path="/admin/dashboard" element={<AdminAuthGuard><AdminDashboard /></AdminAuthGuard>} />
-      <Route path="/admin/add-subadmin" element={<AdminAuthGuard><AddSubAdmin /></AdminAuthGuard>} />
-      <Route path="/admin/userDetails" element={<AdminAuthGuard><UserDetails /></AdminAuthGuard>} />
-      <Route path="/admin/SubAdmin-list" element={<AdminAuthGuard><SubAdminList /></AdminAuthGuard>} />
-      <Route path="/admin/subAdminrequest" element={<AdminAuthGuard><SubAdminrequest /></AdminAuthGuard>} />
-      <Route path="/admin/manageDeals" element={<AdminAuthGuard> <ManageDeals />  </AdminAuthGuard>} />
-      <Route path="/admin/tickethistory" element={<AdminAuthGuard><TicketHistory /></AdminAuthGuard>} />
-      <Route path="/admin/Userlist" element={<AdminAuthGuard><UserList /> </AdminAuthGuard>} />
-      <Route path="/admin/transferfund" element={<AdminAuthGuard><TransferFund /> </AdminAuthGuard>} />
-      <Route path="/admin/wallethistory" element={<AdminAuthGuard><WalletHistory /> </AdminAuthGuard>} />
-      <Route path="/admin/incomehistory" element={<AdminAuthGuard><IncomeHistory /> </AdminAuthGuard>} />
-      <Route path="/admin/withdraworders" element={<AdminAuthGuard><WithdrawOrders /> </AdminAuthGuard>} />
+      <Route path="/admin" element={<AdminAuthGuard>    <AdminLayout /> </AdminAuthGuard>}  >
+        {/* Admin dashboard */}
+        <Route path="dashboard" element={<AdminDashboard />} />
+
+        {/* Sub-Admin management */}
+        <Route path="add-subadmin" element={<AddSubAdmin />} />
+        <Route path="subadmin/list" element={<SubAdminList />} />
+        <Route path="subadmin/request" element={<SubAdminrequest />} />
+
+        {/* User management */}
+        <Route path="users" element={<UserList />} />
+        <Route path="users/details" element={<UserDetails />} />
+        <Route path="deals" element={<ManageDeals />} />
+        <Route path="tickets" element={<TicketHistory />} />
+
+        {/* Transfer Fund */}
+        <Route path="transferfund" element={<TransferFund />} />
+        <Route path="wallet-history" element={<WalletHistory />} />
+        <Route path="income-history" element={<IncomeHistory />} />
+        <Route path="withdraw-orders" element={<WithdrawOrders />} />
+        <Route path="deposit-history" element={<DepositHistory />} />
+      </Route>
     </Routes>
   );
 };

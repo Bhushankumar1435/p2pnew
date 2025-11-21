@@ -44,7 +44,7 @@ const ManageDeals = () => {
       <h2 className="text-2xl font-bold mb-4">Manage Deals</h2>
 
       {loading ? (
-        <p>Loading deals...</p>
+        <p className="text-2xl font-semibold">Loading deals...</p>
       ) : (
         <>
           {/* ----------------------- Desktop Table ----------------------- */}

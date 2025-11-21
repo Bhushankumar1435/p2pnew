@@ -92,18 +92,18 @@ const Profile = () => {
                     <p className="text-gray-500">Loading...</p>
                   ) : (
                     <>
-                      <h2 className="font-semibold text-lg flex items-center gap-1">
-                        <div className="w-full flex justify-between items-center">
-                        <div className="flex gap-2 items-center">
-                        {t}  {profile?.name}    
-                        <img
-                          src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png"
-                          alt="verified"
-                          className="h-4 w-4"
-                        /></div>
-
-                        {t("Id - ")}{profile?.userId}
+                      <h2 className="font-semibold text-lg flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                           {profile?.name}
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png"
+                            alt="verified"
+                            className="h-4 w-4"
+                          />
                         </div>
+                        <span>
+                          ID - {profile?.userId}
+                        </span>
                       </h2>
                     </>
                   )}
@@ -117,9 +117,8 @@ const Profile = () => {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`py-2 px-1 text-black relative text-nowrap ${
-                    activeTab === tab.key ? 'font-semibold' : 'text-gray-500'
-                  }`}
+                  className={`py-2 px-1 text-black relative text-nowrap ${activeTab === tab.key ? 'font-semibold' : 'text-gray-500'
+                    }`}
                 >
                   {tab.label}
                   {activeTab === tab.key && (

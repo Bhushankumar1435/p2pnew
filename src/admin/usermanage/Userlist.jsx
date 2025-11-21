@@ -46,7 +46,6 @@ const UserList = () => {
     fetchUsers();
   }, [page]);
 
-  // Open popup exactly beside clicked "View"
   const openPopup = (event, userId) => {
     const rect = event.target.getBoundingClientRect();
     const popupWidth = 220;
@@ -63,9 +62,10 @@ const UserList = () => {
 
   // Navigate to user details page
   const goToDetailsPage = (type) => {
-    navigate(`/admin/userDetails?type=${type}&id=${selectedUser}`);
-    setModalOpen(false);
-  };
+  navigate(`/admin/users/details?type=${type}&id=${selectedUser}`);
+  setModalOpen(false);
+};
+
 
   // Block/Unblock user
 const toggleBlockUser = async (userId, isBlocked) => {
@@ -91,7 +91,7 @@ const toggleBlockUser = async (userId, isBlocked) => {
       <h2 className="text-2xl font-bold mb-4">User List</h2>
 
       {loading ? (
-        <p>Loading…</p>
+        <p className="text-2xl font-semibold">Loading List…</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full border text-sm">

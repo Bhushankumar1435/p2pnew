@@ -29,7 +29,7 @@ export async function adminPost(endpoint, data, auth = false) {
 }
 
 // 🔹 GET wrapper
-async function adminGet(endpoint, auth = false) {
+export async function adminGet(endpoint, auth = false) {
   try {
     const headers = { "Content-Type": "application/json" };
 
