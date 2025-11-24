@@ -21,29 +21,30 @@ const AddSubAdmin = () => {
 
   // Submit Form
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!form.name || !form.email || !form.password) {
-      toast.error("All fields are required!");
-      return;
-    }
+  if (!form.name || !form.email || !form.password) {
+    toast.error("All fields are required!");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    const res = await AddSubAdminApi(form);
+  const res = await AddSubAdminApi(form);
 
-    if (!res.success) {
-      toast.error(res.message || "Failed to create Sub-Admin");
-      setLoading(false);
-      return;
-    }
-
-    toast.success(res.message || "Sub-Admin created successfully!");
-
-    setTimeout(() => navigate("/admin/subadmin-list"), 700);
-
+  if (!res.success) {
+    toast.error(res.message || "Failed to create Sub-Admin");
     setLoading(false);
-  };
+    return;
+  }
+
+  toast.success(res.message || "Sub-Admin created successfully!");
+
+  setTimeout(() => navigate("/admin/subadmin/list"), 700);
+
+  setLoading(false);
+};
+
 
   return (
     <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-md mt-10">

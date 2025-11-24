@@ -77,6 +77,18 @@ export async function createpassword(data) {
     return res.json()
 }
 
+export async function verifyForgotPassword(data) {
+    const res = await fetch(`${BASE_URL}user/verifyForgotPassword`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+    return res.json();
+}
+
+
 /** we have to delete these reset functions */
 export async function CreateDeal(data) {
     const TOKEN = localStorage.getItem("auth_token");
@@ -124,4 +136,18 @@ export async function depositTxn() {
         },
     })
     return res.json()
+}
+
+export async function getTeamByLevel(level) {
+    const TOKEN = localStorage.getItem("auth_token");
+
+    const res = await fetch(`${BASE_URL}user/teamByLevel?level=${level}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${TOKEN}`
+        }
+    });
+
+    return res.json();
 }

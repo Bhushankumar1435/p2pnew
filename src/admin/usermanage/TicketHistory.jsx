@@ -1,201 +1,265 @@
 import React, { useEffect, useState } from "react";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {GetAdminTicketHistoryApi,ManageAdminTicketApi } from "../../api/Adminapi";
 
-import { GetAdminTicketHistoryApi, ManageAdminTicketApi } from "../../api/Adminapi";
 
 const TicketHistory = () => {
-    const [tickets, setTickets] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
-    const [page, setPage] = useState(1);
-    const [limit] = useState(10);
-    const [totalPages, setTotalPages] = useState(1);
+  const [activeTab, setActiveTab] = useState("OPEN");
 
-    useEffect(() => {
+  // popup
+  const [showPopup, setShowPopup] = useState(false);
+  const [currentTicketId, setCurrentTicketId] = useState(null);
+  const [solution, setSolution] = useState("");
+  const [selectedAction, setSelectedAction] = useState("");
+
+  const fetchTickets = async () => {
+    setLoading(true);
+    try {
+      const res = await GetAdminTicketHistoryApi(page, limit, activeTab);
+
+      if (res.success) {
+        setTickets(res.data.ticket || []);
+        const count = res.data.count || 0;
+        setTotalPages(Math.ceil(count / limit));
+      } else {
+        toast.error(res.message || "Failed to fetch tickets");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTickets();
+  }, [page, activeTab]);
+
+  const openPopup = (ticketId, status) => {
+    setCurrentTicketId(ticketId);
+    setSelectedAction(status);
+    setSolution("");
+    setShowPopup(true);
+  };
+
+  const submitSolution = async () => {
+    if (!solution.trim()) {
+      return toast.error("Solution is required!");
+    }
+
+    try {
+      const res = await ManageAdminTicketApi(currentTicketId, {
+        status: selectedAction,
+        solution,
+      });
+
+      if (res.success) {
+        toast.success("Ticket updated!");
+        setShowPopup(false);
         fetchTickets();
-    }, [page]);
+      } else {
+        toast.error(res.message || "Failed to update");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error");
+    }
+  };
 
-    const fetchTickets = async () => {
-        setLoading(true);
-        try {
-            const res = await GetAdminTicketHistoryApi(page, limit);
-            if (res.success) {
-                setTickets(res.data.tickets || []);
-                const total = res.data.count || 1;
-                setTotalPages(Math.ceil(total / limit));
-            }
-        } catch (err) {
-            console.error("Ticket history error:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      <ToastContainer position="top-right" autoClose={3000} />
 
-    const handleStatusChange = async (ticketId, newStatus) => {
-        try {
-            const res = await ManageAdminTicketApi(ticketId, { status: newStatus });
-            if (res.success) {
-                fetchTickets(); // Refresh tickets after update
-            } else {
-                alert("Failed to update ticket");
-            }
-        } catch (err) {
-            console.error("Error updating ticket:", err);
-        }
-    };
+      <div className="w-full flex justify-between items-center">
+        <h1 className="text-2xl font-semibold mb-4">Ticket History</h1>
 
-    return (
-        <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
-                  <ToastContainer position="top-right" autoClose={3000} />
-
-            <h2 className="text-2xl font-bold mb-4">Ticket History</h2>
-
-            {loading ? (
-                <p className="text-2xl font-semibold">Loading tickets...</p>
-            ) : (
-                <>
-                    {/* ----------------------- Desktop Table ----------------------- */}
-                    <div className="hidden md:block overflow-x-auto">
-                        <table className="min-w-full border text-sm">
-                            <thead className="bg-blue-50 text-center">
-                                <tr>
-                                    <th className="py-2 px-3 border">S.No</th>
-                                    <th className="py-2 px-3 border">Ticket ID</th>
-                                    <th className="py-2 px-3 border">User ID</th>
-                                    <th className="py-2 px-3 border">Subject</th>
-                                    <th className="py-2 px-3 border">Status</th>
-                                    <th className="py-2 px-3 border">Created At</th>
-                                    <th className="py-2 px-3 border">Action</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                {tickets.length > 0 ? (
-                                    tickets.map((t, index) => (
-                                        <tr key={t._id} className="hover:bg-gray-50 text-center">
-                                            <td className="py-2 px-3 border">
-                                                {(page - 1) * limit + (index + 1)}
-                                            </td>
-                                            <td className="py-2 px-3 border">{t.ticketId}</td>
-                                            <td className="py-2 px-3 border">{t.userId?.userId || "—"}</td>
-                                            <td className="py-2 px-3 border">{t.subject}</td>
-                                            <td className="py-2 px-3 border">
-                                                <span
-                                                    className={`px-2 py-1 rounded text-xs ${
-                                                        t.status === "OPEN"
-                                                            ? "bg-yellow-200 text-yellow-700"
-                                                            : t.status === "CLOSED"
-                                                                ? "bg-green-200 text-green-700"
-                                                                : "bg-gray-300 text-gray-700"
-                                                    }`}
-                                                >
-                                                    {t.status}
-                                                </span>
-                                            </td>
-                                            <td className="py-2 px-3 border">
-                                                {new Date(t.createdAt).toLocaleString()}
-                                            </td>
-                                            <td className="py-2 px-3 border">
-                                                <select
-                                                    value={t.status}
-                                                    onChange={(e) =>
-                                                        handleStatusChange(t._id, e.target.value)
-                                                    }
-                                                    className="border rounded px-2 py-1 text-sm"
-                                                >
-                                                    <option value="OPEN">OPEN</option>
-                                                    <option value="IN_PROGRESS">IN_PROGRESS</option>
-                                                    <option value="CLOSED">CLOSED</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="7" className="py-4 text-center text-gray-500">
-                                            No tickets found.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* ----------------------- Mobile Cards ----------------------- */}
-                    <div className="md:hidden flex flex-col gap-4">
-                        {tickets.map((t, index) => (
-                            <div key={t._id} className="border rounded-xl p-4 bg-gray-50 shadow">
-                                <div className="flex justify-between mb-2">
-                                    <h3 className="font-bold">#{(page - 1) * limit + (index + 1)}</h3>
-
-                                    <span className="px-2 py-1 text-xs rounded bg-blue-200 text-blue-700">
-                                        {t.status}
-                                    </span>
-                                </div>
-
-                                <p><strong>Ticket ID:</strong> {t.ticketId}</p>
-                                <p><strong>User:</strong> {t.userId?.userId || "—"}</p>
-                                <p><strong>Subject:</strong> {t.subject}</p>
-
-                                <p className="text-sm mt-2">
-                                    <strong>Created:</strong>{" "}
-                                    {new Date(t.createdAt).toLocaleString()}
-                                </p>
-
-                                {/* Mobile Status Change */}
-                                <div className="mt-2">
-                                    <select
-                                        value={t.status}
-                                        onChange={(e) =>
-                                            handleStatusChange(t._id, e.target.value)
-                                        }
-                                        className="border rounded px-2 py-1 text-sm w-full"
-                                    >
-                                        <option value="OPEN">OPEN</option>
-                                        <option value="IN_PROGRESS">IN_PROGRESS</option>
-                                        <option value="CLOSED">CLOSED</option>
-                                    </select>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* ----------------------- Pagination ----------------------- */}
-                    <div className="flex justify-between items-center gap-4 mt-6">
-                        <button
-                            disabled={page === 1}
-                            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
-                             ${page === 1
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-gray-700 text-white hover:bg-gray-800"
-                                }`}
-                        >
-                            <span className="md:hidden">←</span>
-                            <span className="hidden md:inline">← Prev</span>
-                        </button>
-
-                        <span className="text-gray-700 font-medium ">
-                            Page {page} of {totalPages}
-                        </span>
-
-                        <button
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                            className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md 
-                          ${page >= totalPages
-                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                    : "bg-gray-700 text-white hover:bg-gray-800"
-                                }`}
-                        >
-                            <span className="md:hidden">→</span>
-                            <span className="hidden md:inline">Next →</span>
-                        </button>
-                    </div>
-                </>
-            )}
+        <div className="flex gap-4 mb-6">
+          {["OPEN", "RESOLVED"].map((tab) => {
+            const colors = {
+              OPEN: "bg-gray-600 text-white",
+              RESOLVED: "bg-green-600 text-white",
+            //   CLOSED: "bg-red-600 text-white",
+            };
+            const defaultColors = {
+              OPEN: "bg-gray-200 text-gray-600 hover:bg-gray-300",
+              RESOLVED: "bg-green-100 text-green-600 hover:bg-green-200",
+            //   CLOSED: "bg-red-100 text-red-600 hover:bg-red-200",
+            };
+            return (
+              <button
+                key={tab}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  activeTab === tab ? colors[tab] : defaultColors[tab]
+                }`}
+              >
+                {tab.charAt(0) + tab.slice(1).toLowerCase()}
+              </button>
+            );
+          })}
         </div>
-    );
+      </div>
+
+      {/* TABLE */}
+      {loading ? (
+        <p className="text-center">Loading...</p>
+      ) : tickets.length === 0 ? (
+        <p className="text-center">No {activeTab.toLowerCase()} tickets found.</p>
+      ) : (
+        <div className="overflow-x-auto mt-4">
+          <table className="w-full border rounded-lg">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 border">User ID</th>
+                <th className="p-2 border">Order ID</th>
+                <th className="p-2 border">Description</th>
+                <th className="p-2 border">Subject</th>
+                <th className="p-2 border">File</th>
+                <th className="p-2 border">Status</th>
+                <th className="p-2 border">Date</th>
+                <th className="p-2 border">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.map((t) => (
+                <tr key={t._id} className="text-center">
+                  <td className="p-2 border">{t.userId?.userId || "-"}</td>
+                  <td className="p-2 border">{t.orderId || "_"}</td>
+                  <td className="p-2 border">{t.message}</td>
+                  <td className="p-2 border">{t.subject}</td>
+
+                  <td className="p-2 border">
+                    {t.doc ? (
+                      <a href={t.doc} target="_blank" className="text-blue-600 underline">
+                        View
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+
+                  <td className="p-2 border">
+                    <span
+                      className={`px-2 py-1 rounded text-sm font-semibold ${
+                        t.status === "OPEN"
+                          ? "text-yellow-600"
+                        //   : t.status === "RESOLVED"
+                          : "text-green-600"
+                        //   : "text-red-600"
+                      }`}
+                    >
+                      {t.status}
+                    </span>
+                  </td>
+
+                  <td className="p-2 border">
+                    {new Date(t.createdAt).toLocaleString("en-IN", {
+                      timeZone: "Asia/Kolkata",
+                    })}
+                  </td>
+
+                  <td className="p-2 border">
+                    {activeTab === "OPEN" ? (
+                      <div className="flex gap-2 justify-center">
+                        <button
+                          onClick={() => openPopup(t._id, "RESOLVED")}
+                          className="px-3 py-1 bg-green-500 text-white rounded"
+                        >
+                          Resolve
+                        </button>
+                        <button
+                          onClick={() => openPopup(t._id, "CLOSED")}
+                          className="px-3 py-1 bg-red-500 text-white rounded"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* PAGINATION */}
+      <div className="flex justify-between items-center gap-4 mt-6">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          className={`px-4 py-2 rounded-lg shadow-md ${
+            page === 1
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-800"
+          }`}
+        >
+          ← Prev
+        </button>
+
+        <span className="text-gray-700 font-medium">
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage(page + 1)}
+          className={`px-4 py-2 rounded-lg shadow-md ${
+            page >= totalPages
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-800"
+          }`}
+        >
+          Next →
+        </button>
+      </div>
+
+      {/* POPUP */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white w-96 p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-3">Provide Solution</h2>
+
+            <textarea
+              className="w-full p-2 border rounded"
+              rows="4"
+              placeholder="Enter solution..."
+              value={solution}
+              onChange={(e) => setSolution(e.target.value)}
+            ></textarea>
+
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setShowPopup(false)}
+                className="px-4 py-2 bg-gray-400 text-white rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitSolution}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default TicketHistory;

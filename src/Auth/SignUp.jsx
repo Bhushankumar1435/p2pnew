@@ -72,7 +72,7 @@ const Signup = () => {
         phoneNumber,
         country: selectedCountry.label,
         sponsorId,
-        password,
+        // password,
       };
 
       const response = await registerUser(formData);
@@ -147,12 +147,12 @@ const Signup = () => {
               className="w-full placeholder:text-black px-4 py-3 rounded-xl border border-neutral-300 focus:outline-none"
             />
 
-            <input
+            {/* <input
               type="password"
               placeholder="Enter Password"
               onChange={(e) => setPassword(e.target.value)}
               className="w-full placeholder:text-black px-4 py-3 rounded-xl border border-neutral-300 focus:outline-none"
-            />
+            /> */}
 
             {/* 🌍 Country Dropdown */}
             <Select

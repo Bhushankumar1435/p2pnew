@@ -11,6 +11,7 @@ export default function Raiseticket() {
     const [orderId, setOrderId] = useState("");
     const [message, setMessage] = useState("");
     const [ticketImage, setTicketImage] = useState(null);
+    const [loading, setLoading] = useState(false)
 
     // ✅ Load ticket subjects from backend
     useEffect(() => {
@@ -32,13 +33,17 @@ export default function Raiseticket() {
     };
 
     const handleSubmit = async () => {
+        setLoading(true);
+
         if (!subject) {
             toast.error("Please select a subject");
+            setLoading(false);
             return;
         }
 
         if (!message.trim()) {
             toast.error("Please enter a description");
+            setLoading(false);
             return;
         }
 
@@ -64,7 +69,10 @@ export default function Raiseticket() {
         } catch (error) {
             toast.error("Failed to submit ticket");
         }
+
+        setLoading(false);
     };
+
 
     return (
         <div className="max-w-[600px] mx-auto w-full bg-[var(--primary)]">
@@ -127,10 +135,15 @@ export default function Raiseticket() {
                         {/* Submit Button */}
                         <button
                             onClick={handleSubmit}
-                            className="w-full py-2 text-white rounded-md font-medium bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 transition"
+                            disabled={loading}
+                            className="w-full py-2 text-white rounded-md font-medium bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 transition flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                            Send
+                            {loading && (
+                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            )}
+                            {loading ? "Sending..." : "Send"}
                         </button>
+
                     </div>
                 </div>
 

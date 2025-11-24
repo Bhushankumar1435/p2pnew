@@ -67,7 +67,7 @@ export const AdminResendOtp = (data) => adminPost("admin/resendOtp", data);
 
 
 // Forgot Password
-export const AdminForgotPassword = (data) => adminPost("admin/forgotPassword", data);
+// export const AdminForgotPassword = (data) => adminPost("admin/forgotPassword", data);
 
 
 // change password
@@ -148,8 +148,22 @@ export const BlockUnblockUserApi = (userId, action) =>
 export const GetAdminDealsApi = (page = 1, limit = 10) =>
   adminGet(`admin/deals?page=${page}&limit=${limit}`, true);
 
-export const GetAdminTicketHistoryApi = (page, limit) =>
-  adminGet(`admin/ticketHistory?page=${page}&limit=${limit}`, true);
+export const GetAdminTicketHistoryApi = (page, limit, status) =>
+  adminGet(
+    `admin/ticketHistory?page=${page}&limit=${limit}&status=${status}`,
+    true
+  );
+
 
 export const ManageAdminTicketApi = (ticketId, data) =>
-  adminPost(`admin/manageTicket?ticketId=${ticketId}`, data, true);
+  adminPost(
+    "admin/manageTicket", { id: ticketId, ...data, }, true);
+
+export const GetOrderHistoryApi = (page, limit) =>
+  adminGet(`admin/order-history?page=${page}&limit=${limit}`, true);
+
+export const GetTeamByLevelApi = (userId, level) =>
+  adminGet(`admin/teamByLevel?id=${userId}&level=${level}`, true);
+
+
+

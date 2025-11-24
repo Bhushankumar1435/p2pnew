@@ -10,6 +10,8 @@ import WhyP2p from "./landing_pages/whyp2p";
 import VerifySignup from "./Auth/VerifySignUp";
 import ForgotPassword from "./Auth/ForgotPassword";
 import RegisterSuccess from "./Auth/RegisterSuccess";
+import CreatePassword from "./Auth/CreatePassword";
+
 
 // User Pages
 import Dashboard from "./pages/Dashboard";
@@ -55,6 +57,7 @@ import SubAdminList from "./admin/subadminManage/SubAdminList";
 import SubAdminrequest from "./admin/subadminManage/SubAdminrequest";
 import ManageDeals from "./admin/usermanage/ManageDeals";
 import TicketHistory from "./admin/usermanage/TicketHistory";
+import OrderHistory from "./admin/usermanage/OrderHistory";
 import UserList from "./admin/usermanage/Userlist";
 import TransferFund from "./admin/TransferFund/TransferFund";
 import WalletHistory from "./admin/TransferFund/WalletHistory";
@@ -75,6 +78,7 @@ const App = () => {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/register-success" element={<RegisterSuccess />} />
       <Route path="/forgot_password" element={<ForgotPassword />} />
+      <Route path="/verify-forgot-password" element={<CreatePassword />} />
 
       {/* Protected User Routes */}
       <Route element={<AuthGuard />}>
@@ -117,7 +121,8 @@ const App = () => {
 
       {/* Admin Routes */}
       <Route path="/adminauth/login" element={<AdminLogin />} />
-      <Route path="/admin" element={<AdminAuthGuard>    <AdminLayout /> </AdminAuthGuard>}  >
+      <Route path="/admin" element={<AdminAuthGuard> <AdminLayout /> </AdminAuthGuard>}  >
+
         {/* Admin dashboard */}
         <Route path="dashboard" element={<AdminDashboard />} />
 
@@ -131,6 +136,7 @@ const App = () => {
         <Route path="users/details" element={<UserDetails />} />
         <Route path="deals" element={<ManageDeals />} />
         <Route path="tickets" element={<TicketHistory />} />
+        <Route path="orders" element={<OrderHistory />} />
 
         {/* Transfer Fund */}
         <Route path="transferfund" element={<TransferFund />} />

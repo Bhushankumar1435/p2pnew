@@ -70,12 +70,12 @@ const UserList = () => {
   // Block/Unblock user
 const toggleBlockUser = async (userId, isBlocked) => {
   try {
-    const action = !isBlocked; // true = block, false = unblock
+    const action = !isBlocked; 
     const res = await BlockUnblockUserApi(userId, action);
 
     if (res?.success) {
       alert(`User ${action ? "blocked" : "unblocked"} successfully!`);
-      fetchUsers(); // Refresh user list
+      fetchUsers(); 
     } else {
       alert(res?.message || `Failed to ${action ? "block" : "unblock"} user`);
     }
@@ -99,9 +99,12 @@ const toggleBlockUser = async (userId, isBlocked) => {
               <tr>
                 <th className="py-2 px-3 border">S.No</th>
                 <th className="py-2 px-3 border">User ID</th>
+                <th className="py-2 px-3 border">Sponser ID</th>
+                <th className="py-2 px-3 border">Rank</th>
                 <th className="py-2 px-3 border">Name</th>
                 <th className="py-2 px-3 border">Email</th>
                 <th className="py-2 px-3 border">Phone</th>
+                <th className="py-2 px-3 border">Country</th>
                 <th className="py-2 px-3 border border-b-0">Status</th>
                 <th className="py-2 px-3 border">More Details</th>
               </tr>
@@ -112,10 +115,12 @@ const toggleBlockUser = async (userId, isBlocked) => {
                 <tr key={u._id} className="text-center hover:bg-gray-50">
                   <td className="border py-2">{(page - 1) * limit + index + 1}</td>
                   <td className="border py-2">{u.userId}</td>
+                  <td className="border py-2">{u.sponsorId?.userId}</td>
+                  <td className="border py-2">{u.rank  || "No Rank"}</td>
                   <td className="border py-2">{u.name}</td>
                   <td className="border py-2">{u.email}</td>
                   <td className="border py-2">{u.phoneNumber}</td>
-
+                  <td className="border py-2">{u.country}</td>
                   <td className="border-t py-2 flex justify-center items-center gap-2">
                     {u.isBlocked ? (
                       <>

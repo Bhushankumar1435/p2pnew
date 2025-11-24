@@ -95,11 +95,10 @@ const Tickethistory = () => {
                                     {tabs.map((tab) => (
                                         <button
                                             key={tab}
-                                            className={`w-full py-3 transition-colors ${
-                                                activeTab === tab
+                                            className={`w-full py-3 transition-colors ${activeTab === tab
                                                     ? "text-black border-b-2 border-blue-600 bg-gray-100"
                                                     : "hover:bg-gray-50"
-                                            }`}
+                                                }`}
                                             onClick={() => setActiveTab(tab)}
                                         >
                                             {tab}
@@ -152,7 +151,6 @@ const Tickethistory = () => {
                         </div>
                     </div>
                 </div>
-
                 <Footer />
             </div>
         </div>

@@ -10,7 +10,7 @@ import {
   AdminSignin,
   AdminVerifySignin,
   AdminResendOtp,
-  AdminForgotPassword,
+  // AdminForgotPassword,
   AdminChangePassword,
 } from '../../api/Adminapi';
 
@@ -108,30 +108,30 @@ const AdminLogin = () => {
   /* --------------------------------------------
     🔹 Step 3: FORGOT PASSWORD
   -------------------------------------------- */
-  const handleForgotPassword = async (e) => {
-    e.preventDefault();
+  // const handleForgotPassword = async (e) => {
+  //   e.preventDefault();
 
-    if (!email) {
-      toast.error("Please enter your email");
-      return;
-    }
+  //   if (!email) {
+  //     toast.error("Please enter your email");
+  //     return;
+  //   }
 
-    try {
-      setLoading(true);
-      const response = await AdminForgotPassword({ email });
+  //   try {
+  //     setLoading(true);
+  //     const response = await AdminForgotPassword({ email });
 
-      if (response.success) {
-        toast.success(response.message || "OTP sent to your email");
-        setStep(4);
-      } else {
-        toast.error(response.message || "Failed to send OTP");
-      }
-    } catch (error) {
-      toast.error("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (response.success) {
+  //       toast.success(response.message || "OTP sent to your email");
+  //       setStep(4);
+  //     } else {
+  //       toast.error(response.message || "Failed to send OTP");
+  //     }
+  //   } catch (error) {
+  //     toast.error("Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   /* --------------------------------------------
     🔹 Step 4: RESET PASSWORD
@@ -231,7 +231,7 @@ const AdminLogin = () => {
                 {loading ? "Signing In..." : "Sign In"}
               </button>
 
-              <p className="mt-3">
+              {/* <p className="mt-3">
                 <button
                   type="button"
                   onClick={() => setStep(3)}
@@ -239,7 +239,7 @@ const AdminLogin = () => {
                 >
                   Forgot Password?
                 </button>
-              </p>
+              </p> */}
             </form>
           )}
 

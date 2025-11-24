@@ -1,17 +1,7 @@
 // src/layouts/AdminSidebar.jsx
 import React from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
-import {
-  FaMoneyCheckAlt,
-  FaWallet,
-  FaChartLine,
-  FaUsers,
-  FaHandshake,
-  FaTicketAlt,
-  FaUserPlus,
-  FaCogs,
-  FaMoneyBillWave,
-} from "react-icons/fa";
+import {FaMoneyCheckAlt,FaWallet, FaChartLine,FaUsers,FaHandshake,FaTicketAlt,FaUserPlus,FaCogs,FaMoneyBillWave,} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminSidebar = ({
@@ -139,6 +129,12 @@ const AdminSidebar = ({
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaTicketAlt /> Ticket History
+                </button>
+                <button
+                  onClick={() => navigate("/admin/orders")}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <FaTicketAlt /> Order History
                 </button>
               </div>
             )}

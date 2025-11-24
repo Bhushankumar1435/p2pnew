@@ -24,7 +24,7 @@ const VerifySignUp = () => {
     setLoading(true);
     setError('');
     try {
-      let formData = {email : email,otp : parseInt(otp),password:password}
+      let formData = {email : email,otp : parseInt(otp)}
       let response = await verifySignup(formData);
       console.log(formData ,'resp is ' . resp)
      

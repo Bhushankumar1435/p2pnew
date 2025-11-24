@@ -1,4 +1,3 @@
-// src/layouts/AdminLayout.jsx
 import React, { useState, useEffect } from "react";
 import { Menu } from "lucide-react";
 import AdminSidebar from "./AdminSidebar";
@@ -13,7 +12,6 @@ const AdminLayout = () => {
 
   const location = useLocation();
 
-  // Update activeTab based on current URL
   useEffect(() => {
     const path = location.pathname;
 
@@ -25,6 +23,7 @@ const AdminLayout = () => {
     else if (path.startsWith("/admin/users")) setActiveTab("user-list");
     else if (path.startsWith("/admin/deals")) setActiveTab("manage-deals");
     else if (path.startsWith("/admin/tickets")) setActiveTab("ticket-history");
+    else if (path.startsWith("/admin/orders")) setActiveTab("order-history");
     else if (path.startsWith("/admin/transferfund")) setActiveTab("transfer-fund");
     else if (path.startsWith("/admin/wallet-history")) setActiveTab("wallet-history");
     else if (path.startsWith("/admin/income-history")) setActiveTab("income-history");
@@ -63,11 +62,9 @@ const AdminLayout = () => {
         {/* Mobile menu button */}
         <button
           className="lg:hidden absolute top-4 left-4 p-2 bg-white rounded-md shadow z-50"
-          onClick={() => setSidebarOpen(true)}
-        >
+          onClick={() => setSidebarOpen(true)} >
           <Menu size={22} />
         </button>
-
         <Outlet />
       </div>
     </div>
