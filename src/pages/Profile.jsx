@@ -34,8 +34,8 @@ const Profile = () => {
       const deals = res?.data?.data?.deals || [];
       const count = res?.data?.data?.count || 0;
 
-      console.log("Deals:", deals);
-      console.log("Count:", count);
+      // console.log("Deals:", deals);
+      // console.log("Count:", count);
 
       setAds(deals);
     } catch (error) {
@@ -46,9 +46,23 @@ const Profile = () => {
     }
   };
 
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: "Check this out!",
+        text: "Have a look at this page! try it:",
+        url: window.location.href,
+      })
+      .catch(err => console.log("Share failed:", err));
+    } else {
+      alert("Sharing is not supported in this browser.");
+    }
+  };
+
   useEffect(() => {
     fetchAds();
   }, []);
+  
 
   const tabs = useMemo(
     () => [
@@ -79,7 +93,7 @@ const Profile = () => {
                   />
 
                   <div className="flex space-x-4 text-gray-500 text-lg">
-                    <FaShareAlt className="text-black" />
+                     <FaShareAlt className="text-black cursor-pointer" onClick={handleShare} />
                     <Link to="/Settings">
                       <FaCog className="text-black" />
                     </Link>

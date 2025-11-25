@@ -37,7 +37,7 @@ const Settings = () => {
   // ✅ Move settingsItems here to access currentLang and changeLanguage
   const settingsItems = [
     {
-      icon: React.createElement("img", {src: AccountIcon, alt: "Account",className: "w-5 h-5"}),
+      icon: React.createElement("img", { src: AccountIcon, alt: "Account", className: "w-5 h-5" }),
       label: t("AccountManagement"),
       link: "/account"
     },
@@ -115,7 +115,12 @@ const Settings = () => {
           <div className='w-full bg-[var(--primary)] rounded-t-xl relative z-[1]'>
             <div className='w-full  pt-3'>
               <h1 className="text-base font-semibold px-4 pb-3 border-b border-gray-300">{t('Settings')}</h1>
-
+              <button
+                onClick={() => navigate("/profile")}
+                className="absolute top-3 right-6 text-gray-500 hover:text-red-600 font-bold text-lg"
+              >
+                ✕
+              </button>
               {/* Settings List */}
               <div className="w-full">
                 {settingsItems.map((item, index) => (

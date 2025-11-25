@@ -11,20 +11,17 @@ const Accept = () => {
   const [currentDealId, setCurrentDealId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // fetch requests / accepted deals
   const showRequest = async () => {
     try {
       setLoading(true);
       const res = await getData("/user/getRequests", {});
 
-      // support multiple shapes: res.data.data.data OR res.data.data OR res.data
       const data =
         res?.data?.data?.data ||
         res?.data?.data ||
         res?.data ||
         [];
 
-      // if wrapped object with { acceptedDeals: [...] } handle that too
       const list = Array.isArray(data) ? data : data.acceptedDeals || [];
 
       setAcceptedDeals(Array.isArray(list) ? list : []);
@@ -39,7 +36,6 @@ const Accept = () => {
   useEffect(() => {
     showRequest();
 
-    // auto-refresh every 5 seconds
     const interval = setInterval(() => {
       showRequest();
     }, 5000);
@@ -48,28 +44,28 @@ const Accept = () => {
   }, []);
 
   const UpdateDealStatus = async (dealId, status) => {
-  const action = status === "ACCEPTED" ? "Accept" : "Reject";
-  if (!window.confirm(`Are you sure you want to ${action} this offer?`)) return;
+    const action = status === "ACCEPTED" ? "Accept" : "Reject";
+    if (!window.confirm(`Are you sure you want to ${action} this offer?`)) return;
 
-  try {
-    const res = await postData("/user/manageDeal", { id: dealId, status });
+    try {
+      const res = await postData("/user/manageDeal", { id: dealId, status });
 
-    const success = res?.success; 
-    const message = res?.message || "Something went wrong";
+      const success = res?.success;
+      const message = res?.message || "Something went wrong";
 
-    if (success) {
-      toast.success(message); // Shows backend success message
-      await showRequest();    // Refresh data
-    } else {
-      toast.error(message);   // Shows backend fail message
+      if (success) {
+        toast.success(message); // Shows backend success message
+        await showRequest();    // Refresh data
+      } else {
+        toast.error(message);   // Shows backend fail message
+      }
+
+    } catch (err) {
+      console.error("Error updating deal status:", err);
+      const errMsg = err?.message || "Something went wrong";
+      toast.error(errMsg);
     }
-
-  } catch (err) {
-    console.error("Error updating deal status:", err);
-    const errMsg = err?.message || "Something went wrong";
-    toast.error(errMsg);
-  }
-};
+  };
 
 
 
@@ -99,7 +95,7 @@ const Accept = () => {
           key={deal._id}
           className="border border-[var(--bg-color)] rounded-lg p-4 shadow-sm relative overflow-hidden mb-4"
         >
-          <div className="absolute top-0 right-0 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-bl-full text-[8px] font-semibold leading-4">
+          <div className="absolute top-0 right-0 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-bl-full text-[8px] font-semibold leading-4">
             Featured Deal
           </div>
 
@@ -168,7 +164,12 @@ const Accept = () => {
           </div>
 
           <div className="border-t border-dashed mt-4 pt-2">
-            <Timer expireAt={deal.timestamps?.expireAt} />
+            {/* <Timer expireAt={deal.timestamps?.expireAt} /> */}
+            <Timer
+              expireAt={deal?.timestamps?.expireAt}
+              // label="Deal Timer"
+              status={deal?.status}
+            />
           </div>
         </div>
       ))}

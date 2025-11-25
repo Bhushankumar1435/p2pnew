@@ -13,7 +13,7 @@ export default function History() {
   const activationTransactions = () => {
     getData("/user/walletHistory", { limit: 10, page: 1 })
       .then((res) => {
-        console.log("Wallet History Response:", res.data);
+        // console.log("Wallet History Response:", res.data);
         setActivationList(res.data.data.data || []); 
       })
       .catch((err) => console.error(err));

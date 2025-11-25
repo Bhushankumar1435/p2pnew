@@ -1,4 +1,3 @@
-// src/layouts/AdminSidebar.jsx
 import React from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
 import {FaMoneyCheckAlt,FaWallet, FaChartLine,FaUsers,FaHandshake,FaTicketAlt,FaUserPlus,FaCogs,FaMoneyBillWave,} from "react-icons/fa";
@@ -23,14 +22,20 @@ const AdminSidebar = ({
     navigate("/adminauth/login");
   };
 
+  const handleNav = (path) => {
+  navigate(path);
+  setSidebarOpen(false); 
+};
+
+
   return (
     <div
       className={`fixed lg:static inset-y-0 left-0 z-50 bg-white shadow-md w-64 transform
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 transition-transform duration-300`}
     >
       {/* Mobile Close Button */}
-      <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b">
-        <h2 className="text-lg font-semibold">Menu</h2>
+      <div className="flex items-center justify-end lg:hidden px-4 py-3 border-b">
+        {/* <h2 className="text-lg font-semibold">Menu</h2> */}
         <button onClick={() => setSidebarOpen(false)}>
           <X size={24} />
         </button>
@@ -44,7 +49,7 @@ const AdminSidebar = ({
           <button
             onClick={() => {
               setActiveTab("dashboard");
-              navigate("/admin/dashboard");
+              handleNav("/admin/dashboard");
             }}
             className={`px-4 py-2 rounded-lg text-left font-medium transition
               ${activeTab === "dashboard" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
@@ -70,21 +75,21 @@ const AdminSidebar = ({
             {showSubMenu && (
               <div className="pl-4 space-y-2 mt-2">
                 <button
-                  onClick={() => navigate("/admin/add-subadmin")}
+                  onClick={() => handleNav("/admin/add-subadmin")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaUserPlus /> Add Sub-Admin
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/subadmin/list")}
+                  onClick={() => handleNav("/admin/subadmin/list")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaUsers /> Sub-Admin List
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/subadmin/request")}
+                  onClick={() => handleNav("/admin/subadmin/request")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaCogs /> Sub-Admin Requests
@@ -111,27 +116,27 @@ const AdminSidebar = ({
             {showUserSubMenu && (
               <div className="pl-4 space-y-2 mt-2">
                 <button
-                  onClick={() => navigate("/admin/users")}
+                  onClick={() => handleNav("/admin/users")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaUsers /> User List
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/deals")}
+                  onClick={() => handleNav("/admin/deals")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaHandshake /> Deals
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/tickets")}
+                  onClick={() => handleNav("/admin/tickets")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaTicketAlt /> Ticket History
                 </button>
                 <button
-                  onClick={() => navigate("/admin/orders")}
+                  onClick={() => handleNav("/admin/orders")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaTicketAlt /> Order History
@@ -158,35 +163,35 @@ const AdminSidebar = ({
             {transferFundMenu && (
               <div className="pl-4 space-y-2 mt-2">
                 <button
-                  onClick={() => navigate("/admin/transferfund")}
+                  onClick={() => handleNav("/admin/transferfund")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaMoneyCheckAlt /> Transfer Fund
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/wallet-history")}
+                  onClick={() => handleNav("/admin/wallet-history")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaWallet /> Wallet History
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/income-history")}
+                  onClick={() => handleNav("/admin/income-history")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaChartLine /> Income History
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/withdraw-orders")}
+                  onClick={() => handleNav("/admin/withdraw-orders")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaTicketAlt /> Withdraw Orders
                 </button>
 
                 <button
-                  onClick={() => navigate("/admin/deposit-history")}
+                  onClick={() => handleNav("/admin/deposit-history")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaMoneyBillWave /> Deposit History
@@ -197,10 +202,10 @@ const AdminSidebar = ({
         </nav>
 
         {/* Logout */}
-        <div className="mt-auto">
+        <div className="">
           <button
             onClick={handleLogout}
-            className="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition mt-6"
+            className="w-full bg-red-500 text-white text-xl font-medium px-4 py-2 rounded-lg hover:bg-red-600 transition mt-6"
           >
             Logout
           </button>

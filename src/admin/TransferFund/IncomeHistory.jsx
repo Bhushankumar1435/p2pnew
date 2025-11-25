@@ -66,46 +66,65 @@ const IncomeHistory = () => {
       ) : incomeData.length === 0 ? (
         <p className="text-center">No income history found.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border rounded-lg">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="p-2 border">S.No</th>
-                <th className="p-2 border">UserID</th>
-                {/* <th className="p-2 border">From User</th> */}
-                <th className="p-2 border">Amount</th>
-                <th className="p-2 border">Token</th>
-                <th className="p-2 border">Mode</th>
-                <th className="p-2 border">Type</th>
-                <th className="p-2 border">Remark</th>
-                <th className="p-2 border">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {incomeData.map((item, index) => (
-                <tr key={item._id} className="text-center">
-                  <td className="border p-2">{ index + 1}</td>
-                  <td className="p-2 border">{item.userId.userId}</td>
-                  {/* <td className="p-2 border">{item.from || "-"}</td> */}
-                  <td
-                    className={`p-2 border ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600"
-                      }`}
-                  >
-                    {item.amount}
-                  </td>
-                  <td className="p-2 border">{item.token}</td>
-                  <td className="p-2 border">{item.mode}</td>
-                  <td className="p-2 border">{item.transactionType}</td>
-                  <td className="p-2 border">{item.remark}</td>
-                  <td className="p-2 border">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </td>
+        <div className="w-full">
+
+          {/* DESKTOP TABLE */}
+          <div className="overflow-x-auto hidden md:block mt-4">
+            <table className="w-full border border-gray-300 rounded-lg">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="p-2 border-b border-gray-300">S.No</th>
+                  <th className="p-2 border-b border-gray-300">UserID</th>
+                  <th className="p-2 border-b border-gray-300">Amount</th>
+                  <th className="p-2 border-b border-gray-300">Token</th>
+                  <th className="p-2 border-b border-gray-300">Mode</th>
+                  <th className="p-2 border-b border-gray-300">Type</th>
+                  <th className="p-2 border-b border-gray-300">Remark</th>
+                  <th className="p-2 border-b border-gray-300">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {incomeData.map((item, index) => (
+                  <tr key={item._id} className="text-center border-b border-gray-200">
+                    <td className="p-2">{index + 1}</td>
+                    <td className="p-2">{item.userId.userId}</td>
+                    <td className={`p-2 ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600" }`}  >{item.amount}</td>
+                    <td className="p-2">{item.token}</td>
+                    <td className="p-2">{item.mode}</td>
+                    <td className="p-2">{item.transactionType}</td>
+                    <td className="p-2">{item.remark}</td>
+                    <td className="p-2">
+                      {new Date(item.createdAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* MOBILE CARD VIEW */}
+          <div className="md:hidden space-y-4 mt-4">
+            {incomeData.map((item, index) => (
+              <div key={item._id} className="border rounded-lg p-4 shadow-sm bg-white" >
+                <p className="font-semibold text-gray-800"> #{index + 1} — {item.transactionType}</p>
+                <div className="mt-2 text-sm text-gray-700 space-y-1">
+                  <p> <span className="font-medium">User ID:</span>{" "}{item.userId.userId}</p>
+                  <p> <span className="font-medium">Amount:</span>{" "}
+                    <span className={`font-semibold ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600"}`}>{item.amount}</span>
+                  </p>
+                  <p> <span className="font-medium">Token:</span> {item.token}</p>
+                  <p> <span className="font-medium">Mode:</span> {item.mode} </p>
+                  <p><span className="font-medium">Type:</span>{" "}{item.transactionType} </p>
+                  <p><span className="font-medium">Remark:</span> {item.remark}</p>
+                  <p><span className="font-medium">Date:</span>{" "}{new Date(item.createdAt).toLocaleString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
 
       {/* Pagination */}
       <div className="flex justify-between items-center gap-4 mt-6">

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../../components/Header';
 import { t } from "../../../components/i18n";
 import Footer from '../../../components/Footer';
 import { useNavigate } from 'react-router';
-import { postData } from '../../../api/protectedApi';
+import { postData, getData } from '../../../api/protectedApi';
 import { ToastContainer, toast } from 'react-toastify';
 
 const AddBank = () => {
@@ -14,28 +14,48 @@ const AddBank = () => {
   const [ifsc, setIfsc] = useState("");
   const [bankName, setBankName] = useState("");
 
+  useEffect(() => {
+    fetchOldBankDetails();
+  }, []);
+
+  const fetchOldBankDetails = async () => {
+    try {
+      const res = await getData("/user/bankDetails");
+
+      const data = res?.data?.data;
+
+      if (data) {
+        setName(data?.name || "");
+        setAccountNumber(data?.accountNumber || "");
+        setIfsc(data?.ifscCode || "");
+        setBankName(data?.bankName || "");
+      }
+
+    } catch (err) {
+      console.error(" Error fetching Bankdetails:", err);
+    }
+  };
+
   const HandleConfirm = async () => {
     try {
       const payload = {
         name,
         accountNumber,
-        ifscCode:ifsc,
+        ifscCode: ifsc,
         bankName
       };
 
       const res = await postData("/user/addBankDetails", payload);
 
-      console.log("🔥 API RESPONSE:", res);
-
       if (res?.success === true) {
-        toast.success(res.message || "Bank details added successfully!");
+        toast.success(res.message || "Bank details saved!");
 
         setTimeout(() => {
           navigate("/paymentmethod");
         }, 800);
 
       } else {
-        toast.error(res?.message || "Failed to add bank details!");
+        toast.error(res?.message || "Failed to save bank details!");
       }
 
     } catch (error) {
@@ -59,12 +79,18 @@ const AddBank = () => {
               <h1 className="text-base font-semibold px-4 pb-3 border-b border-gray-400">
                 {t('addBankDetails')}
               </h1>
+              <button
+                onClick={() => navigate("/paymentmethod")}
+                className="absolute top-3 right-6 text-gray-500 hover:text-red-600 font-bold text-lg"
+              >
+                ✕
+              </button>
 
               <div className="w-full space-y-3 px-4 mt-4">
 
                 {/* Name */}
                 <div className='w-full'>
-                  <label className="text-[15px] font-medium mb-3 block">
+                  <label className="text-[15px] font-medium mb-2 block">
                     {t('NameInBank')}
                   </label>
                   <input
@@ -78,7 +104,7 @@ const AddBank = () => {
 
                 {/* Account Number */}
                 <div className='w-full'>
-                  <label className="text-[15px] font-medium mb-3 block">
+                  <label className="text-[15px] font-medium mb-2 block">
                     {t('bankAccount')}
                   </label>
                   <input
@@ -92,7 +118,7 @@ const AddBank = () => {
 
                 {/* IFSC */}
                 <div className='w-full'>
-                  <label className="text-[15px] font-medium mb-3 block">
+                  <label className="text-[15px] font-medium mb-2 block">
                     {t('ifscCode')}
                   </label>
                   <input
@@ -106,7 +132,7 @@ const AddBank = () => {
 
                 {/* Bank Name */}
                 <div className='w-full'>
-                  <label className="text-[15px] font-medium mb-3 block">
+                  <label className="text-[15px] font-medium mb-2 block">
                     {t('bankName')}
                   </label>
                   <input

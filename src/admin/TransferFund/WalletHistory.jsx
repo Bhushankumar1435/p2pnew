@@ -42,7 +42,7 @@ const WalletHistory = () => {
 
   const handleSearchChange = (e) => {
     setSearchUserId(e.target.value);
-    setPage(1); 
+    setPage(1);
   };
 
   return (
@@ -66,45 +66,89 @@ const WalletHistory = () => {
       ) : walletData.length === 0 ? (
         <p className="text-center">No wallet history found.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border rounded-lg">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="p-2 border">S.No</th>
-                <th className="p-2 border">User ID</th>
-                {/* <th className="p-2 border">From</th> */}
-                <th className="p-2 border">Amount</th>
-                <th className="p-2 border">Token</th>
-                <th className="p-2 border">Mode</th>
-                <th className="p-2 border">Type</th>
-                <th className="p-2 border">Remark</th>
-                <th className="p-2 border">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {walletData.map((item,index) => (
-                <tr key={item._id} className="text-center">
-                  <td className="border p-2">{ index + 1}</td>
-                  <td className="p-2 border">{item.userId.userId}</td>
-                  {/* <td className="p-2 border">{item.from || "-"}</td> */}
-                  <td
-                    className={`p-2 border ${
-                      item.mode === "CREDIT" ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {item.amount}
-                  </td>
-                  <td className="p-2 border">{item.token}</td>
-                  <td className="p-2 border">{item.mode}</td>
-                  <td className="p-2 border">{item.transactionType}</td>
-                  <td className="p-2 border">{item.remark}</td>
-                  <td className="p-2 border">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </td>
+        <div className="w-full">
+
+          {/* DESKTOP TABLE */}
+          <div className="overflow-x-auto hidden md:block">
+            <table className="w-full border rounded-lg">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="p-2 border">S.No</th>
+                  <th className="p-2 border">User ID</th>
+                  <th className="p-2 border">Amount</th>
+                  <th className="p-2 border">Token</th>
+                  <th className="p-2 border">Mode</th>
+                  <th className="p-2 border">Type</th>
+                  <th className="p-2 border">Remark</th>
+                  <th className="p-2 border">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {walletData.map((item, index) => (
+                  <tr key={item._id} className="text-center">
+                    <td className="border p-2">{index + 1}</td>
+                    <td className="p-2 border">{item.userId.userId}</td>
+
+                    <td
+                      className={`p-2 border ${item.mode === "CREDIT"
+                          ? "text-green-600"
+                          : "text-red-600"
+                        }`}
+                    >
+                      {item.amount}
+                    </td>
+
+                    <td className="p-2 border">{item.token}</td>
+                    <td className="p-2 border">{item.mode}</td>
+                    <td className="p-2 border">{item.transactionType}</td>
+                    <td className="p-2 border">{item.remark}</td>
+
+                    <td className="p-2 border">
+                      {new Date(item.createdAt).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* MOBILE CARD VIEW */}
+          <div className="md:hidden space-y-4">
+            {walletData.map((item, index) => (
+              <div key={item._id} className="border rounded-lg p-4 shadow-sm bg-white">
+                <p className="font-semibold text-gray-800">
+                  #{index + 1} — {item.transactionType}
+                </p>
+
+                <div className="mt-2 text-sm text-gray-700 space-y-1">
+                  <p><span className="font-medium">User ID:</span> {item.userId.userId}</p>
+
+                  <p>
+                    <span className="font-medium">Amount:</span>{" "}
+                    <span
+                      className={`font-semibold ${item.mode === "CREDIT"
+                          ? "text-green-600"
+                          : "text-red-600"
+                        }`}
+                    >
+                      {item.amount}
+                    </span>
+                  </p>
+
+                  <p><span className="font-medium">Token:</span> {item.token}</p>
+                  <p><span className="font-medium">Mode:</span> {item.mode}</p>
+                  <p><span className="font-medium">Type:</span> {item.transactionType}</p>
+                  <p><span className="font-medium">Remark:</span> {item.remark}</p>
+
+                  <p>
+                    <span className="font-medium">Date:</span>{" "}
+                    {new Date(item.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -113,11 +157,10 @@ const WalletHistory = () => {
         <button
           disabled={page === 1}
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${
-            page === 1
+          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page === 1
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-gray-700 text-white hover:bg-gray-800"
-          }`}
+            }`}
         >
           <span className="md:hidden">←</span>
           <span className="hidden md:inline">← Prev</span>
@@ -130,11 +173,10 @@ const WalletHistory = () => {
         <button
           disabled={page >= totalPages}
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${
-            page >= totalPages
+          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page >= totalPages
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-gray-700 text-white hover:bg-gray-800"
-          }`}
+            }`}
         >
           <span className="md:hidden">→</span>
           <span className="hidden md:inline">Next →</span>

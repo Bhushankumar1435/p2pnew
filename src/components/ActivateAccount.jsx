@@ -122,7 +122,7 @@ const ActivateAccount = () => {
                       value={userId}
                       onChange={(e) => setUserId(e.target.value)}
                       className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="e.g. USER12345"
+                      placeholder="e.g. P2P12"
                     />
                   </div>
 

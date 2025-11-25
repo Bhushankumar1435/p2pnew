@@ -27,7 +27,7 @@ const Header = () => {
           <select
             value={currentLang}
             onChange={changeLanguage}
-            className="block w-full px-2 py-1 pr-4 border border-white/50 rounded-md text-black bg-white font-medium appearance-none focus:outline-none "
+            className="block w-full px-2 py-1 pr-4  border border-white/50 rounded-md text-black bg-white font-medium appearance-none focus:outline-none "
           >
             <option value="en">{t("English")}</option>
             <option value="hi">{t("Hindi")}</option>
@@ -35,7 +35,7 @@ const Header = () => {
           </select>
 
           {/* Custom dropdown arrow */}
-          <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-500">
+          <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-500 ">
             <svg
               className="w-4 h-4"
               fill="none"

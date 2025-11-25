@@ -22,9 +22,8 @@ const Deal = () => {
 
   const navigate = useNavigate();
 
-  // =======================
   // FETCH DEALS
-  // =======================
+  
   const fetchDeals = async (pageToLoad = 1) => {
     try {
       const res = await getData("/user/allDeals", { page: pageToLoad, limit: 10 });
@@ -39,7 +38,7 @@ const Deal = () => {
           setDealList((prev) => [...prev, ...newDeals]);
         }
 
-        setHasMore(newDeals.length >= 10); // If < 10 deals, stop loading
+        setHasMore(newDeals.length >= 10); 
         setCurrentDeal(false);
       } else {
         setCurrentDeal(d.deal || false);
@@ -172,8 +171,13 @@ const Deal = () => {
               )}
           </div>
 
-          <div className="border-t border-dashed mt-4">
-            <Timer expireAt={currentDeal.timestamps.expireAt} />
+          <div className="border-t border-dashed mt-4 pt-2">
+            {/* <Timer expireAt={currentDeal.timestamps.expireAt} /> */}
+            <Timer
+              expireAt={currentDeal?.timestamps?.expireAt}
+              // label="Deal Timer"
+              status={currentDeal?.status}
+            />
           </div>
         </div>
       )}
@@ -250,7 +254,7 @@ const Deal = () => {
         dealList.map((deal, index) => (
           <div
             key={index}
-            className="border-b border-[var(--border-light)] pt-0 px-4 pb-4 hover:border-2 hover:border-blue-500 hover:rounded-md"
+            className="border-b border-[var(--border-light)] pt-1.5 px-4 pb-4 hover:border-2 hover:border-gray-500 hover:rounded-md"
           >
             <div className="flex justify-between items-center mb-1">
               <div className="flex items-center">

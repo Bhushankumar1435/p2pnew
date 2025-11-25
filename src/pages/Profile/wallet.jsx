@@ -4,9 +4,12 @@ import Footer from '../../components/Footer';
 import { postData } from '../../api/protectedApi';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from 'react-router-dom';
 
 export default function Account() {
   const [walletAddress, setWalletAddress] = useState('');
+    const navigate = useNavigate();
+
 
   const handlePaste = async () => {
     try {
@@ -50,6 +53,12 @@ export default function Account() {
               <h1 className="text-base font-semibold px-4 pb-3 border-b border-gray-400">
                 Wallet Address
               </h1>
+              <button
+                onClick={() => navigate("/Settings")}
+                className="absolute top-3 right-6 text-gray-500 hover:text-red-600 font-bold text-lg"
+              >
+                ✕
+              </button>
 
               <div className="w-full space-y-4 px-4 mt-4">
                 <label className="block text-sm text-gray-700">Enter Address (BEP20)</label>

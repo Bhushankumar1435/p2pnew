@@ -29,12 +29,12 @@ const CreateAds = () => {
       availableAmount: parseInt(maxLimit),//Number(availableAmount.replace(/,/g, '')), // remove comma
       paymentMethods: paymentMethod,
     };
-    console.log(payload, 'payload');
+    // console.log(payload, 'payload');
     try {
       let response = await CreateDeal(payload);
 
       // const data = await response.json();
-      console.log(response?.message);
+      // console.log(response?.message);
 
       if (response.success == true) {
         toast.success(response?.message);

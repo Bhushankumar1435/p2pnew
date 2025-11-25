@@ -13,15 +13,15 @@ const MyAds = ({ ads = [] }) => {
   const fetchDeals = async () => {
     try {
       const res = await getData("/user/myDeals");
-      console.log("📦 My Deals API Response:", res);
+      // console.log("📦 My Deals API Response:", res);
 
       // ✅ Correct extraction based on your actual JSON
       const fetchedDeals = res?.data?.data?.deals || [];
-      console.log("✅ Deals extracted:", fetchedDeals);
+      // console.log("✅ Deals extracted:", fetchedDeals);
 
       setDeals(fetchedDeals);
     } catch (err) {
-      console.error("❌ Error fetching deals:", err);
+      // console.error("❌ Error fetching deals:", err);
       toast.error("Failed to fetch deals");
     }
   };
@@ -31,9 +31,9 @@ const MyAds = ({ ads = [] }) => {
 
     setLoading(true);
     try {
-      console.log("🚀 Canceling deal with ID:", dealId);
+      // console.log("🚀 Canceling deal with ID:", dealId);
       const res = await cancelDeal(dealId);
-      console.log("🧾 Cancel deal response:", res);
+      // console.log("🧾 Cancel deal response:", res);
 
       if (res?.success) {
         toast.success(res.message || "Deal canceled successfully!");
@@ -42,7 +42,7 @@ const MyAds = ({ ads = [] }) => {
         toast.error(res?.message || "Failed to cancel deal.");
       }
     } catch (err) {
-      console.error("❌ Cancel deal error:", err);
+      // console.error("❌ Cancel deal error:", err);
       toast.error("Something went wrong while canceling the deal.");
     } finally {
       setLoading(false);

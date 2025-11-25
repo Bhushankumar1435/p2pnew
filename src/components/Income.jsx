@@ -13,7 +13,7 @@ const Income = () => {
     const IncomeTransactions = () => {
         getData("user/incomeHistory", { limit: 10, page: 1 })
             .then((res) => {
-                console.log("income history response", res.data)
+                // console.log("income history response", res.data)
                 setIncomeList(res.data.data.data || []);
 
             })

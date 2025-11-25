@@ -18,7 +18,7 @@ export default function Teams() {
         .then((res) => { setDirectList(res.data.data.directs), console.log('data ', res.data.data) })
         .catch((err) => console.error(err));
 
-        console.log('NOW WE HAVE TO CALL DIRECTS API')
+        // console.log('NOW WE HAVE TO CALL DIRECTS API')
     }, []);
 
     const changeTab = ( tab = 'Directs') =>{
@@ -26,7 +26,8 @@ export default function Teams() {
         if(tab  === 'LevelTeam'){
             // console.log('now we have to show level team')
              getData('/user/team', {})
-            .then((res) => { setTeamLevel(res.data.data.team), console.log('data ', res.data.data) })
+            .then((res) => { setTeamLevel(res.data.data.team),
+                 console.log('data ', res.data.data) })
             .catch((err) => console.error(err));
         }
     }
@@ -43,7 +44,7 @@ export default function Teams() {
     }
 
     const handlePageClick = async (data) => {
-        console.log( ' data is  '  , data)
+        // console.log( ' data is  '  , data)
         await setLevelCurrentPage(data.selected + 1)
         showLevelTeam(data.selected + 1);
     };

@@ -20,42 +20,66 @@ const SubAdminList = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 mt-10 rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">Sub-Admin List</h2>
+    <div className="max-w-4xl mx-auto bg-white p-6 mt-10 rounded-xl shadow-lg">
+      <h2 className="text-2xl font-bold mb-6 text-gray-700">
+        Sub-Admin List
+      </h2>
 
       {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <table className="w-full border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border">S. No.</th>
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border">Email</th>
-              <th className="p-2 border">Created At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {subAdmins.length > 0 ? (
-              subAdmins.map((sa,index) => (
-                <tr key={sa._id} className="text-center">
-                  <td className="p-2 border">{index+1}</td>
-                  <td className="p-2 border">{sa.name}</td>
-                  <td className="p-2 border">{sa.email}</td>
-                  <td className="p-2 border">
+        <p className="text-center text-gray-500">Loading...</p>
+      ) : subAdmins.length > 0 ? (
+        <div className="overflow-x-auto  ">
+          {/* 👉 Desktop Table */}
+          <table className="w-full hidden md:table">
+            <thead>
+              <tr className="bg-gray-100 text-left">
+                <th className="p-3 border">S. No.</th>
+                <th className="p-3 border">Name</th>
+                <th className="p-3 border">Email</th>
+                <th className="p-3 border">Created At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subAdmins.map((sa, index) => (
+                <tr key={sa._id} className="hover:bg-gray-50 transition">
+                  <td className="p-3 border">{index + 1}</td>
+                  <td className="p-3 border">{sa.name}</td>
+                  <td className="p-3 border">{sa.email}</td>
+                  <td className="p-3 border">
                     {new Date(sa.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="p-3 text-center text-gray-500">
-                  No Sub-Admins Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+
+          {/* 👉 Mobile Card View */}
+          <div className="md:hidden space-y-4 p-2">
+            {subAdmins.map((sa, index) => (
+              <div
+                key={sa._id}
+                className="border rounded-xl p-4 shadow-sm bg-white"
+              >
+                <p className="text-gray-800 font-semibold">
+                  #{index + 1} — {sa.name}
+                </p>
+
+                <div className="mt-2 text-sm text-gray-500 space-y-1">
+                  <p>
+                    <span className="font-medium text-gray-700">Email: </span>
+                    {sa.email}
+                  </p>
+                  <p>
+                    <span className="font-medium text-gray-700">Created At: </span>
+                    {new Date(sa.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <p className="text-center text-gray-500">No Sub-Admins Found</p>
       )}
     </div>
   );

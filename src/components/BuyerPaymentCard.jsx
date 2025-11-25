@@ -28,8 +28,8 @@ const BuyerPaymentCard = ({ id, closeBuyerForm }) => {
             setUploading(true);
 
             let imageResp = await postData('user/payToSeller', formData)
-            console.log(' image Resp ', imageResp)
-            console.log('imageResp.data.data.message ', imageResp)
+            // console.log(' image Resp ', imageResp)
+            // console.log('imageResp.data.data.message ', imageResp)
             if (imageResp.success == true) {
 
                 toast.success(imageResp.message)
@@ -43,7 +43,7 @@ const BuyerPaymentCard = ({ id, closeBuyerForm }) => {
             setFile(null);
             setPreview('');
         } catch (err) {
-            console.log('err  ', err)
+            // console.log('err  ', err)
             toast.error(err.message)
             alert('Upload failed');
         } finally {

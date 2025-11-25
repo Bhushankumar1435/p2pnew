@@ -27,7 +27,7 @@ const updateOrderStatus = async (status) => {
   try {
     const resp = await postData('/user/confirmCurrency', { id, status });
 
-    console.log("API Response:", resp);
+    // console.log("API Response:", resp);
 
     // Safety fix: ensure resp is always an object
     const success = resp?.success ?? false;

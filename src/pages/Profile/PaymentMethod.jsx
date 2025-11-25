@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { t } from "../../components/i18n";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import checkIcon from "../../assets/images/checkIcon.png";
 import { getData } from "../../api/protectedApi";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,10 +11,12 @@ const PaymentMethod = () => {
   const [upi, setUpi] = useState("");
   const [bank, setBank] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     getData("/user/bankDetails")
       .then((res) => {
-        console.log("🔥 RAW RESPONSE:", res);
+        // console.log("🔥 RAW RESPONSE:", res);
 
         const api = res?.data || res;
 
@@ -34,7 +36,7 @@ const PaymentMethod = () => {
         }
       })
       .catch((err) => {
-        console.error("❌ Fetch Error:", err);
+        // console.error("❌ Fetch Error:", err);
         toast.error("Server error");
       });
   }, []);
@@ -53,6 +55,12 @@ const PaymentMethod = () => {
               <h1 className="text-base font-semibold px-4 pb-3 border-b border-gray-400">
                 {t("AddPaymentMethod")}
               </h1>
+              <button
+                onClick={() => navigate("/Settings")}
+                className="absolute top-3 right-6 text-gray-500 hover:text-red-600 font-bold text-lg"
+              >
+                ✕
+              </button>
 
               <div className="w-full space-y-3 px-4 mt-4">
 
