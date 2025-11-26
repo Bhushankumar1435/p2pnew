@@ -71,7 +71,7 @@ const Withdraw = () => {
             <div className="w-full bg-[var(--primary)] rounded-t-xl relative z-[1]">
               <div className="w-full py-5 px-3">
                 {/* ✅ Navigation Controls */}
-                <div className="flex items-center justify-between mb-4">
+                {/* <div className="flex items-center justify-between mb-4">
                   <button
                     onClick={() => navigate(-1)}
                     className="flex items-center gap-2 text-gray-600 hover:text-black"
@@ -86,7 +86,7 @@ const Withdraw = () => {
                   >
                     <FaTimes />
                   </button>
-                </div>
+                </div> */}
 
                 <h2 className="font-semibold mb-4 text-lg">Withdraw Funds</h2>
 

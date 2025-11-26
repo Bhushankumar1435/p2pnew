@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { getAdminDashboard } from "../api/Adminapi"; 
+import { getAdminDashboard } from "../api/Adminapi";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalSubAdmins: 0,
     activeDeals: 0,
-    totalRevenue: 0,
+    totalDeals: 0,
   });
   const [loading, setLoading] = useState(true);
 
   const fetchStats = async () => {
     try {
       setLoading(true);
-      const res = await getAdminDashboard(); 
+      const res = await getAdminDashboard();
       if (res.success) {
         setStats({
           totalUsers: res.data.totalUsers || 0,
           totalSubAdmins: res.data.totalSubAdmins || 0,
           activeDeals: res.data.activeDeals || 0,
-          totalRevenue: res.data.totalRevenue || 0,
+          totalDeals: res.data.totalDeals || 0,
         });
       }
     } catch (err) {
@@ -43,22 +43,22 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
         <div className="bg-white rounded-xl p-6 shadow-md text-center">
           <h2 className="text-xl font-semibold mb-2">Total Users</h2>
-          <p className="text-3xl font-bold">{stats.totalUsers}</p>
+          <p className="text-3xl font-bold text-blue-600">{stats.totalUsers}</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-md text-center">
           <h2 className="text-xl font-semibold mb-2">Total Sub-Admins</h2>
-          <p className="text-3xl font-bold">{stats.totalSubAdmins}</p>
+          <p className="text-3xl font-bold text-green-600">{stats.totalSubAdmins}</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-md text-center">
           <h2 className="text-xl font-semibold mb-2">Active Deals</h2>
-          <p className="text-3xl font-bold">{stats.activeDeals}</p>
+          <p className="text-3xl font-bold text-gray-600">{stats.activeDeals}</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-md text-center">
-          <h2 className="text-xl font-semibold mb-2">Total Revenue</h2>
-          <p className="text-3xl font-bold">${stats.totalRevenue}</p>
+          <h2 className="text-xl font-semibold mb-2">Total Deals</h2>
+          <p className="text-3xl font-bold text-orange-600">{stats.totalDeals}</p>
         </div>
       </div>
     </div>

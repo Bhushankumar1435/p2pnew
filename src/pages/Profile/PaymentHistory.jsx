@@ -27,6 +27,7 @@ const PaymentHistory = () => {
     }, []);
     return (
         <div className='max-w-[600px] mx-auto w-full bg-[var(--primary)]'>
+            <ToastContainer position="top-right" autoClose={3000} />
             <div className="min-h-screen flex flex-col items-center bg-white text-black ">
                 <div className='h-[calc(100vh_-_56px)] overflow-auto w-full bg-[var(--primary)] '>
                     <Header />

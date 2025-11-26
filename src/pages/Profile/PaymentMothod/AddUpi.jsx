@@ -64,13 +64,6 @@ const AddUpi = () => {
               <h1 className="text-base font-semibold px-4 pb-3 border-b border-gray-400">
                 {t('AddPaymentMethod')}
               </h1>
-              <button
-                onClick={() => navigate("/paymentmethod")}
-                className="absolute top-3 right-6 text-gray-500 hover:text-red-600 font-bold text-lg"
-              >
-                ✕
-              </button>
-
               <div className="w-full space-y-3 px-4 mt-4">
 
                 <label className="text-[15px] text-black font-medium mb-3 block">

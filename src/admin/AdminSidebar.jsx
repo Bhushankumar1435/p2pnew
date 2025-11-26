@@ -1,6 +1,6 @@
 import React from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
-import {FaMoneyCheckAlt,FaWallet, FaChartLine,FaUsers,FaHandshake,FaTicketAlt,FaUserPlus,FaCogs,FaMoneyBillWave,} from "react-icons/fa";
+import { FaMoneyCheckAlt, FaWallet, FaChartLine, FaUsers, FaHandshake, FaTicketAlt, FaUserPlus, FaCogs, FaMoneyBillWave, } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminSidebar = ({
@@ -23,9 +23,9 @@ const AdminSidebar = ({
   };
 
   const handleNav = (path) => {
-  navigate(path);
-  setSidebarOpen(false); 
-};
+    navigate(path);
+    setSidebarOpen(false);
+  };
 
 
   return (
@@ -34,8 +34,8 @@ const AdminSidebar = ({
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 transition-transform duration-300`}
     >
       {/* Mobile Close Button */}
-      <div className="flex items-center justify-end lg:hidden px-4 py-3 border-b">
-        {/* <h2 className="text-lg font-semibold">Menu</h2> */}
+      <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b">
+        <h2 className="text-lg font-semibold">Menu</h2>
         <button onClick={() => setSidebarOpen(false)}>
           <X size={24} />
         </button>

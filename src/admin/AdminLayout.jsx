@@ -61,7 +61,7 @@ const AdminLayout = () => {
       <div className="flex-1 px-4 py-10 relative">
         {/* Mobile menu button */}
         <button
-          className="lg:hidden absolute top-2 left-4 p-1.5 bg-white rounded-md shadow z-50"
+          className="lg:hidden absolute top-2 left-4 p-1.5 bg-white rounded-md shadow "
           onClick={() => setSidebarOpen(true)} >
           <Menu size={22} />
         </button>

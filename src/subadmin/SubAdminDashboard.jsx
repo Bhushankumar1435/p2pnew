@@ -194,7 +194,7 @@ const SubAdminDashboard = () => {
             </button>
           </nav>
 
-          <div className="mt-auto">
+          <div className="">
             <button
               onClick={handleLogout}
               className="w-full mt-6 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
@@ -235,7 +235,7 @@ const SubAdminDashboard = () => {
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Active Deals</h2>
-                  <p className="text-3xl font-semibold text-purple-600">{dashboardData.activeDeals ?? 0}</p>
+                  <p className="text-3xl font-semibold text-gray-600">{dashboardData.activeDeals ?? 0}</p>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-md text-center">
                   <h2 className="text-xl font-semibold mb-2">Total Deals</h2>

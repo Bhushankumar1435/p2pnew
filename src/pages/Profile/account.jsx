@@ -59,12 +59,7 @@ export default function Account() {
                 <div className="w-full text-left">
                   <h2 className="font-semibold text-lg pb-4">Account Management</h2>
                 </div>
-                <button
-                  onClick={() => navigate("/Settings")}
-                  className="absolute top-5 right-6 text-gray-500 hover:text-red-600 font-bold text-lg"
-                >
-                  ✕
-                </button>
+                
                 <div className="flex items-center justify-between w-full border border-gray-300 bg-white p-4 rounded-lg shadow-sm">
                   <span className="text-gray-700 font-medium">Wallet Balance:</span>
                   <span className="text-xl font-bold text-green-600">

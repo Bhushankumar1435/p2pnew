@@ -34,23 +34,23 @@ export default function History() {
             <div className="w-full py-5 px-3">
 
               {/* ✅ Back / Close Button */}
-              <div className="flex items-center justify-between mb-4">
-                <button
+              {/* <div className="flex items-center justify-between mb-4"> */}
+                {/* <button
                   onClick={() => navigate(-1)} // 👈 go back to previous page
                   className="flex items-center gap-2 text-gray-600 hover:text-black"
                 >
                   <FaArrowLeft />
                   <span className="font-medium">Back</span>
-                </button>
+                </button> */}
 
                 {/* Optional Cross Button on Right */}
-                <button
+                {/* <button
                   onClick={() => navigate("/account")} // 👈 go directly to account page
                   className="text-gray-500 hover:text-black text-lg"
                 >
                   <FaTimes />
-                </button>
-              </div>
+                </button> */}
+              {/* </div> */}
 
               <h2 className="font-semibold mb-4 text-lg">Wallet History</h2>
 

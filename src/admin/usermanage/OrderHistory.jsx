@@ -127,44 +127,17 @@ const OrderHistory = () => {
                     <td className="p-2 border">{o.deal?.fiat || "-"}</td>
                     <td className="p-2 border font-semibold">{o.tokenAmount}</td>
                     <td className="p-2 border font-semibold">₹ {o.fiatAmount}</td>
-
                     <td className="p-2 border">
                       {o.buyerReceipt ? (
-                        <a
-                          href={o.buyerReceipt}
-                          target="_blank"
-                          className="text-blue-600 underline"
-                        >
-                          View
-                        </a>
-                      ) : (
-                        "—"
-                      )}
+                        <a href={o.buyerReceipt} target="_blank" className="text-blue-600 underline" > View</a>
+                      ) : ("—")}
                     </td>
-
-                    <td
-                      className={`p-2 border font-semibold ${statusColor[o.status] || "text-gray-600"
-                        }`}
-                    >
-                      {o.status}
+                    <td className={`p-2 border border-black font-semibold ${statusColor[o.status] || "text-gray-600"}`}>{o.status}</td>
+                    <td className="p-2 border">{o.timestamps?.requestedAt ? new Date(o.timestamps.requestedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                      : "—"}
                     </td>
-
-                    <td className="p-2 border">
-                      {o.timestamps?.requestedAt
-                        ? new Date(o.timestamps.requestedAt).toLocaleString(
-                          "en-IN",
-                          { timeZone: "Asia/Kolkata" }
-                        )
-                        : "—"}
-                    </td>
-
-                    <td className="p-2 border">
-                      {o.timestamps?.completedAt
-                        ? new Date(o.timestamps.completedAt).toLocaleString(
-                          "en-IN",
-                          { timeZone: "Asia/Kolkata" }
-                        )
-                        : "—"}
+                    <td className="p-2 border"> {o.timestamps?.completedAt ? new Date(o.timestamps.completedAt).toLocaleString("en-IN",
+                      { timeZone: "Asia/Kolkata" }) : "—"}
                     </td>
                   </tr>
                 ))}
@@ -183,45 +156,20 @@ const OrderHistory = () => {
                 <p><span className="font-semibold">Order ID:</span> {o._id}</p>
                 <p><span className="font-semibold">Buyer:</span> {o?.buyer?.userId || "-"}</p>
                 <p><span className="font-semibold">Seller:</span> {o?.seller?.userId || "-"}</p>
-
                 <p><span className="font-semibold">Token:</span> {o.deal?.token || "-"}</p>
                 <p><span className="font-semibold">Fiat:</span> {o.deal?.fiat || "-"}</p>
-
-                <p>
-                  <span className="font-semibold">Token Amount:</span>{" "}
-                  {o.tokenAmount}
-                </p>
-
-                <p>
-                  <span className="font-semibold">Fiat Amount:</span>{" "}
-                  ₹ {o.fiatAmount}
-                </p>
-
-                <p>
-                  <span className="font-semibold">Receipt:</span>{" "}
-                  {o.buyerReceipt ? (
-                    <a
-                      href={o.buyerReceipt}
-                      target="_blank"
-                      className="text-blue-600 underline"
-                    >
+                 <p> <span className="font-semibold">Token Amount:</span>{" "} {o.tokenAmount} </p>
+                <p> <span className="font-semibold">Fiat Amount:</span>{" "} ₹ {o.fiatAmount}</p>
+                <p> <span className="font-semibold">Receipt:</span>{" "}{o.buyerReceipt ? ( <a href={o.buyerReceipt}target="_blank" className="text-blue-600 underline">
                       View
                     </a>
-                  ) : (
-                    "—"
-                  )}
-                </p>
-
+                  ) : (  "—" )} </p>
                 <p>
                   <span className="font-semibold">Status:</span>{" "}
-                  <span
-                    className={`font-semibold ${statusColor[o.status] || "text-gray-600"
-                      }`}
-                  >
-                    {o.status}
+                   <span className={`font-semibold ${statusColor[o.status] || "text-gray-600"}`}
+                  >{o.status}
                   </span>
                 </p>
-
                 <p>
                   <span className="font-semibold">Requested:</span>{" "}
                   {o.timestamps?.requestedAt
@@ -230,7 +178,6 @@ const OrderHistory = () => {
                     })
                     : "—"}
                 </p>
-
                 <p>
                   <span className="font-semibold">Completed:</span>{" "}
                   {o.timestamps?.completedAt
