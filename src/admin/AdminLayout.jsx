@@ -9,6 +9,7 @@ const AdminLayout = () => {
   const [showSubMenu, setShowSubMenu] = useState(false);
   const [showUserSubMenu, setShowUserSubMenu] = useState(false);
   const [transferFundMenu, setTransferFundMenu] = useState(false);
+  const [globaldividend, setGlobaldividend] = useState(false);
 
   const location = useLocation();
 
@@ -29,16 +30,14 @@ const AdminLayout = () => {
     else if (path.startsWith("/admin/income-history")) setActiveTab("income-history");
     else if (path.startsWith("/admin/withdraw-orders")) setActiveTab("withdraw-orders");
     else if (path.startsWith("/admin/deposit-history")) setActiveTab("deposit-history");
+    else if (path.startsWith("/admin/global-dividend")) setActiveTab("global-dividend");
 
-    // Automatically open the relevant submenu
-    if (path.includes("/subadmin")) setShowSubMenu(true);
-    else setShowSubMenu(false);
-
-    if (path.includes("/users") || path.includes("/deals") || path.includes("/tickets")) setShowUserSubMenu(true);
-    else setShowUserSubMenu(false);
-
-    if (path.includes("/transferfund") || path.includes("/wallet-history") || path.includes("/income-history") || path.includes("/withdraw-orders") || path.includes("/deposit-history")) setTransferFundMenu(true);
-    else setTransferFundMenu(false);
+    // Automatically open submenus
+    setShowSubMenu(path.includes("/subadmin"));
+    setShowUserSubMenu(path.includes("/users") || path.includes("/deals") || path.includes("/tickets"));
+    setTransferFundMenu(path.includes("/transferfund") || path.includes("/wallet-history") || path.includes("/income-history") || path.includes("/withdraw-orders") ||
+      path.includes("/deposit-history"));
+    setGlobaldividend(path.includes("/global-dividend"));
   }, [location]);
 
   return (
@@ -55,16 +54,18 @@ const AdminLayout = () => {
         setShowUserSubMenu={setShowUserSubMenu}
         transferFundMenu={transferFundMenu}
         setTransferFundMenu={setTransferFundMenu}
+        globaldividend={globaldividend}
+        setGlobaldividend={setGlobaldividend}
       />
 
-      {/* Main Content */}
       <div className="flex-1 px-4 py-10 relative">
-        {/* Mobile menu button */}
         <button
-          className="lg:hidden absolute top-2 left-4 p-1.5 bg-white rounded-md shadow "
-          onClick={() => setSidebarOpen(true)} >
+          className="lg:hidden absolute top-2 left-4 p-1.5 bg-white rounded-md shadow"
+          onClick={() => setSidebarOpen(true)}
+        >
           <Menu size={22} />
         </button>
+
         <Outlet />
       </div>
     </div>

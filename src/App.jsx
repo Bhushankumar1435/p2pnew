@@ -65,6 +65,7 @@ import IncomeHistory from "./admin/TransferFund/IncomeHistory";
 import WithdrawOrders from "./admin/TransferFund/WithdrawOrders";
 import DepositHistory from "./admin/TransferFund/DepositHistory";
 import AdminLayout from "./admin/AdminLayout";
+import Globaldividend from "./admin/globaldividend/Globaldividend";
 
 const App = () => {
   return (
@@ -144,6 +145,10 @@ const App = () => {
         <Route path="income-history" element={<IncomeHistory />} />
         <Route path="withdraw-orders" element={<WithdrawOrders />} />
         <Route path="deposit-history" element={<DepositHistory />} />
+
+        {/* Global dividend */}
+        <Route path="global-dividend" element={<Globaldividend />} />
+
       </Route>
     </Routes>
   );

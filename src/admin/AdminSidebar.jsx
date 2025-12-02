@@ -14,6 +14,8 @@ const AdminSidebar = ({
   setShowUserSubMenu,
   transferFundMenu,
   setTransferFundMenu,
+  globaldividend,
+  setGlobaldividend,
 }) => {
   const navigate = useNavigate();
 
@@ -64,6 +66,7 @@ const AdminSidebar = ({
                 setShowSubMenu(!showSubMenu);
                 setShowUserSubMenu(false);
                 setTransferFundMenu(false);
+                setGlobaldividend(false);
               }}
               className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition
                 ${showSubMenu ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
@@ -105,6 +108,8 @@ const AdminSidebar = ({
                 setShowUserSubMenu(!showUserSubMenu);
                 setShowSubMenu(false);
                 setTransferFundMenu(false);
+                setGlobaldividend(false);
+
               }}
               className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition
                 ${showUserSubMenu ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
@@ -152,11 +157,13 @@ const AdminSidebar = ({
                 setTransferFundMenu(!transferFundMenu);
                 setShowSubMenu(false);
                 setShowUserSubMenu(false);
+                setGlobaldividend(false);
+
               }}
               className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition
                 ${transferFundMenu ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
             >
-              Transfer Fund
+              Fund Management
               {transferFundMenu ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
             </button>
 
@@ -195,6 +202,33 @@ const AdminSidebar = ({
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaMoneyBillWave /> Deposit History
+                </button>
+              </div>
+            )}
+          </div>
+          <div>
+            <button
+              onClick={() => {
+                setGlobaldividend(!globaldividend);
+                setShowSubMenu(false);
+                setShowUserSubMenu(false);
+                setTransferFundMenu(false);
+
+              }}
+              className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition
+                ${globaldividend ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
+            >
+              Global Dividend
+              {globaldividend ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            </button>
+
+            {globaldividend && (
+              <div className="pl-4 space-y-2 mt-2">
+                <button
+                  onClick={() => handleNav("/admin/transferfund")}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <FaMoneyCheckAlt /> Global Funding
                 </button>
               </div>
             )}

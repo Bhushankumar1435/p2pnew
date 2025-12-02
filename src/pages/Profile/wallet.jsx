@@ -1,15 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import { postData } from '../../api/protectedApi';
+import { postData, getData } from '../../api/protectedApi';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from 'react-router-dom';
 
 export default function Account() {
   const [walletAddress, setWalletAddress] = useState('');
-    const navigate = useNavigate();
+  const [savedAddress, setSavedAddress] = useState('');
 
+  // Load saved wallet address when page opens
+  useEffect(() => {
+    getData("/user/getAddress")
+      .then((res) => {
+        const api = res?.data || res;
+        if (api?.success && api?.data?.address) {
+          setSavedAddress(api.data.address);
+          setWalletAddress(api.data.address);
+        }
+      })
+      .catch(() => {
+        toast.error("Failed to load wallet address");
+      });
+  }, []);
 
   const handlePaste = async () => {
     try {
@@ -28,13 +41,13 @@ export default function Account() {
 
     try {
       const res = await postData("/user/addAddress", { address: walletAddress });
-
       const api = res?.data && typeof res.data === "object" ? res.data : res;
 
       if (api?.success) {
-        toast.success(api?.message || "Wallet address saved successfully!");
+        toast.success(api?.message || "Wallet address saved!");
+        setSavedAddress(walletAddress);
       } else {
-        toast.error(api?.message || "Failed to save wallet address");
+        toast.error(api?.message || "Failed to save address");
       }
     } catch (error) {
       toast.error("Server error");
@@ -44,17 +57,22 @@ export default function Account() {
   return (
     <div className='max-w-[600px] mx-auto w-full bg-[var(--primary)]'>
       <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="min-h-screen flex flex-col items-center bg-white text-black">
         <div className='h-[calc(100vh_-_56px)] overflow-auto w-full bg-[var(--primary)]'>
           <Header />
+
           <div className='w-full bg-[var(--primary)] rounded-t-xl relative z-[1]'>
             <div className='w-full pt-3'>
               <h1 className="text-base font-semibold px-4 pb-3 border-b border-gray-400">
                 Wallet Address
               </h1>
+
               <div className="w-full space-y-4 px-4 mt-4">
+                
                 <label className="block text-sm text-gray-700">Enter Address (BEP20)</label>
 
+                {/* Input + Paste */}
                 <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden bg-white">
                   <input
                     type="text"
@@ -78,6 +96,17 @@ export default function Account() {
                 >
                   Save
                 </button>
+
+                {/* Saved Address Card */}
+                {savedAddress && (
+                  <div className="mt-4 p-4 bg-white border border-gray-300 rounded-xl shadow-sm">
+                    <h2 className="text-sm font-semibold mb-2">Saved Wallet Address</h2>
+                    <p className="text-sm break-all text-gray-700">
+                      {savedAddress}
+                    </p>
+                  </div>
+                )}
+
               </div>
 
             </div>

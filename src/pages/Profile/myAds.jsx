@@ -95,7 +95,7 @@ const MyAds = ({ ads = [] }) => {
                   disabled={loading}
                   className="bg-gray-100 text-red-600 font-medium px-4 py-2 rounded-md hover:bg-red-100 disabled:opacity-50"
                 >
-                  {loading ? "Removing..." : "Remove"}
+                  {loading ? "Deleting..." : "Delete"}
                 </button>
               ) : (
                 <span className="text-gray-400 italic text-sm">

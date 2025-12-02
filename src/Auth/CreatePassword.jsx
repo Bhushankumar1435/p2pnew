@@ -3,16 +3,17 @@ import Logo from '../assets/svgs/logo.svg';
 import { ToastContainer, toast } from 'react-toastify';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { verifyForgotPassword } from "../api/api";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const CreatePassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
   const email = searchParams.get("email");
-
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,10 +65,9 @@ const CreatePassword = () => {
 
         <form onSubmit={handleSubmit} className="w-full space-y-4">
 
+          {/* OTP */}
           <div className="w-full">
-            <label className="text-[15px] mb-3 block font-medium">
-              OTP
-            </label>
+            <label className="text-[15px] mb-3 block font-medium">OTP</label>
             <input
               type="number"
               placeholder="Enter OTP"
@@ -77,30 +77,46 @@ const CreatePassword = () => {
             />
           </div>
 
-          <div className="w-full">
-            <label className="text-[15px] mb-3 block font-medium">
-              New Password
-            </label>
+          {/* Password */}
+          <div className="w-full relative">
+            <label className="text-[15px] mb-3 block font-medium">Set Password</label>
+
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Enter New Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:outline-none"
             />
+
+            {/* Eye Icon */}
+            <span
+              className="absolute right-4 top-[52px] cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
-          <div className="w-full">
-            <label className="text-[15px] mb-3 block font-medium">
-              Confirm Password
-            </label>
+          {/* Confirm Password */}
+          <div className="w-full relative">
+            <label className="text-[15px] mb-3 block font-medium">Confirm Password</label>
+
             <input
-              type="password"
+              type={showConfirm ? "text" : "password"}
               placeholder="Confirm New Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:outline-none"
             />
+
+            {/* Eye Icon */}
+            <span
+              className="absolute right-4 top-[52px] cursor-pointer"
+              onClick={() => setShowConfirm(!showConfirm)}
+            >
+              {showConfirm ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </div>
 
           <button

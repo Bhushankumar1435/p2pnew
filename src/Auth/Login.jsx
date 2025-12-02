@@ -123,7 +123,7 @@ const Login = () => {
                   required
                   className="w-full px-4 py-3 rounded-xl border border-neutral-300 focus:outline-none"
                 />
-                <div class="relative w-full ">
+                <div className="relative w-full ">
                   <label className="text-[15px] leading-4 text-black text-left font-medium my-3 block w-full">
                     Password
                   </label>
@@ -136,7 +136,7 @@ const Login = () => {
                     className='w-full px-4 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                   />
                   <div
-                    className="absolute right-[6px] top-3/4 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                    className="absolute right-[6px] top-8/12 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                     onClick={() => setShowPassword((prev) => !prev)}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -144,7 +144,7 @@ const Login = () => {
                 </div>
 
 
-                <Link to="/forgot_password" className="text-right flex mt-2 font-semibold text-[var(--link-color)] justify-end">Forgot Password</Link>
+                <Link to="/forgot_password" className="text-right flex mt-2 font-semibold text-[var(--link-color)] justify-end">Forgot Password ?</Link>
                 <button type="submit" className=" mt-4 w-full rounded-xl py-3 px-4 text-base leading-5 text-black font-normal cursor-pointer bg-gradient-to-r from-[var(--button-gradient-1)] to-[var(--button-gradient-2)]">
                   {loading ? 'Signing in...' : 'Sign in'}
                 </button>

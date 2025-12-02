@@ -12,6 +12,7 @@ export default function Account() {
   const [userId, setUserId] = useState('');
   const [error, setError] = useState('');
   const [balance, setBalance] = useState(0);
+  const [income, setIncome] = useState(0);
   const [activationList, setActivationList] = useState([]);
   const [depositeList, setDepositeList] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -34,7 +35,14 @@ export default function Account() {
         setBalance(res.data?.data || 0);
       })
       .catch((err) => console.error(err));
+    getData('/user/userBalance?type=INCOME', {})
+      .then((res) => {
+        setIncome(res.data?.data || 0);
+      })
+      .catch((err) => console.error(err));
   }, []);
+
+
 
   const menuItems = [
     { label: "Activate", path: "/activateaccount" },
@@ -59,12 +67,19 @@ export default function Account() {
                 <div className="w-full text-left">
                   <h2 className="font-semibold text-lg pb-4">Account Management</h2>
                 </div>
-                
-                <div className="flex items-center justify-between w-full border border-gray-300 bg-white p-4 rounded-lg shadow-sm">
-                  <span className="text-gray-700 font-medium">Wallet Balance:</span>
-                  <span className="text-xl font-bold text-green-600">
-                    ${balance.toFixed(2)}
-                  </span>
+                <div className="w-full flex flex-col gap-2">
+                  <div className="flex items-center justify-between w-full border border-gray-300 bg-white p-4 rounded-lg shadow-sm">
+                    <span className="text-gray-700 font-medium">Wallet Balance:</span>
+                    <span className="text-xl font-bold text-green-600">
+                      ${balance.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between w-full border border-gray-300 bg-white p-4 rounded-lg shadow-sm">
+                    <span className="text-gray-700 font-medium">Income Balance:</span>
+                    <span className="text-xl font-bold text-green-600">
+                      ${income.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
