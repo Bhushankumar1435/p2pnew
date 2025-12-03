@@ -73,28 +73,28 @@ const IncomeHistory = () => {
             <table className="w-full border border-gray-300 rounded-lg">
               <thead className="bg-gray-200">
                 <tr>
-                  <th className="p-2 border-b border-gray-300">S.No</th>
-                  <th className="p-2 border-b border-gray-300">UserID</th>
-                  <th className="p-2 border-b border-gray-300">Amount</th>
-                  <th className="p-2 border-b border-gray-300">Token</th>
-                  <th className="p-2 border-b border-gray-300">Mode</th>
-                  <th className="p-2 border-b border-gray-300">Type</th>
-                  <th className="p-2 border-b border-gray-300">Remark</th>
-                  <th className="p-2 border-b border-gray-300">Date</th>
+                  <th className="p-2 border ">S.No</th>
+                  <th className="p-2 border ">UserID</th>
+                  <th className="p-2 border ">Amount</th>
+                  <th className="p-2 border ">Token</th>
+                  <th className="p-2 border ">Mode</th>
+                  <th className="p-2 border ">Type</th>
+                  <th className="p-2 border ">Remark</th>
+                  <th className="p-2 border ">Date</th>
                 </tr>
               </thead>
 
               <tbody>
                 {incomeData.map((item, index) => (
                   <tr key={item._id} className="text-center border-b border-gray-200">
-                    <td className="p-2">{index + 1}</td>
-                    <td className="p-2">{item.userId.userId}</td>
-                    <td className={`p-2 ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600" }`}  >{item.amount}</td>
-                    <td className="p-2">{item.token}</td>
-                    <td className="p-2">{item.mode}</td>
-                    <td className="p-2">{item.transactionType}</td>
-                    <td className="p-2">{item.remark}</td>
-                    <td className="p-2">
+                    <td className="p-2 border">{index + 1}</td>
+                    <td className="p-2 border">{item.userId.userId}</td>
+                    <td className={`p-2 border border-black ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600" }`}  >{item.amount}</td>
+                    <td className="p-2 border">{item.token}</td>
+                    <td className="p-2 border">{item.mode}</td>
+                    <td className="p-2 border">{item.transactionType}</td>
+                    <td className="p-2 border">{item.remark}</td>
+                    <td className="p-2 border">
                       {new Date(item.createdAt).toLocaleString()}
                     </td>
                   </tr>

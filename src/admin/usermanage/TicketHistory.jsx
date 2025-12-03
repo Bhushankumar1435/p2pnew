@@ -126,6 +126,7 @@ const TicketHistory = () => {
                   <th className="p-2 border">User ID</th>
                   <th className="p-2 border">Order ID</th>
                   <th className="p-2 border">Description</th>
+                  <th className="p-2 border">Contact</th>
                   <th className="p-2 border">Subject</th>
                   <th className="p-2 border">File</th>
                   <th className="p-2 border">Status</th>
@@ -140,6 +141,7 @@ const TicketHistory = () => {
                     <td className="p-2 border">{t.userId?.userId || "-"}</td>
                     <td className="p-2 border">{t.orderId || "_"}</td>
                     <td className="p-2 border">{t.message}</td>
+                    <td className="p-2 border">{t.contact}</td>
                     <td className="p-2 border">{t.subject}</td>
 
                     <td className="p-2 border">

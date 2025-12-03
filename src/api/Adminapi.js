@@ -6,13 +6,14 @@ const API_BASE = import.meta.env.VITE_API_URL;
 // --------------------------------------------
 
 // 🔹 POST wrapper
-export async function adminPost(endpoint, data, auth = false) {
+export async function adminPost(endpoint, data = {}, auth = false) {
   try {
     const headers = { "Content-Type": "application/json" };
 
     if (auth) {
       const token = localStorage.getItem("admin_token");
-      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (!token) return { success: false, message: "Admin not logged in!" };
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     const res = await fetch(`${API_BASE}${endpoint}`, {
@@ -21,21 +22,20 @@ export async function adminPost(endpoint, data, auth = false) {
       body: JSON.stringify(data),
     });
 
-    const json = await res.json();
-    return json;
+    return await res.json();
   } catch (err) {
     return { success: false, message: err.message };
   }
 }
 
-// 🔹 GET wrapper
 export async function adminGet(endpoint, auth = false) {
   try {
     const headers = { "Content-Type": "application/json" };
 
     if (auth) {
       const token = localStorage.getItem("admin_token");
-      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (!token) return { success: false, message: "Admin not logged in!" };
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     const res = await fetch(`${API_BASE}${endpoint}`, {
@@ -43,12 +43,12 @@ export async function adminGet(endpoint, auth = false) {
       headers,
     });
 
-    const json = await res.json();
-    return json;
+    return await res.json();
   } catch (err) {
     return { success: false, message: err.message };
   }
 }
+
 
 // --------------------------------------------
 //  ADMIN AUTH APIS
@@ -161,6 +161,16 @@ export const GetOrderHistoryApi = (page, limit) =>
 
 export const GetTeamByLevelApi = (userId, level) =>
   adminGet(`admin/teamByLevel?id=${userId}&level=${level}`, true);
+
+
+// Only one API: globalIncome handles fetch & distribute
+// Get Global Dividend (and also distribute if amount is provided)
+export const GetGlobalDividendApi = (data = {}) =>
+  adminPost("admin/globalIncome", data, true);
+
+
+
+
 
 
 

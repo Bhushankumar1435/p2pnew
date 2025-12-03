@@ -280,7 +280,7 @@ const SubAdminDashboard = () => {
                   }}
                   className={`px-4 py-2 rounded-lg shadow-md transition ${activeFilter === "failed" ? "bg-red-700 text-white" : "bg-red-600 text-white hover:bg-red-700"}`}
                 >
-                  Failed Orders
+                  Reject Orders
                 </button>
               </div>
             </div>
@@ -334,7 +334,7 @@ const SubAdminDashboard = () => {
                                     Accept
                                   </button>
                                   <button onClick={() => handleActionBySubAdmin(deal._id, "REJECTED")} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
-                                    Failed
+                                    Reject
                                   </button>
                                 </>
                               )}

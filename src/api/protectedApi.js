@@ -72,4 +72,17 @@ export const postFileData = async (url, data) => {
   // left intentionally blank
 };
 
+
+// GET USER PROFILE
+export const getUserProfile = async () => {
+  try {
+    const res = await api.get("/user/userProfile");
+    return res.data; 
+  } catch (err) {
+    console.error("User Profile Error:", err);
+    return null;
+  }
+};
+
+
 export default api;

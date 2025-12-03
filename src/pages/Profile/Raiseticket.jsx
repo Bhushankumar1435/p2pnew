@@ -10,6 +10,7 @@ export default function Raiseticket() {
     const [subject, setSubject] = useState("");
     const [orderId, setOrderId] = useState("");
     const [message, setMessage] = useState("");
+    const [contact, setcontact] = useState("");
     const [ticketImage, setTicketImage] = useState(null);
     const [loading, setLoading] = useState(false)
 
@@ -51,6 +52,7 @@ export default function Raiseticket() {
         formData.append("subject", subject);
         formData.append("message", message);
         if (orderId) formData.append("orderId", orderId);
+        if (contact) formData.append("contact", contact);
         if (ticketImage) formData.append("ticketImage", ticketImage);
 
         try {
@@ -62,6 +64,7 @@ export default function Raiseticket() {
                 setSubject("");
                 setMessage("");
                 setOrderId("");
+                Contact("");
                 setTicketImage(null);
             } else {
                 toast.error(res?.message || "Something went wrong");
@@ -114,12 +117,20 @@ export default function Raiseticket() {
                         </label>
 
                         {/* Order ID */}
-                        <label className="block mb-1 font-medium text-sm pt-2">Order Id (Optional)</label>
+                        <label className="block mb-1 font-medium text-sm pt-1">Order Id (Optional)</label>
                         <input
                             value={orderId}
                             onChange={(e) => setOrderId(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-6"
+                            className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                             placeholder="Enter Order ID"
+                        />
+                        {/* Contact */}
+                        <label className="block mb-1 font-medium text-sm ">WhatsApp Number: (Optional)</label>
+                        <input
+                            value={contact}
+                            onChange={(e) => setcontact(e.target.value)}
+                            className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                            placeholder="WhatsApp Number"
                         />
 
                         {/* Description */}

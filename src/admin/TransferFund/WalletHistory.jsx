@@ -91,7 +91,7 @@ const WalletHistory = () => {
                     <td className="p-2 border">{item.userId.userId}</td>
 
                     <td
-                      className={`p-2 border ${item.mode === "CREDIT"
+                      className={`p-2 border border-black ${item.mode === "CREDIT"
                           ? "text-green-600"
                           : "text-red-600"
                         }`}
