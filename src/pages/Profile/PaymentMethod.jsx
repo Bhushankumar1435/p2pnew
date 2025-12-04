@@ -36,10 +36,10 @@ const PaymentMethod = () => {
         if (d.bankName && d.accountNumber) {
           setBank(true);
           setBankData({
+            name: d.name,
             bankName: d.bankName,
-            accountHolder: d.accountHolder,
             accountNumber: d.accountNumber,
-            ifsc: d.ifsc,
+            ifscCode: d.ifscCode,
           });
         } else {
           setBank(false);

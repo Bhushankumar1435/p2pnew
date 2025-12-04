@@ -151,3 +151,22 @@ export async function getTeamByLevel(level) {
 
     return res.json();
 }
+
+
+export async function getWithdrawOrders(limit = 10, page = 1,status) {
+    const TOKEN = localStorage.getItem("auth_token");
+
+    const res = await fetch(
+        `${BASE_URL}user/withdrawOrders?limit=${limit}&page=${page}&status=${status || "PENDING"}`,
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${TOKEN}`,
+            },
+        }
+    );
+
+    return res.json();
+}
+

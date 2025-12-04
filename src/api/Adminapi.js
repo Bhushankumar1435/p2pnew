@@ -138,6 +138,9 @@ export const GetUserTeamApi = (userId) =>
 export const BlockUnblockUserApi = (userId, action) =>
   adminPost("admin/blockUser", { id: userId, action }, true);
 
+export const HoldUnholdUserApi = (userId, action) =>
+  adminPost("admin/holdUser", { id: userId, action }, true);
+
 
 // --------------------------------------------
 //  ADMIN DEALS & TICKETS

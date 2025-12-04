@@ -6,10 +6,11 @@ const api = axios.create({
 
 // 🔐 Add auth token to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("auth_token");
-  if (token) config.headers["Authorization"] = "Bearer " + token;
+  const token = localStorage.getItem("token");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
 
 // ✅ GET request wrapper
 export const getData = async (url, params) => {

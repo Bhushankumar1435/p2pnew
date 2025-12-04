@@ -11,6 +11,7 @@ import VerifySignup from "./Auth/VerifySignUp";
 import ForgotPassword from "./Auth/ForgotPassword";
 import RegisterSuccess from "./Auth/RegisterSuccess";
 import CreatePassword from "./Auth/CreatePassword";
+// import AccountHold from "./Auth/AccountHold";
 
 
 // User Pages
@@ -38,6 +39,8 @@ import History from "./components/History";
 import ActivateAccount from "./components/ActivateAccount";
 import Withdraw from "./components/Withdraw";
 import Income from "./components/Income";
+import WithdrawHistory from "./components/WithdrawHistory";
+
 
 // Guards
 import AuthGuard from "./components/AuthGuard";
@@ -80,6 +83,7 @@ const App = () => {
       <Route path="/register-success" element={<RegisterSuccess />} />
       <Route path="/forgot_password" element={<ForgotPassword />} />
       <Route path="/verify-forgot-password" element={<CreatePassword />} />
+      {/* <Route path="/account-hold" element={<AccountHold />} /> */}
 
       {/* Protected User Routes */}
       <Route element={<AuthGuard />}>
@@ -107,6 +111,7 @@ const App = () => {
         <Route path="/activateaccount" element={<ActivateAccount />} />
         <Route path="/withdraw" element={<Withdraw />} />
         <Route path="/income" element={<Income />} />
+        <Route path="/withdraw-history" element={<WithdrawHistory />} />
       </Route>
 
       {/* Sub-Admin Routes */}

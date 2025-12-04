@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BlockUnblockUserApi, GetAdminUsersApi } from "../../api/Adminapi";
+import { BlockUnblockUserApi, GetAdminUsersApi, HoldUnholdUserApi } from "../../api/Adminapi";
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -54,8 +54,8 @@ const UserList = () => {
     // Mobile screen
     if (window.innerWidth < 768) {
       setPopupPosition({
-        x: window.innerWidth / 2 - popupWidth / 2, 
-        y: rect.bottom + window.scrollY + 10,     
+        x: window.innerWidth / 2 - popupWidth / 2,
+        y: rect.bottom + window.scrollY + 10,
       });
     }
     // Desktop screen
@@ -95,6 +95,23 @@ const UserList = () => {
       alert(`Failed to ${isBlocked ? "unblock" : "block"} user. Try again.`);
     }
   };
+  const toggleHoldUser = async (userId, isHold) => {
+    try {
+      const action = !isHold; // if hold = true → unhold, else → hold
+      const res = await HoldUnholdUserApi(userId, action);
+
+      if (res?.success) {
+        alert(`User account ${action ? "hold" : "unhold"} successfully!`);
+        fetchUsers();
+      } else {
+        alert(res?.message || "Operation failed.");
+      }
+    } catch (err) {
+      alert("Error updating hold status.");
+      console.error(err);
+    }
+  };
+
 
 
   return (
@@ -137,23 +154,45 @@ const UserList = () => {
                     <td className="border py-2">{u.country}</td>
 
                     {/* Status */}
-                    <td className="border py-2">
-                      {u.isBlocked ? (
-                        <button
-                          onClick={() => toggleBlockUser(u._id, true)}
-                          className="text-xs px-2 py-1 bg-red-600 text-white rounded"
-                        >
-                          Unblock
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => toggleBlockUser(u._id, false)}
-                          className="text-xs px-2 py-1 bg-green-600 text-white rounded"
-                        >
-                          Block
-                        </button>
-                      )}
-                    </td>
+                    <>
+                      <td className="border py-2">
+                        <div className="flex justify-center gap-2">
+                          {u.isBlocked ? (
+                            <button
+                              onClick={() => toggleBlockUser(u._id, true)}
+                              className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                            >
+                              Unblock
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => toggleBlockUser(u._id, false)}
+                              className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                            >
+                              Block
+                            </button>
+                          )}
+
+                          {u.hold ? (
+                            <button
+                              onClick={() => toggleHoldUser(u._id, true)}
+                              className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                            >
+                              Unhold
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => toggleHoldUser(u._id, false)}
+                              className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                            >
+                              Hold
+                            </button>
+                          )}
+                        </div>
+                      </td>
+
+                    </>
+
 
                     <td className="border py-2">
                       <button
@@ -190,21 +229,43 @@ const UserList = () => {
 
                   <p className="flex items-center gap-1">
                     <span className="font-medium">Status:</span>
-                    {u.isBlocked ? (
-                      <button
-                        onClick={() => toggleBlockUser(u._id, true)}
-                        className="text-xs px-2 py-1 bg-red-600 text-white rounded"
-                      >
-                        Unblock
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => toggleBlockUser(u._id, false)}
-                        className="text-xs px-2 py-1 bg-green-600 text-white rounded"
-                      >
-                        Block
-                      </button>
-                    )}
+                    <>
+                      {u.isBlocked ? (
+                        <button
+                          onClick={() => toggleBlockUser(u._id, true)}
+                          className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                        >
+                          Unblock
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => toggleBlockUser(u._id, false)}
+                          className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                        >
+                          Block
+                        </button>
+                      )}
+                      <p className="flex items-center gap-1">
+                        <span className="font-medium">Status:</span>
+                        {u.isHold ? (
+                          <button
+                            onClick={() => toggleHoldUser(u._id, true)}
+                            className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                          >
+                            Unhold
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => toggleHoldUser(u._id, false)}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                          >
+                            Hold
+                          </button>
+                        )}
+
+                      </p>
+
+                    </>
                   </p>
 
                   <button

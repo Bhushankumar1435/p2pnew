@@ -37,7 +37,7 @@ const ProfilePage = () => {
                     <li className="w-full flex justify-between font-medium"><strong>Name:-</strong> {user.name}</li>
                     <li className="w-full flex justify-between font-medium"><strong>Email:-</strong> {user.email}</li>
                     <li className="w-full flex justify-between font-medium"><strong>Phone:-</strong> {user.phoneNumber}</li>
-                    <li className="w-full flex justify-between font-medium"><strong>Sponsor:-</strong> {user.sponsorId || "N/A"}</li>
+                    <li className="w-full flex justify-between font-medium"><strong>Sponsor:-</strong> {user?.sponsorId?.userId || "N/A"}</li>
                     <li className="w-full flex justify-between font-medium"><strong>Country:-</strong> {user.country}</li>
                     <li className="w-full flex justify-between font-medium">
                         <strong>Created:-</strong> {new Date(user.createdAt).toLocaleString()}

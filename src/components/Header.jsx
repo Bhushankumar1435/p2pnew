@@ -30,7 +30,9 @@ const Header = () => {
   "/history",
   "/paymenthistory",
   "/withdraw",
-  "/income"
+  "/income",
+  "/Raiseticket",
+  "/Tickethistory"
 ];
 
   const showBackButton = backButtonRoutes.some(route =>

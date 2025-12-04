@@ -11,7 +11,7 @@ export default function Account() {
 
   // Load saved wallet address when page opens
   useEffect(() => {
-    getData("/user/getAddress")
+    getData("/user/bankDetails")
       .then((res) => {
         const api = res?.data || res;
         if (api?.success && api?.data?.address) {

@@ -12,15 +12,19 @@ export default function Raiseticket() {
     const [message, setMessage] = useState("");
     const [contact, setcontact] = useState("");
     const [ticketImage, setTicketImage] = useState(null);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
-    // ✅ Load ticket subjects from backend
+    // ATTACHMENT MODE (image OR link)
+    const [mode, setMode] = useState("image");
+    const [driveLink, setDriveLink] = useState("");
+
+    // Load subject list
     useEffect(() => {
         const fetchSubjects = async () => {
             const res = await getData("/user/ticketSubject");
 
             if (res?.data?.success) {
-                setSubjectList(res.data.data); // subject array from backend
+                setSubjectList(res.data.data);
             } else {
                 toast.error("Failed to load subjects");
             }
@@ -51,9 +55,18 @@ export default function Raiseticket() {
         const formData = new FormData();
         formData.append("subject", subject);
         formData.append("message", message);
+
         if (orderId) formData.append("orderId", orderId);
-        if (contact) formData.append("contact", contact);
-        if (ticketImage) formData.append("ticketImage", ticketImage);
+        if (contact) formData.append("whatsapp", contact);
+
+        // 🔥 Attachment Logic
+        if (mode === "image" && ticketImage) {
+            formData.append("ticketImage", ticketImage);
+        }
+
+        if (mode === "link" && driveLink.trim()) {
+            formData.append("driveLink", driveLink);
+        }
 
         try {
             const res = await postData("/user/raiseTicket", formData);
@@ -61,11 +74,14 @@ export default function Raiseticket() {
             if (res?.success) {
                 toast.success(res.message || "Ticket sent successfully!");
 
+                // Reset form
                 setSubject("");
                 setMessage("");
                 setOrderId("");
-                Contact("");
+                setcontact("");
                 setTicketImage(null);
+                setDriveLink("");
+                setMode("image");
             } else {
                 toast.error(res?.message || "Something went wrong");
             }
@@ -75,7 +91,6 @@ export default function Raiseticket() {
 
         setLoading(false);
     };
-
 
     return (
         <div className="max-w-[600px] mx-auto w-full bg-[var(--primary)]">
@@ -106,15 +121,43 @@ export default function Raiseticket() {
                             <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none" />
                         </div>
 
-                        {/* Attachment */}
-                        <label className="block mb-1 font-medium text-sm ">Attachment (Optional)</label>
-                        <label className="w-full border border-gray-300 rounded-md px-4 py-2 flex items-center gap-2 cursor-pointer mb-2">
-                            <FaUpload className="text-gray-500" />
-                            <span className="text-sm">
-                                {ticketImage ? ticketImage.name : "Upload Document"}
-                            </span>
-                            <input type="file" className="hidden" onChange={handleFileChange} />
-                        </label>
+                        {/* Attachment section */}
+                        <div className="flex w-full justify-between items-center mb-1">
+                            <label className="font-medium text-sm">Attachment (Optional)</label>
+
+                            {/* MODE SWITCH */}
+                            <select
+                                className="border rounded-md px-2 py-1 text-sm cursor-pointer"
+                                value={mode}
+                                onChange={(e) => setMode(e.target.value)}
+                            >
+                                <option value="image">Image</option>
+                                <option value="link">Drive Link</option>
+                            </select>
+                        </div>
+
+                        {/* IMAGE UPLOAD */}
+                        {mode === "image" && (
+                            <label className="w-full border border-gray-300 rounded-md px-4 py-2 flex items-center gap-2 cursor-pointer mb-2">
+                                <FaUpload className="text-gray-500" />
+                                <span className="text-sm">
+                                    {ticketImage ? ticketImage.name : "Upload Document"}
+                                </span>
+
+                                <input type="file" className="hidden" onChange={handleFileChange} />
+                            </label>
+                        )}
+
+                        {/* GOOGLE DRIVE LINK */}
+                        {mode === "link" && (
+                            <input
+                                type="text"
+                                placeholder="Paste Google Drive link"
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 mb-2 text-sm"
+                                value={driveLink}
+                                onChange={(e) => setDriveLink(e.target.value)}
+                            />
+                        )}
 
                         {/* Order ID */}
                         <label className="block mb-1 font-medium text-sm pt-1">Order Id (Optional)</label>
@@ -124,6 +167,7 @@ export default function Raiseticket() {
                             className="w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
                             placeholder="Enter Order ID"
                         />
+
                         {/* Contact */}
                         <label className="block mb-1 font-medium text-sm ">WhatsApp Number: (Optional)</label>
                         <input

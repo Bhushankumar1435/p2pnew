@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import { getData, postData } from "../api/protectedApi";
-import { FaArrowLeft, FaTimes } from "react-icons/fa";
+import { FaArrowLeft, FaTimes, FaHistory } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { getWithdrawOrders } from "../api/api"; // adjust path
+
+
 
 const Withdraw = () => {
   const navigate = useNavigate();
@@ -41,7 +44,7 @@ const Withdraw = () => {
     try {
       setLoading(true);
       const res = await postData("/user/placeWithdraw", {
-        amount: Number(amount), 
+        amount: Number(amount),
         // walletAddress,
       });
 
@@ -60,6 +63,20 @@ const Withdraw = () => {
     }
   };
 
+  const handleIconClick = async () => {
+    const res = await getWithdrawOrders(10, 1);
+
+    if (res.success) {
+      toast.success(res.message);
+      console.log("Withdraw Orders:", res.data?.data);
+      console.log("Total Count:", res.data?.count);
+    } else {
+      toast.error(res.message || "Couldn't load withdraw history");
+    }
+  };
+
+
+
   return (
     <>
       <div className="max-w-[600px] mx-auto w-full bg-[var(--primary)]">
@@ -70,25 +87,17 @@ const Withdraw = () => {
 
             <div className="w-full bg-[var(--primary)] rounded-t-xl relative z-[1]">
               <div className="w-full py-5 px-3">
-                {/* ✅ Navigation Controls */}
-                {/* <div className="flex items-center justify-between mb-4">
-                  <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-black"
-                  >
-                    <FaArrowLeft />
-                    <span className="font-medium">Back</span>
-                  </button>
 
-                  <button
-                    onClick={() => navigate("/account")}
-                    className="text-gray-500 hover:text-black text-lg"
-                  >
-                    <FaTimes />
-                  </button>
-                </div> */}
+                <div className="font-semibold mb-4 text-lg flex items-center justify-between">
+                  <h2>Withdraw Funds</h2>
 
-                <h2 className="font-semibold mb-4 text-lg">Withdraw Funds</h2>
+                  <FaHistory
+                    size={22}
+                    className="text-blue-600 cursor-pointer"
+                    onClick={() => navigate("/withdraw-history")}
+                  />
+
+                </div>
 
                 {/* ✅ Withdraw Form */}
                 <form onSubmit={handleSubmit} className="space-y-5 bg-white p-4 rounded-xl shadow-sm">
@@ -114,25 +123,14 @@ const Withdraw = () => {
                     />
                   </div>
 
-                  {/* Wallet Address */}
-                  {/* <div>
-                    <label className="block text-sm font-medium mb-2">Wallet Address</label>
-                    <input
-                      type="text"
-                      value={walletAddress}
-                      onChange={(e) => setWalletAddress(e.target.value)}
-                      className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter your USDT wallet address"
-                    />
-                  </div> */}
 
                   {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={loading}
                     className={`w-full text-white py-2 rounded-lg font-semibold transition ${loading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-blue-600 to-cyan-400 hover:hover:from-blue-700 hover:to-cyan-500 transition"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-blue-600 to-cyan-400 hover:hover:from-blue-700 hover:to-cyan-500 transition"
                       }`}
                   >
                     {loading ? "Processing..." : "Withdraw"}
@@ -143,7 +141,7 @@ const Withdraw = () => {
           </div>
           <Footer />
         </div>
-      </div>
+      </div >
     </>
   );
 };

@@ -123,10 +123,11 @@ const TicketHistory = () => {
             <table className="w-full border rounded-lg">
               <thead className="bg-gray-100">
                 <tr>
+                  <th className="p-2 border">S.No.</th>
                   <th className="p-2 border">User ID</th>
                   <th className="p-2 border">Order ID</th>
-                  <th className="p-2 border">Description</th>
                   <th className="p-2 border">Contact</th>
+                  <th className="p-2 border">Description</th>
                   <th className="p-2 border">Subject</th>
                   <th className="p-2 border">File</th>
                   <th className="p-2 border">Status</th>
@@ -136,12 +137,13 @@ const TicketHistory = () => {
               </thead>
 
               <tbody>
-                {tickets.map((t) => (
+                {tickets.map((t, idx) => (
                   <tr key={t._id} className="text-center">
+                    <td className="p-2 border"> {(page - 1) * limit + idx + 1} </td>
                     <td className="p-2 border">{t.userId?.userId || "-"}</td>
                     <td className="p-2 border">{t.orderId || "_"}</td>
+                    <td className="p-2 border">{t.whatsapp}</td>
                     <td className="p-2 border">{t.message}</td>
-                    <td className="p-2 border">{t.contact}</td>
                     <td className="p-2 border">{t.subject}</td>
 
                     <td className="p-2 border">
@@ -209,6 +211,7 @@ const TicketHistory = () => {
                 <div className="mt-2 text-sm text-gray-600 space-y-1">
                   <p><span className="font-medium">User ID:</span> {t.userId?.userId || "-"}</p>
                   <p><span className="font-medium">Order ID:</span> {t.orderId || "_"}</p>
+                  <p><span className="font-medium">Contact:</span> {t.whatsapp || "—"}</p>
                   <p><span className="font-medium">Description:</span> {t.message}</p>
                   <p><span className="font-medium">Subject:</span> {t.subject}</p>
 
