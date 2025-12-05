@@ -121,3 +121,15 @@ body {
 .system_box {
   flex: 0 0 25%;
 }
+
+/* Remove arrows in Chrome, Edge, Safari */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove arrows in Firefox */
+input[type="number"] {
+  -moz-appearance: textfield !important;
+}

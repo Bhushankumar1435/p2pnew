@@ -59,13 +59,12 @@ export default function Raiseticket() {
         if (orderId) formData.append("orderId", orderId);
         if (contact) formData.append("whatsapp", contact);
 
-        // 🔥 Attachment Logic
         if (mode === "image" && ticketImage) {
-            formData.append("ticketImage", ticketImage);
+            formData.append("doc", ticketImage);
         }
 
         if (mode === "link" && driveLink.trim()) {
-            formData.append("driveLink", driveLink);
+            formData.append("doc", driveLink);
         }
 
         try {

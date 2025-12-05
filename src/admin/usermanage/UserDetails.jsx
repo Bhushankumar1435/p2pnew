@@ -306,6 +306,7 @@ const UserDetails = () => {
                   <th className="p-2 border">Bank Name</th>
                   <th className="p-2 border">Account Number</th>
                   <th className="p-2 border">IFSC Code</th>
+                  <th className="p-2 border">Branch Name</th>
                   <th className="p-2 border">UPI</th>
                 </tr>
               </thead>
@@ -315,6 +316,7 @@ const UserDetails = () => {
                     <td className="p-2 border">{item.bankName || "-"}</td>
                     <td className="p-2 border">{item.accountNumber || "-"}</td>
                     <td className="p-2 border">{item.ifscCode || "-"}</td>
+                    <td className="p-2 border">{item.branchName || "-"}</td>
                     <td className="p-2 border">{item.upi || "-"}</td>
                   </tr>
                 ))}
@@ -336,6 +338,7 @@ const UserDetails = () => {
                 <Field label="Bank Name" value={item.bankName} />
                 <Field label="Account Number" value={item.accountNumber} />
                 <Field label="IFSC Code" value={item.ifscCode} />
+                <Field label="IFSC Code" value={item.branchName} />
                 <Field label="UPI" value={item.upi} />
                 <div className="mt-2">
                   <h4 className="font-medium">BEP20 Address</h4>
@@ -543,7 +546,7 @@ const UserDetails = () => {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="p-2 border">S.No.</th>
-                  <th className="p-2 border">User ID</th>
+                  {/* <th className="p-2 border">User ID</th> */}
                   <th className="p-2 border">Token</th>
                   <th className="p-2 border">Amount</th>
                   <th className="p-2 border">Type</th>
@@ -554,7 +557,7 @@ const UserDetails = () => {
                 {currentItems.map((d, idx) => (
                   <tr key={d._id || idx} className="border-b">
                     <td className="p-2 border">{indexOfFirstItem + idx + 1}</td>
-                    <td className="p-2 border">{d.userId?.userId || d.userId || "-"}</td>
+                    {/* <td className="p-2 border">{d.userId?.userId || d.userId || "-"}</td> */}
                     <td className="p-2 border">{d.token}</td>
                     <td className="p-2 border font-semibold text-blue-600">{d.amount}</td>
                     <td className="p-2 border">{d.transactionType}</td>
@@ -590,7 +593,7 @@ const UserDetails = () => {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="p-2 border">S.No.</th>
-                  <th className="p-2 border">User ID</th>
+                  {/* <th className="p-2 border">User ID</th> */}
                   <th className="p-2 border">Token</th>
                   <th className="p-2 border">Amount</th>
                   <th className="p-2 border">Status</th>
@@ -602,7 +605,7 @@ const UserDetails = () => {
                 {currentItems.map((w, idx) => (
                   <tr key={w._id || idx} className="border-b">
                     <td className="p-2 border">{indexOfFirstItem + idx + 1}</td>
-                    <td className="p-2 border">{w.userId?.userId || "-"}</td>
+                    {/* <td className="p-2 border">{w.userId?.userId || "-"}</td> */}
                     <td className="p-2 border">{w.token}</td>
                     <td className="p-2 border text-red-600 font-semibold">{w.amount}</td>
                     <td className="p-2 border">

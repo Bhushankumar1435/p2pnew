@@ -34,7 +34,7 @@ const AdminLayout = () => {
 
     // Automatically open submenus
     setShowSubMenu(path.includes("/subadmin"));
-    setShowUserSubMenu(path.includes("/users") || path.includes("/deals") || path.includes("/tickets"));
+    setShowUserSubMenu(path.includes("/users") || path.includes("/deals") || path.includes("/tickets") || path.includes("/orders"));
     setTransferFundMenu(path.includes("/transferfund") || path.includes("/wallet-history") || path.includes("/income-history") || path.includes("/withdraw-orders") ||
       path.includes("/deposit-history"));
     setGlobaldividend(path.includes("/global-dividend"));
