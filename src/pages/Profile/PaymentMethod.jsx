@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { t } from "../../components/i18n";
-import { Link } from "react-router-dom";
-import checkIcon from "../../assets/images/checkIcon.png";
 import { getData } from "../../api/protectedApi";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -38,6 +36,7 @@ const PaymentMethod = () => {
           setBankData({
             name: d.name,
             bankName: d.bankName,
+            branchName: d.branchName,
             accountNumber: d.accountNumber,
             ifscCode: d.ifscCode,
           });
@@ -65,89 +64,68 @@ const PaymentMethod = () => {
                 {t("AddPaymentMethod")}
               </h1>
 
-              <div className="w-full space-y-3 px-4 mt-4">
+              <div className="w-full space-y-4 px-4 mt-4">
 
-                {/* ---------------- BANK BUTTON ---------------- */}
-                <Link
-                  to="/addbank"
-                  className="flex justify-between items-center border border-gray-300 rounded-2xl px-4 py-3 bg-white"
-                >
-                  <span className="text-base font-normal">{t("bankDetails")}</span>
-
-                  {bank ? (
-                    <img src={checkIcon} alt="done" className="w-5 h-5" />
-                  ) : (
-                    <svg
-                      className="w-4 h-4 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  )}
-                </Link>
-
-                {/* BANK DETAILS CARD */}
-                <div className="border border-gray-300 rounded-2xl p-4 bg-white shadow-sm">
-                  <h2 className="text-sm font-semibold mb-2">{t("bankDetails")}</h2>
-                  {bank && (
-
-                    <div className="space-y-1 text-sm">
-                      <p>
-                        <strong>{t("AccountHolder")}:</strong> {bankData.name}
-                      </p>
-                      <p>
-                        <strong>{t("BankName")}:</strong> {bankData.bankName}
-                      </p>
-                      <p>
-                        <strong>{t("AccountNumber")}:</strong> {bankData.accountNumber}
-                      </p>
-                      <p>
-                        <strong>{t("IFSC")}:</strong> {bankData.ifscCode}
-                      </p>
+                {/* ---------------- BANK CARD ---------------- */}
+                <div className="rounded-xl border border-gray-200 bg-white shadow-md overflow-hidden">
+                  <div className={`h-1 w-full ${bank ? "bg-green-500" : "bg-blue-300"}`}></div>
+                  <div className="p-4 flex flex-col space-y-3">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-lg font-bold text-gray-800">{t("bankDetails")}</h2>
+                      <button
+                        className={`text-sm px-3 py-1 rounded transition ${
+                          bank
+                            ? "bg-green-600 text-white hover:bg-green-700"
+                            : "bg-blue-500 text-white hover:bg-blue-600"
+                        }`}
+                        onClick={() => (window.location.href = "/addbank")}
+                      >
+                        {bank ? "Edit" : "Add"}
+                      </button>
                     </div>
-                  )}
+
+                    {bank ? (
+                      <div className="space-y-1 text-sm">
+                        <p><strong>{t("AccountHolder")}:</strong> {bankData.name}</p>
+                        <p><strong>{t("BankName")}:</strong> {bankData.bankName}</p>
+                        <p><strong>{t("BranchName")}:</strong> {bankData.branchName}</p>
+                        <p><strong>{t("AccountNumber")}:</strong> {bankData.accountNumber}</p>
+                        <p><strong>{t("IFSC")}:</strong> {bankData.ifscCode}</p>
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">No bank details added yet</p>
+                    )}
+                  </div>
                 </div>
 
-                {/* ---------------- UPI BUTTON ---------------- */}
-                <Link
-                  to="/addupi"
-                  className="flex justify-between items-center border border-gray-300 rounded-2xl px-4 py-3 bg-white"
-                >
-                  <span className="text-base font-normal">{t("UPIDetails")}</span>
-
-                  {upi ? (
-                    <img src={checkIcon} alt="done" className="w-5 h-5" />
-                  ) : (
-                    <svg
-                      className="w-4 h-4 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  )}
-                </Link>
-
-                {/* UPI DETAILS CARD */}
-                <div className="border border-gray-300 rounded-2xl p-4 bg-white shadow-sm">
-                  <h2 className="text-sm font-semibold mb-2">{t("UPIDetails")}</h2>
-                  {upi && (
-
-                    <div className="space-y-1 text-sm">
-                      <p>
-                        <strong>{t("UPI")}:</strong> {upiData.upi}
-                      </p>
-                      {/* <p>
-                        <strong>{t("Name")}:</strong> {upiData.upiName}
-                      </p> */}
+                {/* ---------------- UPI CARD ---------------- */}
+                <div className="rounded-xl border border-gray-200 bg-white shadow-md overflow-hidden">
+                  <div className={`h-1 w-full ${upi ? "bg-green-500" : "bg-blue-300"}`}></div>
+                  <div className="p-4 flex flex-col space-y-3">
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-lg font-bold text-gray-800">{t("UPIDetails")}</h2>
+                      <button
+                        className={`text-sm px-3 py-1 rounded transition ${
+                          upi
+                            ? "bg-green-600 text-white hover:bg-green-700"
+                            : "bg-blue-500 text-white hover:bg-blue-600"
+                        }`}
+                        onClick={() => (window.location.href = "/addupi")}
+                      >
+                        {upi ? "Edit" : "Add"}
+                      </button>
                     </div>
-                  )}
+
+                    {upi ? (
+                      <div className="space-y-1 text-sm">
+                        <p><strong>{t("UPI")}:</strong> {upiData.upi}</p>
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">No UPI ID added yet</p>
+                    )}
+                  </div>
                 </div>
+
               </div>
             </div>
           </div>

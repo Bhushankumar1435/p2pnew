@@ -32,6 +32,7 @@ const translations = {
     bankAccount: 'Account Number',
     ifscCode: 'IFSC Code',
     bankName: 'Bank Name',
+    branchName: 'Branch Name',
     confirm: 'Confirm',
     yourUPI:'Your UPI ID',
     Delete: 'Delete'
@@ -67,6 +68,7 @@ const translations = {
     bankAccount: 'खाता संख्या',
     ifscCode: 'आईएफएससी कोड',
     bankName: 'बैंक का नाम',
+    branchName: 'शाखा का नाम',
     confirm: 'पुष्टि करें',
     yourUPI:'आपकी यूपीआई आईडी',
     Delete: 'मिटायें'
@@ -104,6 +106,7 @@ const translations = {
     bankAccount: 'Numéro de compte',
     ifscCode: 'Code IFSC',
     bankName: 'Nom de la banque',
+    branchName: 'Nom de la succursale',
     confirm: 'Confirmer',
     yourUPI:'Votre identifiant UPI',
     Delete: 'Supprimer'

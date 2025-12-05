@@ -13,6 +13,7 @@ const AddBank = () => {
   const [accountNumber, setAccountNumber] = useState("");
   const [ifsc, setIfsc] = useState("");
   const [bankName, setBankName] = useState("");
+  const [branchName, setBranchName] = useState("");
 
   useEffect(() => {
     fetchOldBankDetails();
@@ -29,6 +30,7 @@ const AddBank = () => {
         setAccountNumber(data?.accountNumber || "");
         setIfsc(data?.ifscCode || "");
         setBankName(data?.bankName || "");
+        setBranchName(data?.branchName || "");
       }
 
     } catch (err) {
@@ -42,7 +44,8 @@ const AddBank = () => {
         name,
         accountNumber,
         ifscCode: ifsc,
-        bankName
+        bankName,
+        branchName
       };
 
       const res = await postData("/user/addBankDetails", payload);
@@ -136,10 +139,23 @@ const AddBank = () => {
                     className="w-full px-4 py-3 rounded-xl border border-neutral-300 bg-white"
                   />
                 </div>
+                {/* Branch Name */}
+                <div className='w-full'>
+                  <label className="text-[15px] font-medium mb-2 block">
+                    {t('branchName')}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter Branch Name"
+                    value={branchName}
+                    onChange={(e) => setBranchName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-neutral-300 bg-white"
+                  />
+                </div>
 
                 <button
                   onClick={HandleConfirm}
-                  className="mt-4 w-full rounded-xl py-3 text-base bg-gradient-to-r from-[var(--button-gradient-1)] to-[var(--button-gradient-2)]"
+                  className="mt-4 w-full rounded-xl py-3 text-base font-medium bg-gradient-to-r from-[var(--button-gradient-1)] to-[var(--button-gradient-2)]"
                 >
                   {t('confirm')}
                 </button>

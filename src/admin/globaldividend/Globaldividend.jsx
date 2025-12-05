@@ -3,7 +3,7 @@ import { GetGlobalDividendApi } from "../../api/Adminapi";
 import { toast, ToastContainer } from "react-toastify";
 
 const DEFAULT_DATA = [
-  { rank: "T1", percent: 0 },
+  { rank: "T1", percent: 5.56 },
   { rank: "T2", percent: 5.56 },
   { rank: "T3", percent: 5.56 },
   { rank: "T4", percent: 11.11 },
