@@ -14,6 +14,7 @@ import InformationIcon from '../../assets/svgs/info.svg'
 import { toast, ToastContainer } from 'react-toastify'
 import { useNavigate } from "react-router-dom"
 import { Link } from 'react-router-dom'
+import { KeyRound } from "lucide-react";
 // import ComingSoon from '../components/ComingSoon'
 
 
@@ -42,7 +43,7 @@ const Settings = () => {
       link: "/account"
     },
     {
-      icon: <img src={ProfileIcon} alt="Notifications" className="w-5 h-5" />,
+      icon: <img src={ProfileIcon} alt="editProfile" className="w-5 h-5" />,
       label: t('editProfile'),
       link: '/editprofile',
     },
@@ -50,6 +51,11 @@ const Settings = () => {
       icon: <img src={NotificationIcon} alt="Notifications" className="w-5 h-5" />,
       label: t('Notifications'),
       link: '/notifications',
+    },
+    {
+      icon: <KeyRound alt="ChangePassword" className="w-5 h-5" />,
+      label: t('ChangePassword'),
+      link: '/ChangePassword',
     },
     {
       icon: <img src={Wallet} alt="Wallet" className="w-5 h-5" />,

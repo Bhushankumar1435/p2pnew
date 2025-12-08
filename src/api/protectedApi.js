@@ -86,4 +86,38 @@ export const getUserProfile = async () => {
 };
 
 
+// UPDATE USER PROFILE
+export const updateUserProfile = async (data) => {
+  try {
+    const res = await api.post("/user/updateProfile", data);
+    return res.data;
+  } catch (err) {
+    console.error("Update Profile Error:", err);
+    return (
+      err?.response?.data || {
+        success: false,
+        message: "Update failed!",
+      }
+    );
+  }
+};
+
+
+export const handleUpgrade = async () => {
+  try {
+    const res = await api.get("/user/upgrade"); // use your real API endpoint
+    return res.data;
+  } catch (err) {
+    console.error("Upgrade Error:", err);
+    return (
+      err?.response?.data || {
+        success: false,
+        message: "Upgrade request failed!",
+      }
+    );
+  }
+};
+
+
+
 export default api;

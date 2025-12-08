@@ -32,7 +32,8 @@ const Header = () => {
   "/withdraw",
   "/income",
   "/Raiseticket",
-  "/Tickethistory"
+  "/Tickethistory",
+  "/ChangePassword"
 ];
 
   const showBackButton = backButtonRoutes.some(route =>

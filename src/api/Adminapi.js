@@ -166,10 +166,13 @@ export const GetTeamByLevelApi = (userId, level) =>
   adminGet(`admin/teamByLevel?id=${userId}&level=${level}`, true);
 
 
-// Only one API: globalIncome handles fetch & distribute
 // Get Global Dividend (and also distribute if amount is provided)
 export const GetGlobalDividendApi = (data = {}) =>
   adminPost("admin/globalIncome", data, true);
+
+
+
+
 
 
 

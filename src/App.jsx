@@ -40,6 +40,7 @@ import ActivateAccount from "./components/ActivateAccount";
 import Withdraw from "./components/Withdraw";
 import Income from "./components/Income";
 import WithdrawHistory from "./components/WithdrawHistory";
+import ChangePassword from "./pages/Profile/ChangePassword";
 
 
 // Guards
@@ -112,6 +113,7 @@ const App = () => {
         <Route path="/withdraw" element={<Withdraw />} />
         <Route path="/income" element={<Income />} />
         <Route path="/withdraw-history" element={<WithdrawHistory />} />
+        <Route path="/changepassword" element={<ChangePassword />} />
       </Route>
 
       {/* Sub-Admin Routes */}

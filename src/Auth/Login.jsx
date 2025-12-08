@@ -83,7 +83,7 @@ const Login = () => {
             />
 
             <div
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+              className="absolute right-3 top-8/12 -translate-y-1/2 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}

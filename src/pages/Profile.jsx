@@ -11,6 +11,7 @@ import { getData } from '../api/protectedApi';
 
 const Profile = () => {
   const [profile, setProfileData] = useState(null);
+  const [type, setType] = useState(null);
   const [ads, setAds] = useState([]);
   const [activeTab, setActiveTab] = useState('info');
   const [loading, setLoading] = useState(false);
@@ -20,6 +21,7 @@ const Profile = () => {
     getData('/user/userProfile', {})
       .then((res) => {
         setProfileData(res?.data?.data?.data || null);
+        setType(res?.data?.data?.accountType || null);
       })
       .catch((err) => console.error('❌ Profile fetch error:', err));
   }, []);
@@ -53,7 +55,7 @@ const Profile = () => {
         text: "Have a look at this page! try it:",
         url: window.location.href,
       })
-      .catch(err => console.log("Share failed:", err));
+        .catch(err => console.log("Share failed:", err));
     } else {
       alert("Sharing is not supported in this browser.");
     }
@@ -62,7 +64,7 @@ const Profile = () => {
   useEffect(() => {
     fetchAds();
   }, []);
-  
+
 
   const tabs = useMemo(
     () => [
@@ -86,14 +88,17 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center flex-col w-full">
                 <div className="flex w-full items-center justify-between px-4">
+                  <div className="flex gap-1 items-center">
                   <img
                     src="https://i.pravatar.cc/100"
                     alt="Avatar"
                     className="h-14 w-14 rounded-full"
                   />
-
+                  <span className="px-4 mt-2 block text-xl text-red-600 font-semibold ">
+                    {type}
+                  </span></div>
                   <div className="flex space-x-4 text-gray-500 text-lg">
-                     <FaShareAlt className="text-black cursor-pointer" onClick={handleShare} />
+                    <FaShareAlt className="text-black cursor-pointer" onClick={handleShare} />
                     <Link to="/Settings">
                       <FaCog className="text-black" />
                     </Link>
@@ -108,16 +113,29 @@ const Profile = () => {
                     <>
                       <h2 className="font-semibold text-lg flex justify-between items-center">
                         <div className="flex items-center gap-2">
-                           {profile?.name}
+                          {profile?.name}
+
+                          {/* Verified icon */}
                           <img
                             src="https://cdn-icons-png.flaticon.com/512/1828/1828640.png"
                             alt="verified"
                             className="h-4 w-4"
                           />
+
+
+                          {/* Active / Inactive Status */}
+                          <span
+                            className={`text-sm font-semibold ${profile?.paidStatus ? "text-green-600" : "text-red-600"
+                              }`}
+                          >
+                            {profile?.paidStatus ? "Active" : "Inactive"}
+                          </span>
                         </div>
-                        <span>
-                          ID - {profile?.userId}
-                        </span>
+                        <div className="flex flex-col">
+                          <span>
+                            ID - {profile?.userId}
+                          </span>
+                        </div>
                       </h2>
                     </>
                   )}
@@ -141,6 +159,7 @@ const Profile = () => {
                 </button>
               ))}
             </div>
+
 
             {/* TAB CONTENT */}
             <div className="mt-4 text-sm text-gray-700 px-4">

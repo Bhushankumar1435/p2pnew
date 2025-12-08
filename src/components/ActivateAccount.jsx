@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { postData } from "../api/protectedApi";
+import React, { useEffect, useState } from "react";
+import { getData, postData } from "../api/protectedApi";
 import { validateSponser } from "../api/api";
 import { ToastContainer, toast } from "react-toastify";
 import Header from "./Header";
@@ -9,6 +9,8 @@ import { FaArrowLeft, FaTimes } from "react-icons/fa";
 
 const ActivateAccount = () => {
   const [userId, setUserId] = useState("");
+  const [balance, setBalance] = useState(0);
+  // const [activationList, setActivationList] = useState([]);
   const [validatedUser, setValidatedUser] = useState("");
   const navigate = useNavigate();
 
@@ -78,6 +80,24 @@ const ActivateAccount = () => {
       toast.error(backend?.message || "Something went wrong.");
     }
   };
+  // const activationTransactions = () => {
+  //   getData('/user/walletHistory', { limit: 10, page: 1 })
+  //     .then((res) => {
+  //       setActivationList(res.data?.data?.data || []);
+  //     })
+  //     .catch((err) => console.error(err));
+  // };
+  // activationTransactions();
+
+  useEffect(() => {
+
+    getData('/user/userBalance?type=WALLET', {})
+      .then((res) => {
+        setBalance(res.data?.data || 0);
+      })
+      .catch((err) => console.error(err));
+
+  }, []);
 
   return (
     <>
@@ -110,6 +130,12 @@ const ActivateAccount = () => {
                 </div> */}
 
                 <h2 className="font-semibold mb-4 text-lg">Activate Account</h2>
+                <div className="flex items-center justify-between w-full border border-gray-300 bg-white p-4 rounded-lg shadow-sm">
+                  <span className="text-gray-700 font-medium">Wallet Balance:</span>
+                  <span className="text-xl font-bold text-green-600">
+                    ${balance.toFixed(2)}
+                  </span>
+                </div>
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">

@@ -35,7 +35,8 @@ const translations = {
     branchName: 'Branch Name',
     confirm: 'Confirm',
     yourUPI:'Your UPI ID',
-    Delete: 'Delete'
+    Delete: 'Delete',
+    ChangePassword: 'Change Password'
   },
   hi: {
     home: "होम",
@@ -71,7 +72,8 @@ const translations = {
     branchName: 'शाखा का नाम',
     confirm: 'पुष्टि करें',
     yourUPI:'आपकी यूपीआई आईडी',
-    Delete: 'मिटायें'
+    Delete: 'मिटायें',
+    ChangePassword:'पासवर्ड बदलें'
 
   },
   fr: {
@@ -109,7 +111,8 @@ const translations = {
     branchName: 'Nom de la succursale',
     confirm: 'Confirmer',
     yourUPI:'Votre identifiant UPI',
-    Delete: 'Supprimer'
+    Delete: 'Supprimer',
+    ChangePassword:'Modifier le mot de passe'
   }
 };
 

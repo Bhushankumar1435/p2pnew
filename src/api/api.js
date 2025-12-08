@@ -170,3 +170,18 @@ export async function getWithdrawOrders(limit = 10, page = 1,status) {
     return res.json();
 }
 
+export async function changePassword(data) {
+    const TOKEN = localStorage.getItem("auth_token");
+
+    const res = await fetch(`${BASE_URL}user/changePassword`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify(data),
+    });
+
+    return res.json();
+}
+

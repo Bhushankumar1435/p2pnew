@@ -1,12 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { adminPost } from "../../api/Adminapi"; 
+import { adminPost, GetAdminUsersApi } from "../../api/Adminapi";
 
 const TransferFund = () => {
   const [userId, setUserId] = useState("");
   const [amount, setAmount] = useState("");
+  const [userName, setUserName] = useState("");
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      const res = await GetAdminUsersApi(1, 500);
+
+      if (res.success) {
+        setAllUsers(res.data.users);
+      }
+    };
+
+    loadUsers();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) {
+      setUserName("");
+      return;
+    }
+
+    const user = allUsers.find((u) => u.userId === userId.trim());
+
+    setUserName(user ? user.name : "");
+  }, [userId, allUsers]);
 
   const handleTransfer = async () => {
     if (!userId || !amount) {
@@ -20,19 +45,19 @@ const TransferFund = () => {
       const res = await adminPost(
         "admin/transferFund",
         { userId, amount: Number(amount) },
-        true 
+        true
       );
 
       if (res.success) {
-        toast.success(res.message || "Fund transfer successfully!");
+        toast.success(res.message || "Fund transferred!");
         setUserId("");
         setAmount("");
+        setUserName("");
       } else {
         toast.error(res.message || "Transfer failed!");
       }
     } catch (err) {
-      console.error("Transfer error:", err);
-      toast.error("Server error. Try again!");
+      toast.error("Server error");
     } finally {
       setLoading(false);
     }
@@ -40,36 +65,53 @@ const TransferFund = () => {
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md mt-10">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer />
+
       <h2 className="text-3xl font-semibold mb-6 text-center">Transfer Fund</h2>
 
+      {/* USER ID */}
       <div className="mb-4">
-        <label className="block text-base font-medium mb-1">Recipient User ID</label>
+        <label className="block font-medium mb-1">Recipient User ID</label>
+
         <input
           type="text"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
-          placeholder="Enter recipient ID"
+          className="w-full border px-3 py-2 rounded"
+          placeholder="Enter user ID"
         />
+
+        {/* Show username */}
+        {userId && userName && (
+          <p className="text-green-600 font-semibold mt-1">
+            User Name: {userName}
+          </p>
+        )}
+
+        {/* User not found */}
+        {userId && !userName && (
+          <p className="text-red-500 text-sm mt-1">User Not Found</p>
+        )}
       </div>
 
+      {/* AMOUNT */}
       <div className="mb-4">
-        <label className="block text-base font-medium mb-1">Amount</label>
+        <label className="block font-medium mb-1">Amount</label>
         <input
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300"
+          className="w-full border px-3 py-2 rounded"
           placeholder="Enter amount"
         />
       </div>
 
+      {/* BUTTON */}
       <button
         onClick={handleTransfer}
         disabled={loading}
-        className={`w-full py-2 mt-4 rounded-lg text-white ${
-          loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+        className={`w-full py-2 rounded text-white ${
+          loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
         }`}
       >
         {loading ? "Transferring..." : "Transfer Fund"}
