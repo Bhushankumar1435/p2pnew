@@ -103,6 +103,7 @@ const WithdrawOrders = () => {
             <table className="w-full border rounded-lg">
               <thead className="bg-gray-100">
                 <tr>
+                  <th className="p-2 border ">S.No</th>
                   <th className="p-2 border">User ID</th>
                   <th className="p-2 border">Amount</th>
                   <th className="p-2 border">Token</th>
@@ -114,6 +115,7 @@ const WithdrawOrders = () => {
               <tbody>
                 {orders.map((order) => (
                   <tr key={order._id} className="text-center">
+                    <td className="p-2 border">{(page - 1) * limit + (index + 1)}</td>
                     <td className="p-2 border">{order.userId.userId}</td>
                     <td className="p-2 border">{order.amount}</td>
                     <td className="p-2 border">{order.token}</td>

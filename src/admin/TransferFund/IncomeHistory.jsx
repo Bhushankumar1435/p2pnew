@@ -1,24 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { adminGet } from "../../api/Adminapi"; // adjust path
+import { adminGet } from "../../api/Adminapi"; 
+import { GetUserTxnTypesApi } from "../../api/protectedApi";
 
 const IncomeHistory = () => {
   const [incomeData, setIncomeData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // items per page
+  const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [searchUserId, setSearchUserId] = useState("");
+
+  const [walletTypes, setWalletTypes] = useState([]);
+  const [selectedType, setSelectedType] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef();
 
   // Fetch income history
   const fetchIncomeHistory = async () => {
     setLoading(true);
     try {
       let endpoint = `admin/incomeHistory?page=${page}&limit=${limit}`;
-      if (searchUserId.trim()) {
-        endpoint += `&userId=${encodeURIComponent(searchUserId.trim())}`;
-      }
+      if (searchUserId.trim()) endpoint += `&userId=${encodeURIComponent(searchUserId.trim())}`;
+      if (selectedType) endpoint += `&transactionType=${selectedType}`;
 
       const res = await adminGet(endpoint, true);
       if (res.success) {
@@ -38,17 +44,86 @@ const IncomeHistory = () => {
 
   useEffect(() => {
     fetchIncomeHistory();
-  }, [page, searchUserId]);
+  }, [page, searchUserId, selectedType]);
 
   const handleSearchChange = (e) => {
     setSearchUserId(e.target.value);
-    setPage(1); // reset to first page on new search
+    setPage(1);
   };
+
+  // Fetch wallet types
+  const fetchWalletTypes = async () => {
+    try {
+      const res = await GetUserTxnTypesApi("INCOME");
+      if (res.success) setWalletTypes(res.data);
+      else toast.error(res.message || "Failed to load wallet types");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load wallet types");
+    }
+  };
+
+  useEffect(() => {
+    fetchWalletTypes();
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto p-6">
       <ToastContainer position="top-right" autoClose={3000} />
-      <h1 className="text-2xl font-semibold mb-4">Income History</h1>
+
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Income History</h1>
+
+        {/* Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="px-3 py-1 text-sm bg-gray-700 text-white rounded-md hover:bg-gray-900 transition shadow-md"
+          >
+            Filter: {selectedType || "All"} ▼
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 top-10 w-52 bg-white border rounded-lg shadow-xl z-50 overflow-hidden">
+              <button
+                onClick={() => {
+                  setSelectedType("");
+                  setDropdownOpen(false);
+                  setPage(1);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm border-b"
+              >
+                All Types
+              </button>
+
+              {walletTypes.map((type, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setSelectedType(type);
+                    setDropdownOpen(false);
+                    setPage(1);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Search */}
       <div className="mb-4 flex items-center gap-2">
@@ -61,63 +136,58 @@ const IncomeHistory = () => {
         />
       </div>
 
+      {/* Table or Cards */}
       {loading ? (
         <p className="text-center">Loading...</p>
       ) : incomeData.length === 0 ? (
         <p className="text-center">No income history found.</p>
       ) : (
         <div className="w-full">
-
-          {/* DESKTOP TABLE */}
+          {/* Desktop Table */}
           <div className="overflow-x-auto hidden md:block mt-4">
             <table className="w-full border border-gray-300 rounded-lg">
               <thead className="bg-gray-200">
                 <tr>
-                  <th className="p-2 border ">S.No</th>
-                  <th className="p-2 border ">UserID</th>
-                  <th className="p-2 border ">Amount</th>
-                  <th className="p-2 border ">Token</th>
-                  <th className="p-2 border ">Mode</th>
-                  <th className="p-2 border ">Type</th>
-                  <th className="p-2 border ">Remark</th>
-                  <th className="p-2 border ">Date</th>
+                  <th className="p-2 border">S.No</th>
+                  <th className="p-2 border">UserID</th>
+                  <th className="p-2 border">Amount</th>
+                  <th className="p-2 border">Token</th>
+                  <th className="p-2 border">Mode</th>
+                  <th className="p-2 border">Type</th>
+                  <th className="p-2 border">Remark</th>
+                  <th className="p-2 border">Date</th>
                 </tr>
               </thead>
-
               <tbody>
                 {incomeData.map((item, index) => (
                   <tr key={item._id} className="text-center border-b border-gray-200">
-                    <td className="p-2 border">{index + 1}</td>
+                    <td className="p-2 border">{(page - 1) * limit + (index + 1)}</td>
                     <td className="p-2 border">{item.userId.userId}</td>
-                    <td className={`p-2 border border-black ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600" }`}  >{item.amount}</td>
+                    <td className={`p-2 border border-black ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600"}`}>{item.amount} </td>
                     <td className="p-2 border">{item.token}</td>
                     <td className="p-2 border">{item.mode}</td>
                     <td className="p-2 border">{item.transactionType}</td>
                     <td className="p-2 border">{item.remark}</td>
-                    <td className="p-2 border">
-                      {new Date(item.createdAt).toLocaleString()}
-                    </td>
+                    <td className="p-2 border">{new Date(item.createdAt).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {/* MOBILE CARD VIEW */}
+          {/* Mobile Cards */}
           <div className="md:hidden space-y-4 mt-4">
             {incomeData.map((item, index) => (
-              <div key={item._id} className="border rounded-lg p-4 shadow-sm bg-white" >
-                <p className="font-semibold text-gray-800"> #{index + 1} — {item.transactionType}</p>
+              <div key={item._id} className="border rounded-lg p-4 shadow-sm bg-white">
+                <p className="font-semibold text-gray-800">#{index + 1} — {item.transactionType}</p>
                 <div className="mt-2 text-sm text-gray-700 space-y-1">
-                  <p> <span className="font-medium">User ID:</span>{" "}{item.userId.userId}</p>
-                  <p> <span className="font-medium">Amount:</span>{" "}
-                    <span className={`font-semibold ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600"}`}>{item.amount}</span>
-                  </p>
-                  <p> <span className="font-medium">Token:</span> {item.token}</p>
-                  <p> <span className="font-medium">Mode:</span> {item.mode} </p>
-                  <p><span className="font-medium">Type:</span>{" "}{item.transactionType} </p>
+                  <p><span className="font-medium">User ID:</span> {item.userId.userId}</p>
+                  <p><span className="font-medium">Amount:</span> <span className={`font-semibold ${item.mode === "CREDIT" ? "text-green-600" : "text-red-600"}`}>{item.amount}</span></p>
+                  <p><span className="font-medium">Token:</span> {item.token}</p>
+                  <p><span className="font-medium">Mode:</span> {item.mode}</p>
+                  <p><span className="font-medium">Type:</span> {item.transactionType}</p>
                   <p><span className="font-medium">Remark:</span> {item.remark}</p>
-                  <p><span className="font-medium">Date:</span>{" "}{new Date(item.createdAt).toLocaleString()}</p>
+                  <p><span className="font-medium">Date:</span> {new Date(item.createdAt).toLocaleString()}</p>
                 </div>
               </div>
             ))}
@@ -125,16 +195,12 @@ const IncomeHistory = () => {
         </div>
       )}
 
-
       {/* Pagination */}
       <div className="flex justify-between items-center gap-4 mt-6">
         <button
           disabled={page === 1}
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page === 1
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
           <span className="md:hidden">←</span>
           <span className="hidden md:inline">← Prev</span>
@@ -147,10 +213,7 @@ const IncomeHistory = () => {
         <button
           disabled={page >= totalPages}
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page >= totalPages
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page >= totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
           <span className="md:hidden">→</span>
           <span className="hidden md:inline">Next →</span>

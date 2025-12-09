@@ -34,8 +34,10 @@ const SubAdminList = () => {
             <thead>
               <tr className="bg-gray-100 text-left">
                 <th className="p-3 border">S. No.</th>
+                <th className="p-3 border">User id</th>
                 <th className="p-3 border">Name</th>
                 <th className="p-3 border">Email</th>
+                <th className="p-3 border">Country</th>
                 <th className="p-3 border">Created At</th>
               </tr>
             </thead>
@@ -43,8 +45,10 @@ const SubAdminList = () => {
               {subAdmins.map((sa, index) => (
                 <tr key={sa._id} className="hover:bg-gray-50 transition">
                   <td className="p-3 border">{index + 1}</td>
+                  <td className="p-3 border">{sa.userId}</td>
                   <td className="p-3 border">{sa.name}</td>
                   <td className="p-3 border">{sa.email}</td>
+                  <td className="p-3 border">{sa.country}</td>
                   <td className="p-3 border">
                     {new Date(sa.createdAt).toLocaleDateString()}
                   </td>

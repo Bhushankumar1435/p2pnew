@@ -1,33 +1,40 @@
 import React, { useEffect, useState } from "react";
 import api, { handleUpgrade } from "../../api/protectedApi";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import { FiCopy } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
-  const [accountType, setAccountType] = useState(null); 
-  const [loading, setLoading] = useState(false); 
+  const [accountType, setAccountType] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [copied, setCopied] = useState(false); 
 
   const navigate = useNavigate();
 
-  // -------------------------------
-  // 📌 Fetch Profile
-  // -------------------------------
   const fetchProfile = async () => {
     try {
       const res = await api.get("/user/userProfile");
+
       if (res.data?.success) {
         const userData = res.data.data.data;
-        setUser(userData);
-        setStats({
-          sponsorCount: res.data.data.sponsorCount,
-          teamCount: res.data.data.teamCount,
-          activeDeals: res.data.data.activeDeals,
-          totalDeals: res.data.data.totalDeals,
+        const insideData = res.data.data;
+
+        setUser({
+          ...userData,
+          referralLink: insideData.referralLink,
         });
-        setAccountType(res.data.data.accountType); 
+
+        setStats({
+          sponsorCount: insideData.sponsorCount,
+          teamCount: insideData.teamCount,
+          activeDeals: insideData.activeDeals,
+          totalDeals: insideData.totalDeals,
+        });
+
+        setAccountType(insideData.accountType);
       }
     } catch (err) {
       toast.error("Failed to fetch profile");
@@ -38,9 +45,7 @@ const ProfilePage = () => {
     fetchProfile();
   }, []);
 
-  // -------------------------------
-  // 🔥 Upgrade to Validator
-  // -------------------------------
+ 
   const confirmUpgrade = async () => {
     setLoading(true);
     try {
@@ -50,7 +55,8 @@ const ProfilePage = () => {
 
       if (res.success) {
         toast.success("Upgrade successful!");
-        setAccountType("VALIDATOR"); 
+        setAccountType("VALIDATOR");
+      } else {
         toast.error(res.message);
       }
     } catch (err) {
@@ -60,10 +66,25 @@ const ProfilePage = () => {
     }
   };
 
+  
+  const copyReferralLink = () => {
+    if (!user?.referralLink) {
+      toast.error("Referral link not found!");
+      return;
+    }
+
+    navigator.clipboard.writeText(user.referralLink);
+    setCopied(true);
+
+    setTimeout(() => setCopied(false), 300); 
+  };
+
   if (!user || !stats) return <div className="text-center mt-5">Loading...</div>;
 
   return (
     <>
+      <ToastContainer position="top-center" autoClose={1500} />
+
       {/* ---------------- POPUP MODAL ---------------- */}
       {showPopup && (
         <div className="fixed inset-0 bg-white/65 bg-opacity-50 flex justify-center items-center z-50">
@@ -122,10 +143,23 @@ const ProfilePage = () => {
           <li className="w-full flex justify-between font-medium"><strong>Name:</strong> {user.name}</li>
           <li className="w-full flex justify-between font-medium"><strong>Email:</strong> {user.email}</li>
           <li className="w-full flex justify-between font-medium"><strong>Phone:</strong> {user.phoneNumber}</li>
+          <li className="w-full flex justify-between font-medium"><strong>Rank:</strong> {user.rank}</li>
           <li className="w-full flex justify-between font-medium"><strong>Sponsor:</strong> {user?.sponsorId?.userId || "N/A"}</li>
           <li className="w-full flex justify-between font-medium"><strong>Country:</strong> {user.country}</li>
           <li className="w-full flex justify-between font-medium">
             <strong>Created:</strong> {new Date(user.createdAt).toLocaleString()}
+          </li>
+          <li className="w-full flex justify-between items-center font-medium">
+            <strong>Referral Link:</strong>
+            <div className="flex items-center gap-2 max-w-[400px] overflow-hidden">
+              <span className="text-blue-600 underline text-sm break-all">
+                {user.referralLink}
+              </span>
+              <button onClick={copyReferralLink} className="flex items-center gap-1" >
+                <FiCopy size={18} className="text-gray-700" />
+                {copied && <span className="text-sm font-medium">Copied</span>}
+              </button>
+            </div>
           </li>
         </ul>
       </div>

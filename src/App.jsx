@@ -70,6 +70,7 @@ import WithdrawOrders from "./admin/TransferFund/WithdrawOrders";
 import DepositHistory from "./admin/TransferFund/DepositHistory";
 import AdminLayout from "./admin/AdminLayout";
 import Globaldividend from "./admin/globaldividend/Globaldividend";
+import AccountActivation from "./admin/usermanage/AccountActivation";
 
 const App = () => {
   return (
@@ -145,6 +146,7 @@ const App = () => {
         <Route path="deals" element={<ManageDeals />} />
         <Route path="tickets" element={<TicketHistory />} />
         <Route path="orders" element={<OrderHistory />} />
+        <Route path="account-activation" element={<AccountActivation />} />
 
         {/* Transfer Fund */}
         <Route path="transferfund" element={<TransferFund />} />

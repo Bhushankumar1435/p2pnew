@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { adminGet } from "../../api/Adminapi"; // adjust path
+import { adminGet } from "../../api/Adminapi";
+import { GetUserTxnTypesApi } from "../../api/protectedApi";
 
 const WalletHistory = () => {
   const [walletData, setWalletData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // items per page
+  const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [searchUserId, setSearchUserId] = useState("");
+  const [walletTypes, setWalletTypes] = useState([]);
+  const [selectedType, setSelectedType] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const dropdownRef = useRef();
 
   // Fetch wallet history
   const fetchWalletHistory = async () => {
@@ -18,6 +24,9 @@ const WalletHistory = () => {
       let endpoint = `admin/walletHistory?page=${page}&limit=${limit}`;
       if (searchUserId.trim()) {
         endpoint += `&userId=${encodeURIComponent(searchUserId.trim())}`;
+      }
+      if (selectedType) {
+        endpoint += `&transactionType=${selectedType}`;
       }
 
       const res = await adminGet(endpoint, true);
@@ -38,17 +47,88 @@ const WalletHistory = () => {
 
   useEffect(() => {
     fetchWalletHistory();
-  }, [page, searchUserId]);
+  }, [page, searchUserId, selectedType]);
 
   const handleSearchChange = (e) => {
     setSearchUserId(e.target.value);
     setPage(1);
   };
 
+  // Fetch wallet types from user API
+  const fetchWalletTypes = async () => {
+    try {
+      const res = await GetUserTxnTypesApi("WALLET");
+      if (res.success) {
+        setWalletTypes(res.data);
+      } else {
+        toast.error(res.message || "Failed to load wallet types");
+      }
+    } catch (err) {
+      console.error("Error fetching wallet types:", err);
+      toast.error("Failed to load wallet types");
+    }
+  };
+
+  useEffect(() => {
+    fetchWalletTypes();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <ToastContainer position="top-right" autoClose={3000} />
-      <h1 className="text-2xl font-semibold mb-4">Wallet History</h1>
+
+      {/* Title + Dropdown */}
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-semibold">Wallet History</h1>
+
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="px-3 py-1 text-sm bg-gray-700 text-white rounded-md hover:bg-gray-900 transition shadow-md"
+          >
+            Filter: {selectedType || "All"} ▼
+          </button>
+
+          {dropdownOpen && (
+            <div className="absolute right-0 top-10 w-52 bg-white border rounded-lg shadow-xl z-50 overflow-hidden">
+              <button
+                onClick={() => {
+                  setSelectedType("");
+                  setDropdownOpen(false);
+                  setPage(1);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm border-b"
+              >
+                All Types
+              </button>
+
+              {walletTypes.map((type, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setSelectedType(type);
+                    setDropdownOpen(false);
+                    setPage(1);
+                  }}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Search */}
       <div className="mb-4 flex items-center gap-2">
@@ -61,14 +141,14 @@ const WalletHistory = () => {
         />
       </div>
 
+      {/* Wallet Data Table / Cards */}
       {loading ? (
         <p className="text-center">Loading...</p>
       ) : walletData.length === 0 ? (
         <p className="text-center">No wallet history found.</p>
       ) : (
         <div className="w-full">
-
-          {/* DESKTOP TABLE */}
+          {/* Desktop Table */}
           <div className="overflow-x-auto hidden md:block">
             <table className="w-full border rounded-lg">
               <thead className="bg-gray-200">
@@ -83,27 +163,26 @@ const WalletHistory = () => {
                   <th className="p-2 border">Date</th>
                 </tr>
               </thead>
-
               <tbody>
                 {walletData.map((item, index) => (
                   <tr key={item._id} className="text-center">
-                    <td className="border p-2">{index + 1}</td>
+                    <td className="border p-2">
+                      {(page - 1) * limit + (index + 1)}
+                    </td>
                     <td className="p-2 border">{item.userId.userId}</td>
-
                     <td
-                      className={`p-2 border border-black ${item.mode === "CREDIT"
+                      className={`p-2 border border-black ${
+                        item.mode === "CREDIT"
                           ? "text-green-600"
                           : "text-red-600"
-                        }`}
+                      }`}
                     >
                       {item.amount}
                     </td>
-
                     <td className="p-2 border">{item.token}</td>
                     <td className="p-2 border">{item.mode}</td>
                     <td className="p-2 border">{item.transactionType}</td>
                     <td className="p-2 border">{item.remark}</td>
-
                     <td className="p-2 border">
                       {new Date(item.createdAt).toLocaleString()}
                     </td>
@@ -113,34 +192,31 @@ const WalletHistory = () => {
             </table>
           </div>
 
-          {/* MOBILE CARD VIEW */}
+          {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
             {walletData.map((item, index) => (
               <div key={item._id} className="border rounded-lg p-4 shadow-sm bg-white">
                 <p className="font-semibold text-gray-800">
                   #{index + 1} — {item.transactionType}
                 </p>
-
                 <div className="mt-2 text-sm text-gray-700 space-y-1">
-                  <p><span className="font-medium">User ID:</span> {item.userId.userId}</p>
-
+                  <p>
+                    <span className="font-medium">User ID:</span> {item.userId.userId}
+                  </p>
                   <p>
                     <span className="font-medium">Amount:</span>{" "}
                     <span
-                      className={`font-semibold ${item.mode === "CREDIT"
-                          ? "text-green-600"
-                          : "text-red-600"
-                        }`}
+                      className={`font-semibold ${
+                        item.mode === "CREDIT" ? "text-green-600" : "text-red-600"
+                      }`}
                     >
                       {item.amount}
                     </span>
                   </p>
-
                   <p><span className="font-medium">Token:</span> {item.token}</p>
                   <p><span className="font-medium">Mode:</span> {item.mode}</p>
                   <p><span className="font-medium">Type:</span> {item.transactionType}</p>
                   <p><span className="font-medium">Remark:</span> {item.remark}</p>
-
                   <p>
                     <span className="font-medium">Date:</span>{" "}
                     {new Date(item.createdAt).toLocaleString()}
@@ -157,13 +233,13 @@ const WalletHistory = () => {
         <button
           disabled={page === 1}
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page === 1
+          className={`px-4 py-2 rounded-lg shadow-md ${
+            page === 1
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          }`}
         >
-          <span className="md:hidden">←</span>
-          <span className="hidden md:inline">← Prev</span>
+          ← Prev
         </button>
 
         <span className="text-gray-700 font-medium">
@@ -173,13 +249,13 @@ const WalletHistory = () => {
         <button
           disabled={page >= totalPages}
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page >= totalPages
+          className={`px-4 py-2 rounded-lg shadow-md ${
+            page >= totalPages
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          }`}
         >
-          <span className="md:hidden">→</span>
-          <span className="hidden md:inline">Next →</span>
+          Next →
         </button>
       </div>
     </div>

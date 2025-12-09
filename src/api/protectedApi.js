@@ -105,7 +105,7 @@ export const updateUserProfile = async (data) => {
 
 export const handleUpgrade = async () => {
   try {
-    const res = await api.get("/user/upgrade"); // use your real API endpoint
+    const res = await api.get("/user/upgrade"); 
     return res.data;
   } catch (err) {
     console.error("Upgrade Error:", err);
@@ -117,6 +117,18 @@ export const handleUpgrade = async () => {
     );
   }
 };
+
+export const GetUserTxnTypesApi = async (type) => {
+  try {
+    const res = await getData(`user/txnType?type=${type}`, null);
+    return res.data; // or return res if your API returns { success, data }
+  } catch (err) {
+    console.error("Failed to fetch wallet types:", err);
+    return { success: false, data: [] };
+  }
+};
+
+
 
 
 

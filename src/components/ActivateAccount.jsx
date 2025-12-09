@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Header from "./Header";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaTimes } from "react-icons/fa";
+// import { FaArrowLeft, FaTimes } from "react-icons/fa";
 
 const ActivateAccount = () => {
   const [userId, setUserId] = useState("");

@@ -15,6 +15,7 @@ const UserList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [filter, setFilter] = useState("active");
 
   const TABS = [
     "BANK",
@@ -31,7 +32,13 @@ const UserList = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await GetAdminUsersApi(page, limit);
+      let status;
+      if (filter === "active") status = true;
+      else if (filter === "inactive") status = false;
+      else status = undefined; 
+
+      const res = await GetAdminUsersApi(page, limit, status);
+
       if (res.success) {
         setUsers(res.data.users || []);
         setTotalPages(Math.ceil(res.data.count / limit));
@@ -44,7 +51,10 @@ const UserList = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page]);
+  }, [page, filter]); 
+
+
+
 
   const openPopup = (event, userId) => {
     const rect = event.target.getBoundingClientRect();
@@ -118,6 +128,33 @@ const UserList = () => {
     <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
       <h2 className="text-2xl font-bold mb-4">User List</h2>
 
+      {/* ---------------- Active/Inactive Filter Tabs ---------------- */}
+      <div className="flex justify-end gap-2 mb-4">
+        <button
+          onClick={() => setFilter("all")}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "all"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-800 hover:bg-blue-400"
+            }`} >
+          All
+        </button>
+        <button
+          onClick={() => setFilter("active")}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "active"
+              ? "bg-green-600 text-white"
+              : "bg-green-200 text-green-800 hover:bg-green-400"
+            }`} >
+          Active
+        </button>
+        <button
+          onClick={() => setFilter("inactive")}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "inactive"
+              ? "bg-red-600 text-white"
+              : "bg-red-200 text-red-800 hover:bg-red-400"
+            }`} >
+          Inactive
+        </button>
+      </div>
       {loading ? (
         <p className="text-2xl font-semibold">Loading List…</p>
       ) : (

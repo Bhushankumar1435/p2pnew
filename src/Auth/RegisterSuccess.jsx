@@ -21,6 +21,15 @@ const RegisterSuccess = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const [showPopup, setShowPopup] = useState(false);
+
+  // STORED DETAILS FOR POPUP
+  const [popupDetails, setPopupDetails] = useState({
+    userId: "",
+    email: "",
+    password: ""
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,8 +56,18 @@ const RegisterSuccess = () => {
       const response = await createpassword(formData);
 
       if (response?.success) {
-        toast.success(response?.message || 'Password created successfully!');
-        setTimeout(() => navigate('/dashboard'), 2000);
+        toast.success("Password created successfully!");
+
+        const apiEmail = response?.data?.email || data?.email || "Not Provided";
+        const apiUserId = response?.data?.userId || data?.userId || "N/A";
+
+        setPopupDetails({
+          userId: apiUserId,
+          email: apiEmail,
+          password: newPassword
+        });
+
+        setShowPopup(true);
       } else {
         toast.error(response?.message || 'Something went wrong');
       }
@@ -59,10 +78,41 @@ const RegisterSuccess = () => {
     }
   };
 
+  const handleContinue = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <div className="max-w-[600px] mx-auto">
       <ToastContainer position="top-right" autoClose={3000} />
 
+      {/* POPUP */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-white/95 bg-opacity-40 flex justify-center items-center z-50 px-4">
+          <div className="bg-white w-full max-w-md rounded-xl p-6 shadow-xl text-center">
+            <h2 className="text-xl font-bold mb-4">Account Created Successfully</h2>
+
+            <div className="text-left bg-gray-100 p-4 rounded-lg mb-4">
+              <p><strong>User ID:</strong> {popupDetails.userId}</p>
+              <p><strong>Email:</strong> {popupDetails.email}</p>
+              <p><strong>Password:</strong> {popupDetails.password}</p>
+            </div>
+
+            <p className="text-red-600 font-semibold mb-3">
+              Please take a screenshot of this information.
+            </p>
+
+            <button
+              onClick={handleContinue}
+              className="w-full bg-black text-white py-2 mt-2 rounded-lg hover:bg-gray-800"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MAIN PAGE */}
       <div className="min-h-screen py-4 flex flex-col items-center justify-between bg-white text-black font-sans">
         <div className="w-full text-center">
           <img src={Logo} alt="Logo" className="w-32 mt-5 inline-block" />
@@ -73,7 +123,6 @@ const RegisterSuccess = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full px-6">
 
-            {/* Set Password */}
             <label className="text-[15px] leading-4 font-medium text-left">
               Set Password
             </label>
@@ -84,9 +133,8 @@ const RegisterSuccess = () => {
                 value={newPassword}
                 onChange={(e) => setNewPass(e.target.value)}
                 placeholder="Enter new password"
-                className="w-full placeholder:text-gray-400 px-4 py-3 pr-12 rounded-xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[var(--button-gradient-1)]"
+                className="w-full placeholder:text-gray-400 px-4 py-3 pr-12 rounded-xl border border-neutral-300"
               />
-
               <span
                 className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
                 onClick={() => setShowPassword(!showPassword)}
@@ -95,7 +143,6 @@ const RegisterSuccess = () => {
               </span>
             </div>
 
-            {/* Confirm Password */}
             <label className="text-[15px] leading-4 font-medium text-left">
               Confirm Password
             </label>
@@ -106,9 +153,8 @@ const RegisterSuccess = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPass(e.target.value)}
                 placeholder="Confirm new password"
-                className="w-full placeholder:text-gray-400 px-4 py-3 pr-12 rounded-xl border border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[var(--button-gradient-1)]"
+                className="w-full placeholder:text-gray-400 px-4 py-3 pr-12 rounded-xl border border-neutral-300"
               />
-
               <span
                 className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
                 onClick={() => setShowConfirm(!showConfirm)}
@@ -117,14 +163,13 @@ const RegisterSuccess = () => {
               </span>
             </div>
 
-            {/* Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full rounded-xl py-3 px-4 text-base leading-5 font-medium transition-all duration-200 ${
-                loading
-                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                  : 'text-black bg-gradient-to-r from-[var(--button-gradient-1)] to-[var(--button-gradient-2)] hover:opacity-90'
+              className={`w-full rounded-xl py-3 px-4 text-base leading-5 font-medium 
+              ${loading
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                : 'text-black bg-gradient-to-r from-[var(--button-gradient-1)] to-[var(--button-gradient-2)] hover:opacity-90'
               }`}
             >
               {loading ? 'Please wait...' : 'Confirm'}
@@ -132,7 +177,6 @@ const RegisterSuccess = () => {
           </form>
         </div>
 
-        {/* Footer */}
         <div className="pt-3 w-full sticky bottom-0 bg-white flex justify-center items-center text-xs text-gray-500 gap-1">
           <img src={VarifyIcon} alt="" className="w-4 h-4" />
           A secure P2P service provider

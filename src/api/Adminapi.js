@@ -105,8 +105,14 @@ export const GetSubAdminsRequestsApi = () =>
 // --------------------------------------------
 //  ADMIN USERS LIST
 // --------------------------------------------
-export const GetAdminUsersApi = (page = 1, limit = 10) =>
-  adminGet(`admin/users?page=${page}&limit=${limit}`, true);
+export const GetAdminUsersApi = (page = 1, limit = 10, paidStatus) => {
+  let query = `?page=${page}&limit=${limit}`;
+  if (paidStatus !== undefined) {
+    query += `&paidStatus=${paidStatus}`; 
+  }
+  return adminGet(`admin/users${query}`, true);
+};
+
 
 export const GetUserDetailsApi = (type, userId) =>
   adminGet(`admin/userDetails?type=${type}&id=${userId}`, true);
@@ -140,6 +146,21 @@ export const BlockUnblockUserApi = (userId, action) =>
 
 export const HoldUnholdUserApi = (userId, action) =>
   adminPost("admin/holdUser", { id: userId, action }, true);
+
+export const ActivateAccountApi = (userId) =>
+  adminPost("admin/activateAccount", { userId }, true);
+
+
+// export const GetAdminWalletHistoryApi = (page = 1, limit = 10, type) => {
+//   let query = `?page=${page}&limit=${limit}`;
+//   if (type) query += `&type=${type}`;
+//   return adminGet(`admin/walletHistory${query}`, true);
+// };
+// export const GetAdminIncomeHistoryApi = (page = 1, limit = 10, type) => {
+//   let query = `?page=${page}&limit=${limit}`;
+//   if (type) query += `&type=${type}`;
+//   return adminGet(`admin/incomeHistory${query}`, true);
+// };
 
 
 // --------------------------------------------
