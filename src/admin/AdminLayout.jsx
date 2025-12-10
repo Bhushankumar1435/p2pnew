@@ -10,6 +10,7 @@ const AdminLayout = () => {
   const [showUserSubMenu, setShowUserSubMenu] = useState(false);
   const [transferFundMenu, setTransferFundMenu] = useState(false);
   const [globaldividend, setGlobaldividend] = useState(false);
+  const [resolvedispute,setResolveDispute] = useState(false)
 
   const location = useLocation();
 
@@ -19,13 +20,14 @@ const AdminLayout = () => {
     if (path.startsWith("/admin/dashboard")) setActiveTab("dashboard");
     else if (path.startsWith("/admin/add-subadmin")) setActiveTab("add-subadmin");
     else if (path.startsWith("/admin/subadmin/list")) setActiveTab("subadmin-list");
-    else if (path.startsWith("/admin/subadmin/request")) setActiveTab("subadmin-request");
+    // else if (path.startsWith("/admin/subadmin/request")) setActiveTab("subadmin-request");
     else if (path.startsWith("/admin/subadmin/deposits")) setActiveTab("subadmin-deposits");
     else if (path.startsWith("/admin/users")) setActiveTab("user-list");
     else if (path.startsWith("/admin/deals")) setActiveTab("manage-deals");
     else if (path.startsWith("/admin/tickets")) setActiveTab("ticket-history");
     else if (path.startsWith("/admin/orders")) setActiveTab("order-history");
     else if (path.startsWith("/admin/account-activation")) setActiveTab("account-activation");
+    else if (path.startsWith("/admin/resolve-dispute")) setActiveTab("resolve-dispute");
     else if (path.startsWith("/admin/transferfund")) setActiveTab("transfer-fund");
     else if (path.startsWith("/admin/wallet-history")) setActiveTab("wallet-history");
     else if (path.startsWith("/admin/income-history")) setActiveTab("income-history");
@@ -35,7 +37,7 @@ const AdminLayout = () => {
 
     // Automatically open submenus
     setShowSubMenu(path.includes("/subadmin"));
-    setShowUserSubMenu(path.includes("/users") || path.includes("/deals") || path.includes("/tickets") || path.includes("/orders") || path.includes("/account-activation"));
+    setShowUserSubMenu(path.includes("/users") || path.includes("/deals") || path.includes("/tickets") || path.includes("/orders") || path.includes("/account-activation") || path.includes("/resolve-dispute"));
     setTransferFundMenu(path.includes("/transferfund") || path.includes("/wallet-history") || path.includes("/income-history") || path.includes("/withdraw-orders") ||
       path.includes("/deposit-history"));
     setGlobaldividend(path.includes("/global-dividend"));
@@ -57,6 +59,7 @@ const AdminLayout = () => {
         setTransferFundMenu={setTransferFundMenu}
         globaldividend={globaldividend}
         setGlobaldividend={setGlobaldividend}
+       
       />
 
       <div className="flex-1 px-4 py-10 relative">

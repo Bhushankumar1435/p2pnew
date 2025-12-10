@@ -58,7 +58,7 @@ import AdminDashboard from "./admin/AdminDashboard";
 import AddSubAdmin from "./admin/subadminManage/AddSubAdmin";
 import UserDetails from "./admin/usermanage/UserDetails";
 import SubAdminList from "./admin/subadminManage/SubAdminList";
-import SubAdminrequest from "./admin/subadminManage/SubAdminrequest";
+// import SubAdminrequest from "./admin/subadminManage/SubAdminrequest";
 import ManageDeals from "./admin/usermanage/ManageDeals";
 import TicketHistory from "./admin/usermanage/TicketHistory";
 import OrderHistory from "./admin/usermanage/OrderHistory";
@@ -71,6 +71,7 @@ import DepositHistory from "./admin/TransferFund/DepositHistory";
 import AdminLayout from "./admin/AdminLayout";
 import Globaldividend from "./admin/globaldividend/Globaldividend";
 import AccountActivation from "./admin/usermanage/AccountActivation";
+import ResolveDispute from "./admin/usermanage/ResolveDispute";
 
 const App = () => {
   return (
@@ -138,7 +139,7 @@ const App = () => {
         {/* Sub-Admin management */}
         <Route path="add-subadmin" element={<AddSubAdmin />} />
         <Route path="subadmin/list" element={<SubAdminList />} />
-        <Route path="subadmin/request" element={<SubAdminrequest />} />
+        {/* <Route path="subadmin/request" element={<SubAdminrequest />} /> */}
 
         {/* User management */}
         <Route path="users" element={<UserList />} />
@@ -147,6 +148,7 @@ const App = () => {
         <Route path="tickets" element={<TicketHistory />} />
         <Route path="orders" element={<OrderHistory />} />
         <Route path="account-activation" element={<AccountActivation />} />
+        <Route path="resolve-dispute" element={<ResolveDispute />} />
 
         {/* Transfer Fund */}
         <Route path="transferfund" element={<TransferFund />} />
@@ -157,6 +159,8 @@ const App = () => {
 
         {/* Global dividend */}
         <Route path="global-dividend" element={<Globaldividend />} />
+
+
 
       </Route>
     </Routes>

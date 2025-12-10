@@ -47,10 +47,10 @@ const Dashboard = () => {
                   </div>
                   {/* <span className="text-[var(--red)] text[15px] tracking-tighter font-medium">00:14:59 hrs</span> */}
                 </div>
-                <div className='shrink-0 flex items-center gap-2'>
+                {/* <div className='shrink-0 flex items-center gap-2'>
                   <button className="text-sm bg-yellow-400 text-black px-1 py-[2px] rounded tracking-tighter font-medium">New Deals</button>
                   <button className='relative after:absolute after:top-0 after:right-[1px] after:w-2 after:h-2 after:bg-red-500 after:rounded-full'><img src={BellIcon} /></button>
-                </div>
+                </div> */}
               </div>
 
 

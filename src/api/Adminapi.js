@@ -1,3 +1,4 @@
+
 // ✅ Read API base URL from env
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -191,6 +192,30 @@ export const GetTeamByLevelApi = (userId, level) =>
 export const GetGlobalDividendApi = (data = {}) =>
   adminPost("admin/globalIncome", data, true);
 
+
+//  resolve dispute 
+
+// ✅ Resolve a dispute
+export const resolveDisputeApi = async (id) => {
+  try {
+    const res = await adminGet(`admin/resolveDispute?id=${id}`, true);
+    return res; 
+  } catch (err) {
+    console.error("Dispute Error:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+// ✅ Get all disputed orders
+export const getAllDisputesApi = async () => {
+  try {
+    const res = await adminGet("admin/dispute-orders?status=DISPUTE", true);
+    return res;
+  } catch (err) {
+    console.error("Fetch Disputes Error:", err);
+    return { success: false, data: { orders: [] } };
+  }
+};
 
 
 

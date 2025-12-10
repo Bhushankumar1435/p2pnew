@@ -16,6 +16,7 @@ const AdminSidebar = ({
   setTransferFundMenu,
   globaldividend,
   setGlobaldividend,
+  
 }) => {
   const navigate = useNavigate();
 
@@ -91,12 +92,12 @@ const AdminSidebar = ({
                   <FaUsers /> Sub-Admin List
                 </button>
 
-                <button
+                {/* <button
                   onClick={() => handleNav("/admin/subadmin/request")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaCogs /> Sub-Admin Requests
-                </button>
+                </button> */}
               </div>
             )}
           </div>
@@ -109,7 +110,6 @@ const AdminSidebar = ({
                 setShowSubMenu(false);
                 setTransferFundMenu(false);
                 setGlobaldividend(false);
-
               }}
               className={`px-4 py-2 w-full flex justify-between items-center rounded-lg font-medium transition
                 ${showUserSubMenu ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
@@ -151,6 +151,12 @@ const AdminSidebar = ({
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
                   <FaTicketAlt /> Activate Account
+                </button>
+                <button
+                  onClick={() => handleNav("/admin/resolve-dispute")}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <FaTicketAlt /> Resolve Dispute
                 </button>
               </div>
             )}
@@ -239,6 +245,7 @@ const AdminSidebar = ({
               </div>
             )}
           </div>
+           
         </nav>
 
         {/* Logout */}

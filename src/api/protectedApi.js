@@ -121,12 +121,26 @@ export const handleUpgrade = async () => {
 export const GetUserTxnTypesApi = async (type) => {
   try {
     const res = await getData(`user/txnType?type=${type}`, null);
-    return res.data; // or return res if your API returns { success, data }
+    return res.data; 
   } catch (err) {
     console.error("Failed to fetch wallet types:", err);
     return { success: false, data: [] };
   }
 };
+export const raiseDisputeApi = async (id) => {
+  try {
+    const res = await getData(`user/dispute?id=${id}`, null);
+    return res.data;  
+  } catch (err) {
+    console.error("Dispute Error:", err);
+    return { success: false, message: err.message };
+  }
+};
+
+
+
+
+
 
 
 

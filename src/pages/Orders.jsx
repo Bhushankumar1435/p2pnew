@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CopyIcon from "../assets/images/copy_icon.png";
-import { getData } from "../api/protectedApi";
-import { ToastContainer } from "react-toastify";
+import { getData, raiseDisputeApi } from "../api/protectedApi";
+import { ToastContainer, toast } from "react-toastify";
 
 const Orders = () => {
   const [tab, setTab] = useState("all_orders");
@@ -16,13 +16,11 @@ const Orders = () => {
 
   const scrollContainerRef = useRef(null);
 
-  // FETCH ORDERS FROM BACKEND
-
+  // FETCH ORDERS
   const fetchOrders = async (params = {}, pageToLoad = 1) => {
-    // prevent duplicate loads
     if (loading) return;
-
     setLoading(true);
+
     try {
       const res = await getData("/user/orderHistory", {
         page: pageToLoad,
@@ -30,7 +28,7 @@ const Orders = () => {
         ...params,
       });
 
-      const list = (res?.data?.data?.orders) || [];
+      const list = res?.data?.data?.orders || [];
 
       if (pageToLoad === 1) {
         setOrders(list);
@@ -38,7 +36,6 @@ const Orders = () => {
         setOrders((prev) => [...prev, ...list]);
       }
 
-      // if returned list length < limit then no more pages
       setHasMore(list.length >= 10);
     } catch (err) {
       console.error("❌ Error fetching orders:", err);
@@ -49,7 +46,7 @@ const Orders = () => {
     }
   };
 
-
+  // Tab change load
   useEffect(() => {
     let statusParam = {};
 
@@ -62,6 +59,7 @@ const Orders = () => {
     fetchOrders(statusParam, 1);
   }, [tab]);
 
+  // Filter change load (only for all_orders)
   useEffect(() => {
     if (tab !== "all_orders") return;
 
@@ -74,14 +72,13 @@ const Orders = () => {
     fetchOrders(statusParam, 1);
   }, [filter, tab]);
 
-  // Scroll handler attached to scrollable container
-
+  // Infinite Scroll
   const handleScroll = () => {
     const container = scrollContainerRef.current;
     if (!container || loading || !hasMore) return;
 
     const { scrollTop, clientHeight, scrollHeight } = container;
-    // when user is within 120px of bottom, load next page
+
     if (scrollHeight - (scrollTop + clientHeight) < 120) {
       const next = page + 1;
       setPage(next);
@@ -103,20 +100,17 @@ const Orders = () => {
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
+
     container.addEventListener("scroll", handleScroll, { passive: true });
     return () => container.removeEventListener("scroll", handleScroll);
   }, [page, loading, hasMore, tab, filter]);
 
-
-
-  // RENDER
-
+  // RENDER UI
   return (
     <div className="max-w-[600px] mx-auto w-full bg-[var(--primary)]">
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="min-h-screen flex flex-col items-center bg-white text-black">
-        {/* This is the actual scroll container — keep its classes (UI unchanged) */}
         <div
           className="h-[calc(100vh_-_56px)] overflow-auto w-full bg-[var(--primary)]"
           ref={scrollContainerRef}
@@ -134,9 +128,10 @@ const Orders = () => {
                 ].map((item) => (
                   <button
                     key={item.key}
-                    className={`pb-2 text-base font-semibold ${tab === item.key
-                      ? "border-b-2 border-blue-500 text-black"
-                      : "text-[var(--text-color)]"
+                    className={`pb-2 text-base font-semibold 
+                      ${tab === item.key
+                        ? "border-b-2 border-blue-500 text-black"
+                        : "text-[var(--text-color)]"
                       }`}
                     onClick={() => setTab(item.key)}
                   >
@@ -151,9 +146,10 @@ const Orders = () => {
                   {["all", "completed", "rejected"].map((f) => (
                     <button
                       key={f}
-                      className={`px-3 py-1 rounded-md border ${filter === f
-                        ? "bg-blue-100 border-blue-500 text-blue-700 font-semibold"
-                        : "border-gray-300 text-gray-600"
+                      className={`px-3 py-1 rounded-md border 
+                        ${filter === f
+                          ? "bg-blue-100 border-blue-500 text-blue-700 font-semibold"
+                          : "border-gray-300 text-gray-600"
                         }`}
                       onClick={() => setFilter(f)}
                     >
@@ -163,23 +159,26 @@ const Orders = () => {
                 </div>
               )}
 
-              {/* Orders list */}
+              {/* Orders List */}
               <div className="w-full px-4">
                 {!loading && orders.length === 0 && (
-                  <p className="text-center text-gray-400 py-10">No orders found.</p>
+                  <p className="text-center text-gray-400 py-10">
+                    No orders found.
+                  </p>
                 )}
 
                 {orders.map((order) => (
                   <OrderCard key={order._id} order={order} />
                 ))}
 
-                {/* bottom loader / end message */}
                 {loading && (
                   <p className="text-center text-gray-500 py-4">Loading...</p>
                 )}
 
                 {!hasMore && !loading && orders.length > 0 && (
-                  <p className="text-center text-gray-400 py-4">No more orders.</p>
+                  <p className="text-center text-gray-400 py-4">
+                    No more orders.
+                  </p>
                 )}
               </div>
             </div>
@@ -192,14 +191,28 @@ const Orders = () => {
   );
 };
 
-// =====================================================================
-// ORDER CARD COMPONENT (UI kept the same)
-// =====================================================================
+// ======================== ORDER CARD ===========================
 const OrderCard = ({ order }) => {
+  const [disputeLoading, setDisputeLoading] = useState(false);
+
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
-    alert("Copied to clipboard!");
+    toast.success("Copied!");
   };
+
+  // Raise Dispute
+const handleDispute = async () => {
+  if (!window.confirm("Are you sure you want to raise a dispute?")) return;
+
+  setDisputeLoading(true);
+  const res = await raiseDisputeApi(order._id);
+  setDisputeLoading(false);
+
+  if (res.success) toast.success("Dispute raised successfully!");
+  else toast.error(res.message || "Failed to raise dispute");
+};
+
+
 
   const getStatusColor = () => {
     switch (order.status) {
@@ -233,16 +246,17 @@ const OrderCard = ({ order }) => {
 
   return (
     <div className="border border-gray-200 rounded-lg p-3 mb-3 shadow-sm bg-white">
+      {/* TOP */}
       <div className="flex justify-between items-center mb-2">
         <span className={`font-semibold ${getStatusTextColor()}`}>
           {order.deal?.token}/{order.deal?.fiat}
         </span>
-
         <span className={`px-2 py-0.5 text-xs rounded-md ${getStatusColor()}`}>
           {order.status}
         </span>
       </div>
 
+      {/* BODY */}
       <div className="flex justify-between mb-1">
         <span className="text-gray-600 text-sm">Token Amount</span>
         <span className="text-black font-medium">{order.tokenAmount}</span>
@@ -252,7 +266,6 @@ const OrderCard = ({ order }) => {
         <span className="text-gray-600 text-sm">Price</span>
         <span className="text-black font-medium">{order.deal?.price}</span>
       </div>
-      
 
       <div className="flex justify-between items-center mb-1">
         <span className="text-gray-600 text-sm">Hash</span>
@@ -261,7 +274,7 @@ const OrderCard = ({ order }) => {
           onClick={() => handleCopy(order.hash || "No Hash")}
         >
           {order.hash ? order.hash.substring(0, 10) : "No Hash"}...
-          <img src={CopyIcon} alt="copy" className="w-4 h-4" />
+          <img src={CopyIcon} className="w-4 h-4" />
         </span>
       </div>
 
@@ -295,7 +308,7 @@ const OrderCard = ({ order }) => {
           onClick={() => handleCopy(order._id)}
         >
           {order._id.substring(0, 10)}...
-          <img src={CopyIcon} alt="copy" className="w-4 h-4" />
+          <img src={CopyIcon} className="w-4 h-4" />
         </span>
       </div>
 
@@ -307,7 +320,17 @@ const OrderCard = ({ order }) => {
             : "N/A"}
         </span>
       </div>
-      
+
+      {/* DISPUTE BUTTON (ONLY FOR COMPLETED ORDERS) */}
+      {order.status === "COMPLETED" && (
+        <button
+          disabled={disputeLoading}
+          onClick={handleDispute}
+          className="mt-3 w-full bg-red-500 text-white py-2 rounded-md shadow hover:bg-red-600 disabled:bg-gray-400"
+        >
+          {disputeLoading ? "Processing..." : "Raise a Dispute"}
+        </button>
+      )}
     </div>
   );
 };

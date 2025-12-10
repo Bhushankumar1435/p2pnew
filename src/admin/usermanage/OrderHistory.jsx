@@ -38,7 +38,6 @@ const OrderHistory = () => {
     fetchOrders();
   }, [page]);
 
-  // Status Colors
   const statusColor = {
     PENDING: "text-yellow-600",
     ACCEPTED: "text-blue-600",
@@ -46,6 +45,8 @@ const OrderHistory = () => {
     SELLER_CONFIRMED: "text-orange-600",
     COMPLETED: "text-green-600",
     CANCELLED: "text-red-600",
+    REJECTED:"text-red-600",
+    DISPUTE:"text-red-600",
   };
 
   const handleSearch = () => {
@@ -67,7 +68,7 @@ const OrderHistory = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <ToastContainer />
+           <ToastContainer position="top-right" autoClose={3000} />
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
         <h1 className="text-2xl font-semibold">Order History</h1>
 
@@ -119,7 +120,9 @@ const OrderHistory = () => {
               <tbody>
                 {orders.map((o, ind) => (
                   <tr key={o._id} className="border-b">
-                    <td className="p-2 border">{ind + 1}</td>
+                     <td className="border p-2">
+                      {(page - 1) * limit + (ind + 1)}
+                    </td>
                     <td className="p-2 border">{o._id}</td>
                     <td className="p-2 border">{o?.buyer?.userId || "-"}</td>
                     <td className="p-2 border">{o?.seller?.userId || "-"}</td>
