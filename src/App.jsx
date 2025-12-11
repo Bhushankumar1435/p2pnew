@@ -51,6 +51,7 @@ import AdminAuthGuard from "./Admin/AdminAuthGuard";
 // Sub-Admin Pages
 import SubAdminLogin from "./subadmin/subadminauth/SubAdminLogin";
 import SubAdminDashboard from "./subadmin/SubAdminDashboard";
+import PickOrders from "./subadmin/subadminauth/PickOrders";
 
 // Admin Pages
 import AdminLogin from "./admin/adminauth/AdminLogin";
@@ -128,6 +129,7 @@ const App = () => {
           </SubAdminAuthGuard>
         }
       />
+      <Route path="/subadminauth/pick-orders" element={<PickOrders/>}/>
 
       {/* Admin Routes */}
       <Route path="/adminauth/login" element={<AdminLogin />} />

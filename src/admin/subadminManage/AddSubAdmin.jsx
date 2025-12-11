@@ -29,31 +29,37 @@ const AddSubAdmin = () => {
   }, [userId, allUsers]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!userId) {
-      toast.error("User ID is required!");
+  if (!userId) {
+    toast.error("User ID is required!");
+    return;
+  }
+
+  if (!userName) {
+    toast.error("User not found!");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await AddSubAdminApi({ userId });
+
+    if (!res.success) {
+      toast.error(res.message || "Failed to create Sub-Admin");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await AddSubAdminApi({ userId });
+    toast.success(res.message || "Sub-Admin created successfully!");
+    setTimeout(() => navigate("/admin/subadmin/list"), 700);
+  } catch (err) {
+    toast.error(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      if (!res.success) {
-        toast.error(res.message || "Failed to create Sub-Admin");
-        setLoading(false);
-        return;
-      }
-
-      toast.success(res.message || "Sub-Admin created successfully!");
-      setTimeout(() => navigate("/admin/subadmin/list"), 700);
-    } catch (err) {
-      toast.error(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-md mt-10">

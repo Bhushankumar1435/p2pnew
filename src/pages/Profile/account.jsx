@@ -20,7 +20,7 @@ export default function Account() {
   const navigate = useNavigate();
 
   const activationTransactions = () => {
-    getData('/user/walletHistory', { limit: 10, page: 1 })
+    getData('/user/walletHistory', { limit: 50, page: 1 })
       .then((res) => {
         setActivationList(res.data?.data?.data || []);
       })

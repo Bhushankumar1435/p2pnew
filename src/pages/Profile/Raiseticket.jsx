@@ -122,7 +122,7 @@ export default function Raiseticket() {
 
                         {/* Attachment section */}
                         <div className="flex w-full justify-between items-center mb-1">
-                            <label className="font-medium text-sm">Attachment (Optional)</label>
+                            <label className="font-medium text-sm">Attachment  ( Optional )</label>
 
                             {/* MODE SWITCH */}
                             <select
@@ -159,7 +159,7 @@ export default function Raiseticket() {
                         )}
 
                         {/* Order ID */}
-                        <label className="block mb-1 font-medium text-sm pt-1">Order Id (Optional)</label>
+                        <label className="block mb-1 font-medium text-sm pt-1">Order Id  ( Optional )</label>
                         <input
                             value={orderId}
                             onChange={(e) => setOrderId(e.target.value)}
@@ -168,7 +168,7 @@ export default function Raiseticket() {
                         />
 
                         {/* Contact */}
-                        <label className="block mb-1 font-medium text-sm ">WhatsApp Number: (Optional)</label>
+                        <label className="block mb-1 font-medium text-sm ">WhatsApp Number: ( Optional )</label>
                         <input
                             value={contact}
                             onChange={(e) => setcontact(e.target.value)}

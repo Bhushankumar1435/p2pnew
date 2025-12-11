@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { getSubAdminDashboard } from "../api/SubAdminapi";
+import PickOrders from "./subadminauth/PickOrders";
 
 const SubAdminDashboard = () => {
   const navigate = useNavigate();
@@ -16,15 +17,15 @@ const SubAdminDashboard = () => {
 
   // Deals state + pagination
   const [deals, setDeals] = useState([]);
-  const [allDeals, setAllDeals] = useState([]); // raw page data
+  const [allDeals, setAllDeals] = useState([]);
   const [dealsLoading, setDealsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedDeal, setSelectedDeal] = useState(null);
 
   // Pagination
   const [page, setPage] = useState(1);
-  const [limit] = useState(10); // items per page
-  const [totalPages, setTotalPages] = useState(1); // computed from backend count
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   const BASE_URL = import.meta.env.VITE_API_URL || "";
   const API_BASE = BASE_URL.endsWith("/") ? BASE_URL : `${BASE_URL}/`;
@@ -62,9 +63,11 @@ const SubAdminDashboard = () => {
   // Reset to page 1 when user switches to deals tab
   useEffect(() => {
     if (activeTab === "deals") {
-      setPage(1);
+      setActiveFilter("all");
+      setDeals(allDeals);
     }
-  }, [activeTab]);
+  }, [activeTab, allDeals]);
+
 
   // ===== Fetch Deals (paginated) =====
   useEffect(() => {
@@ -192,6 +195,19 @@ const SubAdminDashboard = () => {
             >
               Manage Orders
             </button>
+            <button
+              onClick={() => {
+                setActiveTab("pick-orders");
+                setSidebarOpen(false);
+              }}
+              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "pick-orders"
+                ? "bg-blue-100 text-blue-700"
+                : "hover:bg-gray-100 text-gray-700"
+                }`}
+            >
+              Pick Orders
+            </button>
+
           </nav>
 
           <div className="">
@@ -302,7 +318,7 @@ const SubAdminDashboard = () => {
                           <th className="py-2 px-3 border">Token</th>
                           <th className="py-2 px-3 border">Fiat</th>
                           <th className="py-2 px-3 border">Receipt</th>
-                          <th className="py-2 px-3 border border-b-0">Actions</th>
+                          <th className="py-2 px-3 border">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -323,21 +339,34 @@ const SubAdminDashboard = () => {
                                 "—"
                               )}
                             </td>
-                            <td className="py-2 px-3 flex border-t justify-center flex-wrap gap-2">
-                              <button onClick={() => setSelectedDeal(deal)} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                More Details
-                              </button>
+                            <td className="py-2 px-3 border text-center">
+                              <div className="flex justify-center flex-wrap gap-2">
+                                <button
+                                  onClick={() => setSelectedDeal(deal)}
+                                  className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                >
+                                  More Details
+                                </button>
 
-                              {(activeFilter === "confirmed" || activeFilter === "failed") && (
-                                <>
-                                  <button onClick={() => handleActionBySubAdmin(deal._id, "COMPLETED")} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
-                                    Accept
-                                  </button>
-                                  <button onClick={() => handleActionBySubAdmin(deal._id, "REJECTED")} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
-                                    Reject
-                                  </button>
-                                </>
-                              )}
+                                {activeFilter !== "all" &&
+                                  (deal.status === "CONFIRMED" || deal.status === "FAILED") && (
+                                    <>
+                                      <button
+                                        onClick={() => handleActionBySubAdmin(deal._id, "COMPLETED")}
+                                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                                      >
+                                        Accept
+                                      </button>
+
+                                      <button
+                                        onClick={() => handleActionBySubAdmin(deal._id, "REJECTED")}
+                                        className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                                      >
+                                        Reject
+                                      </button>
+                                    </>
+                                  )}
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -373,10 +402,33 @@ const SubAdminDashboard = () => {
                         </p>
 
                         <div className="flex flex-wrap gap-2 mt-2">
-                          <button onClick={() => setSelectedDeal(deal)} className="w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700">
+                          <button
+                            onClick={() => setSelectedDeal(deal)}
+                            className="w-full bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700"
+                          >
                             More Details
                           </button>
+
+                          {activeFilter !== "all" &&
+                            (deal.status === "CONFIRMED" || deal.status === "FAILED") && (
+                              <>
+                                <button
+                                  onClick={() => handleActionBySubAdmin(deal._id, "COMPLETED")}
+                                  className="w-full bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  onClick={() => handleActionBySubAdmin(deal._id, "REJECTED")}
+                                  className="w-full bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700"
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            )}
+
                         </div>
+
                       </div>
                     ))}
                   </div>
@@ -410,6 +462,12 @@ const SubAdminDashboard = () => {
             </div>
           </section>
         )}
+        {activeTab === "pick-orders" && (
+          <section className="w-full max-w-6xl">
+            <PickOrders />
+          </section>
+        )}
+
       </main>
 
       {/* ===== Modal: Selected Deal ===== */}

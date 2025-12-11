@@ -89,9 +89,9 @@ const IncomeHistory = () => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="px-3 py-1 text-sm bg-gray-700 text-white rounded-md hover:bg-gray-900 transition shadow-md"
+            className="flex px-3 py-1 text-sm bg-gray-700 text-white items-center rounded-md hover:bg-gray-900 transition shadow-md"
           >
-            Filter: {selectedType || "All"} ▼
+             {selectedType || "All"}  ▼
           </button>
 
           {dropdownOpen && (

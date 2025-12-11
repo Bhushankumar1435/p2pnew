@@ -101,3 +101,47 @@ export async function getSubAdminDashboard() {
   const data = await res.json();
   return data;
 }
+
+// ⭐ NEW: Fetch Paginated Request Orders (Your Required API)
+export async function getSubAdminOrderhistory(page = 1, limit = 10) {
+  const token = localStorage.getItem("sub_admin_token");
+  if (!token) return { success: false, message: "Unauthorized" };
+
+  try {
+    const res = await fetch(`${API_BASE}sub-admin/order-history?page=${page}&limit=${limit}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) return { success: false, message: `HTTP ${res.status}` };
+    return await res.json();
+  } catch (err) {
+    console.error("API fetch error:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+// 🔹 Pick Order API
+export async function pickOrder(orderId) {
+  const token = localStorage.getItem("sub_admin_token");
+  if (!token) return { success: false, message: "Unauthorized" };
+
+  try {
+    const res = await fetch(`${API_BASE}sub-admin/pickOrder`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ id:orderId }),  // ✅ FIXED
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+}

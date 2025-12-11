@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BlockUnblockUserApi, GetAdminUsersApi, HoldUnholdUserApi } from "../../api/Adminapi";
+import { ToastContainer } from "react-toastify";
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const UserList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  const [filter, setFilter] = useState("active");
+  const [filter, setFilter] = useState("all");
 
   const TABS = [
     "BANK",
@@ -126,6 +127,8 @@ const UserList = () => {
 
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <h2 className="text-2xl font-bold mb-4">User List</h2>
 
       {/* ---------------- Active/Inactive Filter Tabs ---------------- */}

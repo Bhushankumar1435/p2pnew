@@ -5,23 +5,27 @@ import { ToastContainer, toast } from "react-toastify";
 import Header from "./Header";
 import Footer from "./Footer";
 import { useNavigate } from "react-router-dom";
-// import { FaArrowLeft, FaTimes } from "react-icons/fa";
 
 const ActivateAccount = () => {
   const [userId, setUserId] = useState("");
   const [balance, setBalance] = useState(0);
-  // const [activationList, setActivationList] = useState([]);
   const [validatedUser, setValidatedUser] = useState("");
+
+  const [loadingCheck, setLoadingCheck] = useState(false);
+  const [loadingActivate, setLoadingActivate] = useState(false);
+
   const navigate = useNavigate();
 
   // ============================================
-  // 🔍 Check if User Exists Before Activation
+  // 🔍 CHECK USER
   // ============================================
   const checkUser = async () => {
     if (!userId.trim()) {
       toast.error("Please enter a User ID.");
       return;
     }
+
+    setLoadingCheck(true);
 
     try {
       const response = await validateSponser(userId);
@@ -30,6 +34,7 @@ const ActivateAccount = () => {
         toast.error(response?.message || "User not found.");
         setUserId("");
         setValidatedUser("");
+        setLoadingCheck(false);
         return;
       }
 
@@ -39,10 +44,12 @@ const ActivateAccount = () => {
       toast.error("Unable to validate user.");
       setValidatedUser("");
     }
+
+    setLoadingCheck(false);
   };
 
   // ============================================
-  // 🚀 Activate User Account
+  // 🚀 ACTIVATE USER
   // ============================================
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,10 +59,11 @@ const ActivateAccount = () => {
       return;
     }
 
+    setLoadingActivate(true);
+
     try {
       const res = await postData("/user/activateAccount", { userId });
 
-      // Extract success safely (covers all backend structures)
       const success =
         res?.data?.success ??
         res?.success ??
@@ -76,27 +84,21 @@ const ActivateAccount = () => {
         toast.error(message || "Activation failed.");
       }
     } catch (err) {
-      const backend = err?.response?.data;
-      toast.error(backend?.message || "Something went wrong.");
+      toast.error(err?.response?.data?.message || "Something went wrong.");
     }
+
+    setLoadingActivate(false);
   };
-  // const activationTransactions = () => {
-  //   getData('/user/walletHistory', { limit: 10, page: 1 })
-  //     .then((res) => {
-  //       setActivationList(res.data?.data?.data || []);
-  //     })
-  //     .catch((err) => console.error(err));
-  // };
-  // activationTransactions();
 
+  // ============================================
+  // Get Wallet Balance
+  // ============================================
   useEffect(() => {
-
-    getData('/user/userBalance?type=WALLET', {})
+    getData("/user/userBalance?type=WALLET")
       .then((res) => {
         setBalance(res.data?.data || 0);
       })
       .catch((err) => console.error(err));
-
   }, []);
 
   return (
@@ -110,26 +112,8 @@ const ActivateAccount = () => {
 
             <div className="w-full bg-[var(--primary)] rounded-t-xl relative z-[1]">
               <div className="w-full py-5 px-3">
-
-                {/* Navigation */}
-                {/* <div className="flex items-center justify-between mb-4">
-                  <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-black"
-                  >
-                    <FaArrowLeft />
-                    <span className="font-medium">Back</span>
-                  </button>
-
-                  <button
-                    onClick={() => navigate("/account")}
-                    className="text-gray-500 hover:text-black text-xl"
-                  >
-                    <FaTimes />
-                  </button>
-                </div> */}
-
                 <h2 className="font-semibold mb-4 text-lg">Activate Account</h2>
+
                 <div className="flex items-center justify-between w-full border border-gray-300 bg-white p-4 rounded-lg shadow-sm">
                   <span className="text-gray-700 font-medium">Wallet Balance:</span>
                   <span className="text-xl font-bold text-green-600">
@@ -137,8 +121,8 @@ const ActivateAccount = () => {
                   </span>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* =================== FORM =================== */}
+                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">
                       Enter User ID
@@ -159,19 +143,33 @@ const ActivateAccount = () => {
                   )}
 
                   <div className="flex gap-3">
+                    {/* 🔄 Check User Button */}
                     <button
                       type="button"
                       onClick={checkUser}
-                      className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600"
+                      disabled={loadingCheck}
+                      className={`px-4 py-2 rounded-lg text-white ${
+                        loadingCheck ? "bg-yellow-400" : "bg-yellow-500 hover:bg-yellow-600"
+                      } flex items-center gap-2`}
                     >
-                      Check User
+                      {loadingCheck && (
+                        <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></span>
+                      )}
+                      {loadingCheck ? "Checking..." : "Check User"}
                     </button>
 
+                    {/* 🚀 Activate Account Button */}
                     <button
                       type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                      disabled={loadingActivate}
+                      className={`px-4 py-2 rounded-lg text-white ${
+                        loadingActivate ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+                      } flex items-center gap-2`}
                     >
-                      Activate Account
+                      {loadingActivate && (
+                        <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></span>
+                      )}
+                      {loadingActivate ? "Processing..." : "Activate Account"}
                     </button>
                   </div>
                 </form>

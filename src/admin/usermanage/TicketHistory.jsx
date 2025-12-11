@@ -306,7 +306,7 @@ const TicketHistory = () => {
 
       {/* POPUP */}
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-white/95 bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white w-96 p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-semibold mb-3">Provide Solution</h2>
 

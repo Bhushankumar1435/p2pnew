@@ -53,6 +53,9 @@ const ManageDeals = () => {
     case "FAILED":
       return `Waiting for Subadmin (${deal.orderId?.subAdmin?.userId || "—"})`;
 
+      case "COMPLETED":
+      return `Completed by (${deal.orderId?.subAdmin?.userId || "—"})`;
+
     case "DISPUTE":
       return `Waiting for Admin`;
 
@@ -98,7 +101,7 @@ const ManageDeals = () => {
                   <th className="py-2 px-3 border">Price</th>
                   <th className="py-2 px-3 border">Payment</th>
                   <th className="py-2 px-3 border">Deal Status</th>
-                  <th className="py-2 px-3 border">Waiting For</th> 
+                  <th className="py-2 px-3 border">Action</th> 
                   <th className="py-2 px-3 border">Order ID</th>
                   <th className="py-2 px-3 border">Created At</th>
                 </tr>
@@ -177,7 +180,7 @@ const ManageDeals = () => {
                 <p><strong>Price:</strong> {deal.price}</p>
                 <p><strong>Payment:</strong> {deal.paymentMethods?.join(", ")}</p>
 
-                <p className="mt-2"><strong>Waiting For:</strong> {getDealStatusText(deal)}</p>
+                <p className="mt-2"><strong>Action:</strong> {getDealStatusText(deal)}</p>
 
                 <p><strong>Order ID:</strong> {deal.orderId?._id || "—"}</p>
 
