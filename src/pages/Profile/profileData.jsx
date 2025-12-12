@@ -10,7 +10,7 @@ const ProfilePage = () => {
   const [accountType, setAccountType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [copied, setCopied] = useState(false); 
+  const [copied, setCopied] = useState(false);
 
   const navigate = useNavigate();
 
@@ -45,7 +45,7 @@ const ProfilePage = () => {
     fetchProfile();
   }, []);
 
- 
+
   const confirmUpgrade = async () => {
     setLoading(true);
     try {
@@ -66,7 +66,7 @@ const ProfilePage = () => {
     }
   };
 
-  
+
   const copyReferralLink = () => {
     if (!user?.referralLink) {
       toast.error("Referral link not found!");
@@ -76,7 +76,7 @@ const ProfilePage = () => {
     navigator.clipboard.writeText(user.referralLink);
     setCopied(true);
 
-    setTimeout(() => setCopied(false), 300); 
+    setTimeout(() => setCopied(false), 300);
   };
 
   if (!user || !stats) return <div className="text-center mt-5">Loading...</div>;
@@ -122,7 +122,10 @@ const ProfilePage = () => {
           {accountType === "VALIDATOR" ? (
             <button
               onClick={() => navigate("/subadminauth/login")}
-              className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+              className="px-4 py-2 rounded-lg font-semibold text-white
+                       bg-gradient-to-br from-blue-600 to-blue-400
+                       hover:brightness-120 hover:shadow-lg
+                       transition-all duration-300"
             >
               Go To Validator Panel
             </button>
@@ -130,13 +133,19 @@ const ProfilePage = () => {
             <button
               onClick={() => setShowPopup(true)}
               disabled={loading}
-              className={`px-4 py-2 rounded text-white transition-all duration-300 ${
-                loading ? "bg-gray-400" : "bg-red-600 hover:bg-red-700"
-              }`}
+              className={`
+                          px-4 py-2 rounded-lg font-semibold text-white
+                          transition-all duration-300
+                          shadow-[0_3px_10px_rgb(0,0,0,0.1)]
+              ${loading
+                  ? "bg-gray-300 cursor-not-allowed shadow-none"
+                  : "bg-gray-700 hover:bg-gray-900 hover:shadow-[0_5px_15px_rgba(0,0,0,0.25)]"
+                }`}
             >
               {loading ? "Loading..." : "Upgrade To Validator"}
             </button>
           )}
+
         </div>
 
         <ul className="text-sm text-gray-700 space-y-2">
@@ -152,7 +161,7 @@ const ProfilePage = () => {
           <li className="w-full flex justify-between items-center font-medium">
             <strong>Referral Link:</strong>
             <div className="flex items-center gap-2 max-w-[400px] overflow-hidden">
-              <span className="text-blue-600 underline text-sm break-all">
+              <span className="text-blue-600 underline text-xs break-all">
                 {user.referralLink}
               </span>
               <button onClick={copyReferralLink} className="flex items-center gap-1" >

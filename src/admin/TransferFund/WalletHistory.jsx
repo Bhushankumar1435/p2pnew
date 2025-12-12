@@ -90,7 +90,6 @@ const WalletHistory = () => {
       {/* Title + Dropdown */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">Wallet History</h1>
-
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -154,7 +153,7 @@ const WalletHistory = () => {
               <thead className="bg-gray-200">
                 <tr>
                   <th className="p-2 border">S.No</th>
-                  <th className="p-2 border">User ID</th>
+                  <th className="p-2 border">UserID</th>
                   <th className="p-2 border">Amount</th>
                   <th className="p-2 border">Token</th>
                   <th className="p-2 border">Mode</th>

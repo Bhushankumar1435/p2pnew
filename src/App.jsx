@@ -51,7 +51,7 @@ import AdminAuthGuard from "./Admin/AdminAuthGuard";
 // Sub-Admin Pages
 import SubAdminLogin from "./subadmin/subadminauth/SubAdminLogin";
 import SubAdminDashboard from "./subadmin/SubAdminDashboard";
-import PickOrders from "./subadmin/subadminauth/PickOrders";
+// import PickOrders from "./subadmin/pages/PickOrders";
 
 // Admin Pages
 import AdminLogin from "./admin/adminauth/AdminLogin";
@@ -121,15 +121,13 @@ const App = () => {
 
       {/* Sub-Admin Routes */}
       <Route path="/subadminauth/login" element={<SubAdminLogin />} />
-      <Route
-        path="/subadmin/dashboard"
-        element={
-          <SubAdminAuthGuard>
-            <SubAdminDashboard />
-          </SubAdminAuthGuard>
-        }
-      />
-      <Route path="/subadminauth/pick-orders" element={<PickOrders/>}/>
+
+      <Route path="/subadmin" element={<SubAdminAuthGuard><SubAdminDashboard /></SubAdminAuthGuard>}>
+        <Route path="dashboard" element={<div />} />
+        <Route path="manage-orders" element={<div />} />
+        <Route path="pick-orders" element={<div />} />
+      </Route>
+
 
       {/* Admin Routes */}
       <Route path="/adminauth/login" element={<AdminLogin />} />

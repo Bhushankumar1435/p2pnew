@@ -88,15 +88,16 @@ const Profile = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center flex-col w-full">
                 <div className="flex w-full items-center justify-between px-4">
-                  <div className="flex gap-1 items-center">
-                  <img
-                    src="https://i.pravatar.cc/100"
-                    alt="Avatar"
-                    className="h-14 w-14 rounded-full"
-                  />
-                  <span className="px-4 mt-2 block text-xl text-red-600 font-semibold ">
-                    {type}
-                  </span></div>
+                  <div className="flex items-center gap-3 p-1">
+                    <img
+                      src="https://i.pravatar.cc/100"
+                      alt="Avatar"
+                      className="h-14 w-14 rounded-full"
+                    />
+                    <span className="px-3 py-1 text-sm font-semibold text-blue-600 border border-blue-600 rounded-md">
+                      {type}
+                    </span>
+                  </div>
                   <div className="flex space-x-4 text-gray-500 text-lg">
                     <FaShareAlt className="text-black cursor-pointer" onClick={handleShare} />
                     <Link to="/Settings">
@@ -106,7 +107,7 @@ const Profile = () => {
                 </div>
 
                 {/* USER NAME + USER ID */}
-                <div className="w-full mt-3 px-4">
+                <div className="w-full mt-3 px-5">
                   {!profile ? (
                     <p className="text-gray-500">Loading...</p>
                   ) : (

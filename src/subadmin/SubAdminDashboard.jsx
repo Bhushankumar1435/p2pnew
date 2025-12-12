@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { getSubAdminDashboard } from "../api/SubAdminapi";
-import PickOrders from "./subadminauth/PickOrders";
+import PickOrders from "./pages/PickOrders";
 
 const SubAdminDashboard = () => {
   const navigate = useNavigate();
@@ -179,35 +179,34 @@ const SubAdminDashboard = () => {
               onClick={() => {
                 setActiveTab("dashboard");
                 setSidebarOpen(false);
+                navigate("/subadmin/dashboard");
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "dashboard" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"
-                }`}
+              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "dashboard" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
             >
               Dashboard
             </button>
+
             <button
               onClick={() => {
                 setActiveTab("deals");
                 setSidebarOpen(false);
+                navigate("/subadmin/manage-orders");
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "deals" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"
-                }`}
+              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "deals" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
             >
               Manage Orders
             </button>
+
             <button
               onClick={() => {
                 setActiveTab("pick-orders");
                 setSidebarOpen(false);
+                navigate("/subadmin/pick-orders");
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "pick-orders"
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-100 text-gray-700"
-                }`}
+              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "pick-orders" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
             >
               Pick Orders
             </button>
-
           </nav>
 
           <div className="">

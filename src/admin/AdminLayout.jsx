@@ -10,7 +10,7 @@ const AdminLayout = () => {
   const [showUserSubMenu, setShowUserSubMenu] = useState(false);
   const [transferFundMenu, setTransferFundMenu] = useState(false);
   const [globaldividend, setGlobaldividend] = useState(false);
-  const [resolvedispute,setResolveDispute] = useState(false)
+  // const [resolvedispute,setResolveDispute] = useState(false)
 
   const location = useLocation();
 

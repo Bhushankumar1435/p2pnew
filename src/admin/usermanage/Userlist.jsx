@@ -36,7 +36,7 @@ const UserList = () => {
       let status;
       if (filter === "active") status = true;
       else if (filter === "inactive") status = false;
-      else status = undefined; 
+      else status = undefined;
 
       const res = await GetAdminUsersApi(page, limit, status);
 
@@ -52,7 +52,7 @@ const UserList = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, filter]); 
+  }, [page, filter]);
 
 
 
@@ -128,7 +128,6 @@ const UserList = () => {
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
       <ToastContainer position="top-right" autoClose={3000} />
-
       <h2 className="text-2xl font-bold mb-4">User List</h2>
 
       {/* ---------------- Active/Inactive Filter Tabs ---------------- */}
@@ -136,24 +135,24 @@ const UserList = () => {
         <button
           onClick={() => setFilter("all")}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "all"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 text-gray-800 hover:bg-blue-400"
+            ? "bg-blue-600 text-white"
+            : "bg-gray-200 text-gray-800 hover:bg-blue-400"
             }`} >
           All
         </button>
         <button
           onClick={() => setFilter("active")}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "active"
-              ? "bg-green-600 text-white"
-              : "bg-green-200 text-green-800 hover:bg-green-400"
+            ? "bg-green-600 text-white"
+            : "bg-green-200 text-green-800 hover:bg-green-400"
             }`} >
           Active
         </button>
         <button
           onClick={() => setFilter("inactive")}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "inactive"
-              ? "bg-red-600 text-white"
-              : "bg-red-200 text-red-800 hover:bg-red-400"
+            ? "bg-red-600 text-white"
+            : "bg-red-200 text-red-800 hover:bg-red-400"
             }`} >
           Inactive
         </button>
@@ -180,7 +179,6 @@ const UserList = () => {
                   <th className="py-2 px-3 border">More Details</th>
                 </tr>
               </thead>
-
               <tbody>
                 {users.map((u, index) => (
                   <tr key={u._id} className="text-center hover:bg-gray-50">
@@ -230,9 +228,7 @@ const UserList = () => {
                           )}
                         </div>
                       </td>
-
                     </>
-
 
                     <td className="border py-2">
                       <button
@@ -267,46 +263,41 @@ const UserList = () => {
                   <p><span className="font-medium">Phone:</span> {u.phoneNumber}</p>
                   <p><span className="font-medium">Country:</span> {u.country}</p>
 
-                  <p className="flex items-center gap-1">
+                  <p className="flex items-center gap-2">
                     <span className="font-medium">Status:</span>
-                    <>
-                      {u.isBlocked ? (
-                        <button
-                          onClick={() => toggleBlockUser(u._id, true)}
-                          className="text-xs px-2 py-1 bg-red-600 text-white rounded"
-                        >
-                          Unblock
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => toggleBlockUser(u._id, false)}
-                          className="text-xs px-2 py-1 bg-green-600 text-white rounded"
-                        >
-                          Block
-                        </button>
-                      )}
-                      <p className="flex items-center gap-1">
-                        <span className="font-medium">Status:</span>
-                        {u.isHold ? (
-                          <button
-                            onClick={() => toggleHoldUser(u._id, true)}
-                            className="text-xs px-2 py-1 bg-red-600 text-white rounded"
-                          >
-                            Unhold
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => toggleHoldUser(u._id, false)}
-                            className="text-xs px-2 py-1 bg-green-600 text-white rounded"
-                          >
-                            Hold
-                          </button>
-                        )}
+                    {u.isBlocked ? (
+                      <button
+                        onClick={() => toggleBlockUser(u._id, true)}
+                        className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                      >
+                        Unblock
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => toggleBlockUser(u._id, false)}
+                        className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                      >
+                        Block
+                      </button>
+                    )}
 
-                      </p>
-
-                    </>
+                    {u.hold ? (
+                      <button
+                        onClick={() => toggleHoldUser(u._id, true)}
+                        className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                      >
+                        Unhold
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => toggleHoldUser(u._id, false)}
+                        className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                      >
+                        Hold
+                      </button>
+                    )}
                   </p>
+
 
                   <button
                     onClick={(e) => openPopup(e, u._id)}

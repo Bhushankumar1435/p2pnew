@@ -21,7 +21,6 @@ const PickOrders = () => {
 
     try {
       const res = await getSubAdminOrderhistory(pageNumber, limit);
-      console.log("Orders API response:", res);
 
       setApiMessage(res.message); 
 
@@ -78,6 +77,7 @@ const PickOrders = () => {
             <table className="w-full border rounded-lg text-center">
               <thead className="bg-gray-200">
                 <tr className="bg-gray-100 text-center">
+                  <th className="p-3 border">S.No.</th>
                   <th className="p-3 border">Order ID</th>
                   <th className="p-3 border">Buyer</th>
                   <th className="p-3 border">Seller</th>
@@ -89,8 +89,9 @@ const PickOrders = () => {
               </thead>
 
               <tbody>
-                {orders.map((order) => (
+                {orders.map((order,idx) => (
                   <tr key={order._id} className="hover:bg-gray-50">
+                    <td className="p-2 border"> {(page - 1) * limit + idx + 1} </td>
                     <td className="p-3 border">{order._id}</td>
                     <td className="p-3 border">{order.buyer?.userId || "—"}</td>
                     <td className="p-3 border">{order.seller?.userId || "—"}</td>
