@@ -52,7 +52,7 @@ const Profile = () => {
     if (navigator.share) {
       navigator.share({
         title: "Check this out!",
-        text: "Have a look at this page! try it:",
+        text: "Have a look at this page! try it.",
         url: window.location.href,
       })
         .catch(err => console.log("Share failed:", err));

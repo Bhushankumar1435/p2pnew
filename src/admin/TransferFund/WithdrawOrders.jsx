@@ -10,6 +10,7 @@ const WithdrawOrders = () => {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [activeTab, setActiveTab] = useState("pending");
+  const maxVisiblePages = 10;
 
   const fetchWithdrawOrders = async () => {
     setLoading(true);
@@ -50,6 +51,20 @@ const WithdrawOrders = () => {
       toast.error("Server error. Try again!");
     }
   };
+
+  const getVisiblePageNumbers = () => {
+    const start = Math.floor((page - 1) / maxVisiblePages) * maxVisiblePages + 1;
+    const end = Math.min(start + maxVisiblePages - 1, totalPages);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+  // Move to previous page
+  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+
+  // Move to next page
+  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -153,19 +168,21 @@ const WithdrawOrders = () => {
 
           {/* MOBILE CARD VIEW */}
           <div className="md:hidden space-y-4 mt-4">
-            {orders.map((order) => (
-              <div key={order._id} className="border rounded-lg p-4 shadow-sm bg-white" >
-                <p className="font-semibold text-gray-800"> Withdraw — {order.token} </p>
+            {orders.map((order, index) => (
+              <div key={order._id} className="border rounded-lg p-4 shadow-sm bg-white">
+                <p className="font-semibold text-gray-800">
+                  #{(page - 1) * limit + index + 1} — Withdraw — {order.token}
+                </p>
                 <div className="mt-2 text-sm text-gray-700 space-y-1">
                   <p><span className="font-medium">User ID:</span> {order.userId.userId}</p>
-                  <p><span className="font-medium">Amount:</span>{" "}
+                  <p>
+                    <span className="font-medium">Amount:</span>{" "}
                     <span className="font-semibold">{order.amount}</span>
                   </p>
-                  <p><span className="font-medium">Token:</span> {order.token} </p>
-                  <p> <span className="font-medium">Status:</span>{" "}
-                    <span className="font-semibold">
-                      {order.status || activeTab.toUpperCase()}
-                    </span>
+                  <p><span className="font-medium">Token:</span> {order.token}</p>
+                  <p>
+                    <span className="font-medium">Status:</span>{" "}
+                    <span className="font-semibold">{order.status || activeTab.toUpperCase()}</span>
                   </p>
                   <p>
                     <span className="font-medium">Date:</span>{" "}
@@ -193,40 +210,46 @@ const WithdrawOrders = () => {
               </div>
             ))}
           </div>
+
         </div>
       )}
 
 
       {/* Pagination */}
-      <div className="flex justify-between items-center gap-4 mt-6">
+      <div className="flex justify-between items-center mt-6 gap-4 flex-wrap">
+        {/* Prev */}
         <button
           disabled={page === 1}
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page === 1
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          onClick={handlePrevPage}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
-          <span className="md:hidden">←</span>
-          <span className="hidden md:inline">← Prev</span>
+          ← Prev
         </button>
 
-        <span className="text-gray-700 font-medium">
-          Page {page} of {totalPages}
-        </span>
+        {/* Page Numbers */}
+        <div className="flex items-center gap-1 flex-wrap">
+          {getVisiblePageNumbers().map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"}`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
 
+        {/* Next */}
         <button
-          disabled={page >= totalPages}
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          className={`px-2 md:px-4 py-1 md:py-2 rounded-lg shadow-md ${page >= totalPages
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          disabled={page === totalPages}
+          onClick={handleNextPage}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
-          <span className="md:hidden">→</span>
-          <span className="hidden md:inline">Next →</span>
+          Next →
         </button>
       </div>
+
+
     </div>
   );
 };

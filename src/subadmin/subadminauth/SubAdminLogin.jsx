@@ -170,7 +170,7 @@ const SubAdminLogin = () => {
           <img src={Logo} alt="Logo" className="w-32 mt-5 inline-block" />
           <h1 className="text-2xl font-semibold leading-4 mt-6 mb-10">
             {step === 1
-              ? 'Sub-Admin Login'
+              ? 'Validator Login'
               : step === 2
                 ? 'Verify OTP'
                 : step === 3
@@ -181,7 +181,7 @@ const SubAdminLogin = () => {
           {/*  Step 1: Login Form */}
           {step === 1 && (
             <form className="w-full space-y-3 px-6" onSubmit={handleLogin}>
-              <label className="block text-left font-medium">Sub-Admin Email</label>
+              <label className="block text-left font-medium">Validator Email</label>
               <input
                 type="email"
                 placeholder="Enter Email"

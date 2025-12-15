@@ -173,7 +173,7 @@ const SubAdminDashboard = () => {
 
         {/* Sidebar Content */}
         <div className="flex flex-col h-full p-6">
-          <h2 className="text-3xl font-bold mb-8 text-center">Sub-Admin Panel</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">Validator Panel</h2>
           <nav className="flex flex-col space-y-3">
             <button
               onClick={() => {
@@ -181,7 +181,7 @@ const SubAdminDashboard = () => {
                 setSidebarOpen(false);
                 navigate("/subadmin/dashboard");
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "dashboard" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
+              className={`text-left px-4 py-2 rounded-lg text-lg font-semibold transition ${activeTab === "dashboard" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
             >
               Dashboard
             </button>
@@ -192,7 +192,7 @@ const SubAdminDashboard = () => {
                 setSidebarOpen(false);
                 navigate("/subadmin/manage-orders");
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "deals" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
+              className={`text-left px-4 py-2 rounded-lg text-lg font-semibold transition ${activeTab === "deals" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
             >
               Manage Orders
             </button>
@@ -203,7 +203,7 @@ const SubAdminDashboard = () => {
                 setSidebarOpen(false);
                 navigate("/subadmin/pick-orders");
               }}
-              className={`text-left px-4 py-2 rounded-lg font-medium transition ${activeTab === "pick-orders" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
+              className={`text-left px-4 py-2 rounded-lg text-lg font-semibold transition ${activeTab === "pick-orders" ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-700"}`}
             >
               Pick Orders
             </button>
@@ -234,7 +234,24 @@ const SubAdminDashboard = () => {
         {/* Dashboard View */}
         {activeTab === "dashboard" && (
           <section className="w-full max-w-6xl">
-            <h1 className="text-3xl font-bold mb-10 lg:mt-0 mt-6 text-left">Sub-Admin Dashboard</h1>
+            <div className="w-full flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4 mt-8">
+              {/* ---------------- Title ---------------- */}
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">
+                Validator Dashboard
+              </h1>
+
+              {/* ---------------- Button ---------------- */}
+              <button
+                onClick={() => navigate("/login")}
+                className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-white
+               bg-gradient-to-br from-blue-600 to-blue-400
+               hover:scale-105 hover:brightness-110 hover:shadow-lg
+               transition-transform duration-300 ease-in-out w-full md:w-auto text-center"
+              >
+                Go To User Panel
+              </button>
+            </div>
+
 
             {loading ? (
               <p>Loading...</p>

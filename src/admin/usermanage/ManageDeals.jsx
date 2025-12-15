@@ -9,6 +9,8 @@ const ManageDeals = () => {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
+  const maxVisiblePages = 10;
+
   useEffect(() => {
     fetchDeals();
   }, [page]);
@@ -22,11 +24,8 @@ const ManageDeals = () => {
       if (res.success) {
         const newDeals = res.data?.deals || [];
 
-        if (page === 1) {
-          setDeals(newDeals);
-        } else {
-          setDeals((prev) => [...prev, ...newDeals]);
-        }
+        // REPLACE previous deals with current page deals
+        setDeals(newDeals);
 
         const total = res.data?.count || 1;
         setTotalPages(Math.ceil(total / limit));
@@ -38,31 +37,32 @@ const ManageDeals = () => {
     }
   };
 
-  
+
+
   const getDealStatusText = (deal) => {
-  const status = deal.orderId?.status;
+    const status = deal.orderId?.status;
 
-  switch (status) {
-    case "ACCEPTED":
-      return `Waiting for Buyer (${deal.orderId?.buyer.userId || "—"})`;
+    switch (status) {
+      case "ACCEPTED":
+        return `Waiting for Buyer (${deal.orderId?.buyer.userId || "—"})`;
 
-    case "PAID":
-      return `Waiting for Seller (${deal.orderId?.seller?.userId || "—"})`;
+      case "PAID":
+        return `Waiting for Seller (${deal.orderId?.seller?.userId || "—"})`;
 
-    case "CONFIRMED":
-    case "FAILED":
-      return `Waiting for Subadmin (${deal.orderId?.subAdmin?.userId || "—"})`;
+      case "CONFIRMED":
+      case "FAILED":
+        return `Waiting for Subadmin (${deal.orderId?.subAdmin?.userId || "—"})`;
 
       case "COMPLETED":
-      return `Completed by (${deal.orderId?.subAdmin?.userId || "—"})`;
+        return `Completed by (${deal.orderId?.subAdmin?.userId || "—"})`;
 
-    case "DISPUTE":
-      return `Waiting for Admin`;
+      case "DISPUTE":
+        return `Waiting for Admin`;
 
-    default:
-      return status || "—";
-  }
-};
+      default:
+        return status || "—";
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -80,6 +80,21 @@ const ManageDeals = () => {
         return "bg-gray-300 text-gray-700";
     }
   };
+  const getVisiblePageNumbers = () => {
+    // calculate current block
+    let start = Math.floor((page - 1) / maxVisiblePages) * maxVisiblePages + 1;
+    let end = Math.min(start + maxVisiblePages - 1, totalPages);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+
+  // Move to previous page
+  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+
+  // Move to next page
+  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="max-w-7xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
@@ -101,7 +116,7 @@ const ManageDeals = () => {
                   <th className="py-2 px-3 border">Price</th>
                   <th className="py-2 px-3 border">Payment</th>
                   <th className="py-2 px-3 border">Deal Status</th>
-                  <th className="py-2 px-3 border">Action</th> 
+                  <th className="py-2 px-3 border">Action</th>
                   <th className="py-2 px-3 border">Order ID</th>
                   <th className="py-2 px-3 border">Created At</th>
                 </tr>
@@ -193,37 +208,40 @@ const ManageDeals = () => {
           </div>
 
           {/* ----------------------- Pagination ----------------------- */}
-          <div className="flex justify-between items-center gap-4 mt-6">
+          {/* Pagination */}
+          <div className="flex justify-between items-center mt-6 gap-4 flex-wrap">
+            {/* Prev */}
             <button
               disabled={page === 1}
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              className={`px-4 py-2 rounded-lg shadow-md 
-                ${
-                  page === 1
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-700 text-white hover:bg-gray-800"
-                }`}
+              onClick={handlePrevPage}
+              className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
             >
               ← Prev
             </button>
 
-            <span className="text-gray-700 font-medium ">
-              Page {page} of {totalPages}
-            </span>
+            {/* Page Numbers */}
+            <div className="flex items-center gap-1 flex-wrap">
+              {getVisiblePageNumbers().map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"}`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
 
+            {/* Next */}
             <button
-              disabled={page >= totalPages}
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              className={`px-4 py-2 rounded-lg shadow-md 
-                ${
-                  page >= totalPages
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-700 text-white hover:bg-gray-800"
-                }`}
+              disabled={page === totalPages}
+              onClick={handleNextPage}
+              className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
             >
               Next →
             </button>
           </div>
+
         </>
       )}
     </div>

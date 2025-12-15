@@ -21,15 +21,18 @@ const UserDetails = () => {
   const [teamPage, setTeamPage] = useState(1);
   const teamPageSize = 5;
 
+  const maxVisiblePages = 10;
+
   const navigate = useNavigate();
 
+  // Fetch user details
   const fetchDetails = async () => {
     try {
       setLoading(true);
       const res = await GetUserDetailsApi(type, id);
 
       if (res.success) {
-        let data = res.data?.data || [];
+        const data = res.data?.data;
 
         switch (type) {
           case "INCOME":
@@ -44,12 +47,12 @@ const UserDetails = () => {
             break;
 
           case "BANK":
-            setDetails(Array.isArray(data) ? data : [data]);
-            break;
-
           default:
-            setDetails(Array.isArray(data) ? data : [data]);
+            setDetails(data ? [data] : []);
         }
+
+        // Reset current page after new data
+        setCurrentPage(1);
       }
     } catch (err) {
       console.error("Detail fetch error:", err);
@@ -59,18 +62,19 @@ const UserDetails = () => {
     }
   };
 
+  // Call fetch on type/id change
   useEffect(() => {
     fetchDetails();
-    setCurrentPage(1);
   }, [type, id]);
 
+  // Fetch team by level
   const fetchTeamByLevel = async (level) => {
     try {
       const res = await GetTeamByLevelApi(id, level);
       if (res.success) {
         setLevelTeam(res.data);
         setIsModalOpen(true);
-        setTeamPage(1);
+        setTeamPage(1); // reset team modal page
       } else {
         toast.error(res.message || "Failed to fetch team members");
       }
@@ -80,36 +84,60 @@ const UserDetails = () => {
     }
   };
 
-  // Pagination items (shared for all list types)
+  // Pagination logic (main list)
   const items = type === "WALLET" ? walletData : details;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = Array.isArray(items) ? items.slice(indexOfFirstItem, indexOfLastItem) : [];
   const totalPages = Math.max(1, Math.ceil(items.length / itemsPerPage));
 
   // Team modal pagination
-  const teamItems = levelTeam?.teamMembers || [];
+  const teamItems = Array.isArray(levelTeam?.teamMembers) ? levelTeam.teamMembers : [];
   const teamIndexOfLast = teamPage * teamPageSize;
   const teamIndexOfFirst = teamIndexOfLast - teamPageSize;
   const currentTeamItems = teamItems.slice(teamIndexOfFirst, teamIndexOfLast);
   const teamTotalPages = Math.max(1, Math.ceil(teamItems.length / teamPageSize));
 
+  // Loading fallback
   if (loading) {
-    return (
-      <p className="text-center mt-4 text-2xl font-medium">Loading Details...</p>
-    );
+    return <p className="text-center mt-4 text-2xl font-medium">Loading Details...</p>;
   }
 
-  // Helper small components for consistent mobile card layout
+  // Small card wrapper component for mobile views
   const CardWrapper = ({ children }) => (
     <div className="border rounded-lg p-4 shadow-sm bg-white">{children}</div>
   );
+
 
   const Field = ({ label, value }) => (
     <p className="text-sm text-gray-700">
       <span className="font-medium">{label}:</span> {value ?? "-"}
     </p>
   );
+
+  const getVisiblePageNumbers = () => {
+    let start = Math.floor((currentPage - 1) / maxVisiblePages) * maxVisiblePages + 1;
+    let end = Math.min(start + maxVisiblePages - 1, totalPages);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+
+  const getVisibleTeamPageNumbers = () => {
+    let start = Math.floor((teamPage - 1) / maxVisiblePages) * maxVisiblePages + 1;
+    let end = Math.min(start + maxVisiblePages - 1, teamTotalPages);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+  // Move to previous page
+  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+
+  // Move to next page
+  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+
 
   return (
     <div className="max-w-[960px] mx-auto bg-white p-6 mt-10 rounded-xl shadow relative">
@@ -262,32 +290,36 @@ const UserDetails = () => {
 
                 {/* team modal pagination */}
                 {teamTotalPages > 1 && (
-                  <div className="flex justify-center mt-4 gap-4">
+                  <div className="flex justify-center mt-4 gap-3 flex-wrap">
                     <button
-                      onClick={() => setTeamPage((p) => Math.max(1, p - 1))}
+                      onClick={() => setTeamPage(p => Math.max(1, p - 1))}
                       disabled={teamPage === 1}
-                      className={`px-4 py-2 rounded-lg border ${teamPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"
-                        }`}
+                      className="text-sm underline disabled:opacity-40"
                     >
-                      <span className="md:hidden">←</span>
-                      <span className="hidden md:inline">← Prev</span>
+                      Prev
                     </button>
 
-                    <span className="px-4 py-2 font-medium">
-                      Page {teamPage} of {teamTotalPages}
-                    </span>
+                    {getVisibleTeamPageNumbers().map(p => (
+                      <button
+                        key={p}
+                        onClick={() => setTeamPage(p)}
+                        className={`text-sm ${teamPage === p ? "font-bold underline" : "hover:underline"}`}
+                      >
+                        {p}
+                      </button>
+                    ))}
 
                     <button
-                      onClick={() => setTeamPage((p) => Math.min(teamTotalPages, p + 1))}
+                      onClick={() => setTeamPage(p => Math.min(teamTotalPages, p + 1))}
                       disabled={teamPage === teamTotalPages}
-                      className={`px-4 py-2 rounded-lg border ${teamPage === teamTotalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"
-                        }`}
+                      className="text-sm underline disabled:opacity-40"
                     >
-                      <span className="md:hidden">→</span>
-                      <span className="hidden md:inline">Next →</span>
+                      Next
                     </button>
                   </div>
                 )}
+
+
               </div>
             </div>
           )}
@@ -370,7 +402,7 @@ const UserDetails = () => {
               <tbody>
                 {currentItems.map((item, idx) => (
                   <tr key={item._id || idx} className="border-b">
-                    <td className="p-2 border">{idx + 1}</td>
+                    <td className="p-2 border">{indexOfFirstItem + idx + 1}</td>
                     <td className="p-2 border">{item.token}</td>
                     <td className={`p-2 border font-semibold ${item.amount > 0 ? "text-green-600" : "text-red-600"}`}>
                       {item.amount}
@@ -395,25 +427,31 @@ const UserDetails = () => {
           <div className="md:hidden space-y-4 mt-4">
             {currentItems.map((item, idx) => (
               <CardWrapper key={item._id || idx}>
-                <p className="font-semibold text-gray-800">{item.transactionType}</p>
+                <p className="font-semibold text-gray-800">
+                  #{indexOfFirstItem + idx + 1} — {item.transactionType}
+                </p>
                 <div className="mt-2 space-y-1">
                   <Field label="Token" value={item.token} />
                   <Field label="Amount" value={item.amount} />
                   <Field label="Mode" value={item.mode} />
                   <Field label="Type" value={item.transactionType} />
                   <Field label="Remark" value={item.remark || "-"} />
-                  <Field label="Date" value={new Date(item.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} />
+                  <Field
+                    label="Date"
+                    value={new Date(item.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
+                  />
                 </div>
               </CardWrapper>
             ))}
           </div>
+
         </>
       )}
 
       {/* ================= ORDER ================= */}
       {type === "ORDER" && (
         <>
-        {/* Desktop */}
+          {/* Desktop */}
           <div className="hidden md:block">
             <table className="w-full border mt-4 text-center text-sm">
               <thead>
@@ -486,7 +524,7 @@ const UserDetails = () => {
       {/* ================= WALLET ================= */}
       {type === "WALLET" && (
         <>
-        {/* Desktop */}
+          {/* Desktop */}
           <div className="hidden md:block">
             <table className="w-full border rounded-lg mt-4">
               <thead className="bg-gray-100">
@@ -540,7 +578,7 @@ const UserDetails = () => {
       {/* ================= DEPOSIT ================= */}
       {type === "DEPOSIT" && (
         <>
-        {/* Desktop */}
+          {/* Desktop */}
           <div className="hidden md:block">
             <table className="w-full border rounded-lg mt-4 text-center">
               <thead className="bg-gray-100">
@@ -587,7 +625,7 @@ const UserDetails = () => {
       {/* ================= WITHDRAW ================= */}
       {type === "WITHDRAW" && (
         <>
-        {/* Desktop */}
+          {/* Desktop */}
           <div className="hidden md:block">
             <table className="w-full border rounded-lg mt-4 text-center">
               <thead className="bg-gray-100">
@@ -639,7 +677,7 @@ const UserDetails = () => {
       {/* ================= DEAL ================= */}
       {type === "DEAL" && (
         <>
-        {/* Desktop */}
+          {/* Desktop */}
           <div className="hidden md:block">
             <table className="w-full border rounded-lg mt-4 text-center text-sm">
               <thead className="bg-gray-100">
@@ -692,32 +730,43 @@ const UserDetails = () => {
         </>
       )}
 
-      {/* ================= PAGINATION (shared) ================= */}
-      {items.length > itemsPerPage && (
-        <div className="flex justify-center mt-6 gap-4">
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center mt-6 gap-4 flex-wrap">
+          {/* Prev */}
           <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg border ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"}`}
+            disabled={page === 1}
+            onClick={handlePrevPage}
+            className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
           >
-            <span className="md:hidden">←</span>
-            <span className="hidden md:inline">← Prev</span>
+            ← Prev
           </button>
 
-          <span className="px-4 py-2 font-medium">
-            Page {currentPage} of {totalPages}
-          </span>
+          {/* Page Numbers */}
+          <div className="flex items-center gap-1 flex-wrap">
+            {getVisiblePageNumbers().map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"}`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
 
+          {/* Next */}
           <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg border ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"}`}
+            disabled={page === totalPages}
+            onClick={handleNextPage}
+            className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
           >
-            <span className="md:hidden">→</span>
-            <span className="hidden md:inline">Next →</span>
+            Next →
           </button>
         </div>
+
       )}
+
+
     </div>
   );
 };

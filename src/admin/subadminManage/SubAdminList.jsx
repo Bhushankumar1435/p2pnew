@@ -7,6 +7,8 @@ const SubAdminList = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const maxVisiblePages = 10;
+
 
   useEffect(() => {
     fetchSubAdmins();
@@ -27,6 +29,19 @@ const SubAdminList = () => {
     setLoading(false);
   };
 
+  const getVisiblePageNumbers = () => {
+    // calculate current block
+    let start = Math.floor((page - 1) / maxVisiblePages) * maxVisiblePages + 1;
+    let end = Math.min(start + maxVisiblePages - 1, totalPages);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+  // For Next / Prev page buttons
+const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 mt-10 rounded-xl shadow-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-700">Sub-Admin List</h2>
@@ -35,7 +50,7 @@ const SubAdminList = () => {
         <p className="text-center text-gray-500">Loading...</p>
       ) : subAdmins.length > 0 ? (
         <div className="overflow-x-auto">
-          
+
           {/* 👉 Desktop Table */}
           <table className="w-full hidden md:table">
             <thead>
@@ -87,37 +102,42 @@ const SubAdminList = () => {
           </div>
 
           {/* 👉 Pagination Controls */}
-          <div className="flex justify-between items-center gap-4 mt-6">
+          <div className="flex justify-between items-center mt-6 flex-wrap gap-4">
+
+            {/* Prev */}
             <button
               disabled={page === 1}
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              className={`px-4 py-2 rounded-lg shadow-md 
-                ${
-                  page === 1
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-700 text-white hover:bg-gray-800"
-                }`}
+              onClick={handlePrevPage}
+              className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
             >
               ← Prev
             </button>
 
-            <span className="text-gray-700 font-medium">
-              Page {page} of {totalPages}
-            </span>
+            {/* Page Numbers */}
+            <div className="flex items-center gap-1 flex-wrap">
+          <span className="font-medium text-gray-700">Page</span>
 
+              {getVisiblePageNumbers().map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"}`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+
+            {/* Next */}
             <button
-              disabled={page >= totalPages}
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              className={`px-4 py-2 rounded-lg shadow-md 
-                ${
-                  page >= totalPages
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-700 text-white hover:bg-gray-800"
-                }`}
+              disabled={page === totalPages}
+              onClick={handleNextPage}
+              className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
             >
               Next →
             </button>
           </div>
+
 
         </div>
       ) : (

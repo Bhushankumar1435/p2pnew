@@ -7,10 +7,14 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]); // for searching
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit] = useState(5);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
   const [searchText, setSearchText] = useState("");
+
+  // Sliding window pagination
+  const maxVisiblePages = 10;
+  
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -45,8 +49,8 @@ const OrderHistory = () => {
     SELLER_CONFIRMED: "text-orange-600",
     COMPLETED: "text-green-600",
     CANCELLED: "text-red-600",
-    REJECTED:"text-red-600",
-    DISPUTE:"text-red-600",
+    REJECTED: "text-red-600",
+    DISPUTE: "text-red-600",
   };
 
   const handleSearch = () => {
@@ -66,9 +70,27 @@ const OrderHistory = () => {
     setOrders(result);
   };
 
+  // Compute visible page numbers for sliding window
+  const getVisiblePageNumbers = () => {
+    // calculate current block
+    let start = Math.floor((page - 1) / maxVisiblePages) * maxVisiblePages + 1;
+    let end = Math.min(start + maxVisiblePages - 1, totalPages);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+
+  // Move to previous page
+  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+
+  // Move to next page
+  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+
+
   return (
     <div className="max-w-7xl mx-auto p-6">
-           <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-4">
         <h1 className="text-2xl font-semibold">Order History</h1>
 
@@ -120,7 +142,7 @@ const OrderHistory = () => {
               <tbody>
                 {orders.map((o, ind) => (
                   <tr key={o._id} className="border-b">
-                     <td className="border p-2">
+                    <td className="border p-2">
                       {(page - 1) * limit + (ind + 1)}
                     </td>
                     <td className="p-2 border">{o._id}</td>
@@ -155,22 +177,28 @@ const OrderHistory = () => {
                 key={o._id}
                 className="border rounded-lg p-4 shadow-sm bg-white"
               >
-                <p><span className="font-semibold">Sr. No:</span> {ind + 1}</p>
+                <p>
+                  <span className="font-semibold">Sr. No:</span> {(page - 1) * limit + ind + 1}
+                </p>
                 <p><span className="font-semibold">Order ID:</span> {o._id}</p>
                 <p><span className="font-semibold">Buyer:</span> {o?.buyer?.userId || "-"}</p>
                 <p><span className="font-semibold">Seller:</span> {o?.seller?.userId || "-"}</p>
                 <p><span className="font-semibold">Token:</span> {o.deal?.token || "-"}</p>
                 <p><span className="font-semibold">Fiat:</span> {o.deal?.fiat || "-"}</p>
-                 <p> <span className="font-semibold">Token Amount:</span>{" "} {o.tokenAmount} </p>
-                <p> <span className="font-semibold">Fiat Amount:</span>{" "} ₹ {o.fiatAmount}</p>
-                <p> <span className="font-semibold">Receipt:</span>{" "}{o.buyerReceipt ? ( <a href={o.buyerReceipt}target="_blank" className="text-blue-600 underline">
+                <p><span className="font-semibold">Token Amount:</span> {o.tokenAmount}</p>
+                <p><span className="font-semibold">Fiat Amount:</span> ₹ {o.fiatAmount}</p>
+                <p>
+                  <span className="font-semibold">Receipt:</span>{" "}
+                  {o.buyerReceipt ? (
+                    <a href={o.buyerReceipt} target="_blank" className="text-blue-600 underline">
                       View
                     </a>
-                  ) : (  "—" )} </p>
+                  ) : ("—")}
+                </p>
                 <p>
                   <span className="font-semibold">Status:</span>{" "}
-                   <span className={`font-semibold ${statusColor[o.status] || "text-gray-600"}`}
-                  >{o.status}
+                  <span className={`font-semibold ${statusColor[o.status] || "text-gray-600"}`}>
+                    {o.status}
                   </span>
                 </p>
                 <p>
@@ -192,40 +220,46 @@ const OrderHistory = () => {
               </div>
             ))}
           </div>
+
         </>
       )}
 
 
-      {/* PAGINATION */}
-      <div className="flex justify-between items-center mt-6">
+      <div className="flex justify-between items-center mt-6 gap-4 flex-wrap">
+        {/* Prev */}
         <button
           disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-          className={`px-4 py-2 rounded ${page === 1
-            ? "bg-gray-300 text-gray-500"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          onClick={handlePrevPage}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
-          <span className="md:hidden">←</span>
-          <span className="hidden md:inline">← Prev</span>
+          ← Prev
         </button>
 
-        <span className="text-gray-700 font-medium">
-          Page {page} of {totalPages}
-        </span>
+        {/* Page Numbers */}
+        <div className="flex items-center gap-1 flex-wrap">
+          {getVisiblePageNumbers().map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"}`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
 
+        {/* Next */}
         <button
-          disabled={page >= totalPages}
-          onClick={() => setPage(page + 1)}
-          className={`px-4 py-2 rounded ${page >= totalPages
-            ? "bg-gray-300 text-gray-500"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          disabled={page === totalPages}
+          onClick={handleNextPage}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
-          <span className="md:hidden">→</span>
-          <span className="hidden md:inline">Next →</span>
+          Next →
         </button>
       </div>
+
+
+
     </div>
   );
 };

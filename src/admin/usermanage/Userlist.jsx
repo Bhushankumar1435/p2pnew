@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BlockUnblockUserApi, GetAdminUsersApi, HoldUnholdUserApi } from "../../api/Adminapi";
-import { ToastContainer } from "react-toastify";
+import {
+  BlockUnblockUserApi,
+  GetAdminUsersApi,
+  HoldUnholdUserApi,
+  GetCountriesApi,
+} from "../../api/Adminapi";
+import { ToastContainer, toast } from "react-toastify";
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -18,16 +23,25 @@ const UserList = () => {
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [filter, setFilter] = useState("all");
 
-  const TABS = [
-    "BANK",
-    "INCOME",
-    "WALLET",
-    "DEPOSIT",
-    "WITHDRAW",
-    "DEAL",
-    "ORDER",
-    "TEAM",
-  ];
+  const [searchUserId, setSearchUserId] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [searchCountry, setSearchCountry] = useState("");
+  const [searchRank, setSearchRank] = useState("");
+  const [pageWindowStart, setPageWindowStart] = useState(1);
+  const PAGE_WINDOW_SIZE = 10;
+
+  const TABS = ["BANK", "INCOME", "WALLET", "DEPOSIT", "WITHDRAW", "DEAL", "ORDER", "TEAM"];
+
+  // Fetch countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      setLoading(true);
+      const data = await GetCountriesApi();
+      setCountries(data);
+      setLoading(false);
+    };
+    fetchCountries();
+  }, []);
 
   // Fetch users
   const fetchUsers = async () => {
@@ -38,39 +52,49 @@ const UserList = () => {
       else if (filter === "inactive") status = false;
       else status = undefined;
 
-      const res = await GetAdminUsersApi(page, limit, status);
+      const res = await GetAdminUsersApi(
+        page,
+        limit,
+        status,
+        searchUserId.trim(),
+        searchCountry,
+        searchRank
+      );
 
       if (res.success) {
         setUsers(res.data.users || []);
         setTotalPages(Math.ceil(res.data.count / limit));
+      } else {
+        toast.error(res.message || "Failed to fetch users");
       }
     } catch (err) {
       console.error("User fetch error:", err);
+      toast.error("Error fetching users");
     }
     setLoading(false);
   };
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+    setPageWindowStart(1);
+  }, [filter, searchUserId, searchCountry, searchRank]);
+
   useEffect(() => {
     fetchUsers();
-  }, [page, filter]);
-
-
-
+  }, [page, filter, searchUserId, searchCountry, searchRank]);
 
   const openPopup = (event, userId) => {
     const rect = event.target.getBoundingClientRect();
     const popupWidth = 250;
     const gap = 10;
 
-    // Mobile screen
     if (window.innerWidth < 768) {
       setPopupPosition({
         x: window.innerWidth / 2 - popupWidth / 2,
         y: rect.bottom + window.scrollY + 10,
       });
-    }
-    // Desktop screen
-    else {
+    } else {
       setPopupPosition({
         x: rect.right - popupWidth - gap,
         y: rect.top + window.scrollY,
@@ -81,88 +105,168 @@ const UserList = () => {
     setModalOpen(true);
   };
 
-
-  // Navigate to user details page
   const goToDetailsPage = (type) => {
     navigate(`/admin/users/details?type=${type}&id=${selectedUser}`);
     setModalOpen(false);
   };
 
-
-  // Block/Unblock user
   const toggleBlockUser = async (userId, isBlocked) => {
     try {
       const action = !isBlocked;
       const res = await BlockUnblockUserApi(userId, action);
-
       if (res?.success) {
-        alert(`User ${action ? "blocked" : "unblocked"} successfully!`);
+        toast.success(`User ${action ? "blocked" : "unblocked"} successfully!`);
         fetchUsers();
       } else {
-        alert(res?.message || `Failed to ${action ? "block" : "unblock"} user`);
+        toast.error(res?.message || `Failed to ${action ? "block" : "unblock"} user`);
       }
     } catch (err) {
       console.error(err);
-      alert(`Failed to ${isBlocked ? "unblock" : "block"} user. Try again.`);
+      toast.error(`Failed to ${isBlocked ? "unblock" : "block"} user. Try again.`);
     }
   };
+
   const toggleHoldUser = async (userId, isHold) => {
     try {
-      const action = !isHold; // if hold = true → unhold, else → hold
+      const action = !isHold;
       const res = await HoldUnholdUserApi(userId, action);
-
       if (res?.success) {
-        alert(`User account ${action ? "hold" : "unhold"} successfully!`);
+        toast.success(`User account ${action ? "hold" : "unhold"} successfully!`);
         fetchUsers();
       } else {
-        alert(res?.message || "Operation failed.");
+        toast.error(res?.message || "Operation failed.");
       }
     } catch (err) {
-      alert("Error updating hold status.");
+      toast.error("Error updating hold status.");
       console.error(err);
     }
   };
 
+  const getPageNumbers = () => {
+    const start = pageWindowStart;
+    const end = Math.min(start + PAGE_WINDOW_SIZE - 1, totalPages);
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
 
+  const handlePrevBlock = () => {
+    const newStart = Math.max(pageWindowStart - PAGE_WINDOW_SIZE, 1);
+    setPageWindowStart(newStart);
+    setPage(newStart);
+  };
 
+  const handleNextBlock = () => {
+    const newStart = Math.min(pageWindowStart + PAGE_WINDOW_SIZE, totalPages);
+    setPageWindowStart(newStart);
+    setPage(newStart);
+  };
+
+  // Static rank options
+  const ranks = ["T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8"];
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
       <ToastContainer position="top-right" autoClose={3000} />
       <h2 className="text-2xl font-bold mb-4">User List</h2>
 
-      {/* ---------------- Active/Inactive Filter Tabs ---------------- */}
-      <div className="flex justify-end gap-2 mb-4">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "all"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-200 text-gray-800 hover:bg-blue-400"
-            }`} >
-          All
-        </button>
-        <button
-          onClick={() => setFilter("active")}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "active"
-            ? "bg-green-600 text-white"
-            : "bg-green-200 text-green-800 hover:bg-green-400"
-            }`} >
-          Active
-        </button>
-        <button
-          onClick={() => setFilter("inactive")}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "inactive"
-            ? "bg-red-600 text-white"
-            : "bg-red-200 text-red-800 hover:bg-red-400"
-            }`} >
-          Inactive
-        </button>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-4 mb-6 flex-wrap">
+        {/* ---------------- Search Input ---------------- */}
+        <div className="flex items-center gap-2 flex-1 md:flex-none w-full md:w-auto">
+          <input
+            type="text"
+            placeholder="Search by User ID"
+            value={searchUserId}
+            onChange={(e) => setSearchUserId(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-60 transition"
+          />
+          {searchUserId && (
+            <button
+              onClick={() => setSearchUserId("")}
+              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* ---------------- Status Filter Buttons ---------------- */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "all"
+              ? "bg-blue-600 text-white shadow-md"
+              : "bg-gray-200 text-gray-800 hover:bg-blue-400 hover:text-white"
+              }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter("active")}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "active"
+              ? "bg-green-600 text-white shadow-md"
+              : "bg-green-200 text-green-800 hover:bg-green-500 hover:text-white"
+              }`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setFilter("inactive")}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === "inactive"
+              ? "bg-red-600 text-white shadow-md"
+              : "bg-red-200 text-red-800 hover:bg-red-500 hover:text-white"
+              }`}
+          >
+            Inactive
+          </button>
+        </div>
+
+        {/* ---------------- Country Filter ---------------- */}
+        <div className="flex items-center gap-2">
+          <select
+            value={searchCountry}
+            onChange={(e) => setSearchCountry(e.target.value)}
+            className="border border-gray-300 px-1 py-2 text-sm
+             rounded-md shadow-sm
+             focus:outline-none focus:ring-2 focus:ring-blue-500
+             transition"
+          >
+            <option value="">All Countries</option>
+            {countries.map((c) => (
+              <option key={c.code} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+
+        </div>
+
+        {/* ---------------- Rank Filter ---------------- */}
+        <div className="flex items-center gap-2">
+          <select
+            value={searchRank}
+            onChange={(e) => setSearchRank(e.target.value)}
+            className="border border-gray-300 px-2 py-2 text-sm
+             rounded-md shadow-sm
+             focus:outline-none focus:ring-2 focus:ring-blue-500
+             transition"
+          >
+            <option value="">All Ranks</option>
+            {ranks.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+
+        </div>
       </div>
+
+
       {loading ? (
         <p className="text-2xl font-semibold">Loading List…</p>
       ) : (
         <div className="w-full">
-
-          {/* DESKTOP TABLE */}
+          {/* ---------------- Desktop Table ---------------- */}
           <div className="overflow-x-auto hidden md:block">
             <table className="min-w-full border text-sm">
               <thead className="bg-gray-100 text-center">
@@ -191,44 +295,41 @@ const UserList = () => {
                     <td className="border py-2">{u.phoneNumber}</td>
                     <td className="border py-2">{u.country}</td>
 
-                    {/* Status */}
-                    <>
-                      <td className="border py-2">
-                        <div className="flex justify-center gap-2">
-                          {u.isBlocked ? (
-                            <button
-                              onClick={() => toggleBlockUser(u._id, true)}
-                              className="text-xs px-2 py-1 bg-red-600 text-white rounded"
-                            >
-                              Unblock
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => toggleBlockUser(u._id, false)}
-                              className="text-xs px-2 py-1 bg-green-600 text-white rounded"
-                            >
-                              Block
-                            </button>
-                          )}
+                    <td className="border py-2">
+                      <div className="flex justify-center gap-2">
+                        {u.isBlocked ? (
+                          <button
+                            onClick={() => toggleBlockUser(u._id, true)}
+                            className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                          >
+                            Unblock
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => toggleBlockUser(u._id, false)}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                          >
+                            Block
+                          </button>
+                        )}
 
-                          {u.hold ? (
-                            <button
-                              onClick={() => toggleHoldUser(u._id, true)}
-                              className="text-xs px-2 py-1 bg-red-600 text-white rounded"
-                            >
-                              Unhold
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => toggleHoldUser(u._id, false)}
-                              className="text-xs px-2 py-1 bg-green-600 text-white rounded"
-                            >
-                              Hold
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </>
+                        {u.hold ? (
+                          <button
+                            onClick={() => toggleHoldUser(u._id, true)}
+                            className="text-xs px-2 py-1 bg-red-600 text-white rounded"
+                          >
+                            Unhold
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => toggleHoldUser(u._id, false)}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded"
+                          >
+                            Hold
+                          </button>
+                        )}
+                      </div>
+                    </td>
 
                     <td className="border py-2">
                       <button
@@ -244,7 +345,7 @@ const UserList = () => {
             </table>
           </div>
 
-          {/* MOBILE CARD VIEW */}
+          {/* ---------------- Mobile Card View ---------------- */}
           <div className="md:hidden space-y-4 mt-4">
             {users.map((u, index) => (
               <div
@@ -298,7 +399,6 @@ const UserList = () => {
                     )}
                   </p>
 
-
                   <button
                     onClick={(e) => openPopup(e, u._id)}
                     className="mt-2 w-full bg-blue-600 text-white py-1 rounded text-sm"
@@ -309,12 +409,10 @@ const UserList = () => {
               </div>
             ))}
           </div>
-
         </div>
       )}
 
-
-      {/* Popup */}
+      {/* ---------------- Popup ---------------- */}
       {modalOpen && (
         <div
           className="fixed z-50 w-56"
@@ -356,35 +454,44 @@ const UserList = () => {
         </div>
       )}
 
-
-      {/* Pagination */}
-      <div className="flex justify-between items-center gap-4 mt-6">
+      {/* ---------------- Pagination ---------------- */}
+      <div className="flex justify-between items-center mt-6 flex-wrap gap-4">
         <button
-          disabled={page === 1}
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          className={`px-4 py-2 rounded-lg shadow-md ${page === 1
+          disabled={pageWindowStart === 1}
+          onClick={handlePrevBlock}
+          className={`px-4 py-2 rounded-lg shadow-md ${pageWindowStart === 1
             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
             : "bg-gray-700 text-white hover:bg-gray-800"
             }`}
         >
-          <span className="md:hidden">←</span>
-          <span className="hidden md:inline">← Prev</span>
+          ← Prev
         </button>
 
-        <span className="text-gray-700 font-medium">
-          Page {page} of {totalPages}
-        </span>
+        <div className="flex items-center gap-0.5 flex-wrap">
+          <span className="font-medium text-gray-700">Page</span>
+          {getPageNumbers().map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`px-1 text-sm font-medium cursor-pointer ${page === p
+                ? "text-blue-600 underline"
+                : "text-gray-700 hover:text-blue-500"
+                }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
 
         <button
-          disabled={page >= totalPages}
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          className={`px-4 py-2 rounded-lg shadow-md ${page >= totalPages
+          disabled={pageWindowStart + PAGE_WINDOW_SIZE > totalPages}
+          onClick={handleNextBlock}
+          className={`px-4 py-2 rounded-lg shadow-md ${pageWindowStart + PAGE_WINDOW_SIZE > totalPages
             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
             : "bg-gray-700 text-white hover:bg-gray-800"
             }`}
         >
-          <span className="md:hidden">→</span>
-          <span className="hidden md:inline">Next →</span>
+          Next →
         </button>
       </div>
     </div>

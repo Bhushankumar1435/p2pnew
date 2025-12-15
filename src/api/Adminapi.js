@@ -106,13 +106,37 @@ export const GetSubAdminsRequestsApi = () =>
 // --------------------------------------------
 //  ADMIN USERS LIST
 // --------------------------------------------
-export const GetAdminUsersApi = (page = 1, limit = 10, paidStatus) => {
+export const GetAdminUsersApi = (
+  page = 1,
+  limit = 10,
+  paidStatus = "",
+  userId = "",
+  country = "",
+  rank = ""
+) => {
   let query = `?page=${page}&limit=${limit}`;
-  if (paidStatus !== undefined) {
-    query += `&paidStatus=${paidStatus}`; 
+
+  if (paidStatus !== "") {
+    query += `&paidStatus=${paidStatus}`;
   }
+
+  if (userId !== "") {
+    query += `&userId=${encodeURIComponent(userId)}`;
+  }
+
+  if (country !== "") {
+    query += `&country=${encodeURIComponent(country)}`;
+  }
+
+  if (rank !== "") {
+    query += `&rank=${encodeURIComponent(rank)}`;
+  }
+
   return adminGet(`admin/users${query}`, true);
 };
+
+
+
 
 
 export const GetUserDetailsApi = (type, userId) =>
@@ -216,6 +240,20 @@ export const getAllDisputesApi = async () => {
     return { success: false, data: { orders: [] } };
   }
 };
+
+// Fetch all countries
+export const GetCountriesApi = async () => {
+  try {
+    const res = await adminGet("user/getCountry", true); // add auth if required
+    if (res.success) return res.data || [];
+    console.error("Failed to fetch countries:", res.message);
+    return [];
+  } catch (err) {
+    console.error("Error fetching countries:", err);
+    return [];
+  }
+};
+
 
 
 

@@ -19,13 +19,18 @@ const TicketHistory = () => {
   const [solution, setSolution] = useState("");
   const [selectedAction, setSelectedAction] = useState("");
 
+
+  const maxVisiblePages = 10;
+
   const fetchTickets = async () => {
     setLoading(true);
     try {
       const res = await GetAdminTicketHistoryApi(page, limit, activeTab);
 
       if (res.success) {
+        // ALWAYS replace tickets with current page's data
         setTickets(res.data.ticket || []);
+
         const count = res.data.count || 0;
         setTotalPages(Math.ceil(count / limit));
       } else {
@@ -38,6 +43,7 @@ const TicketHistory = () => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchTickets();
@@ -73,6 +79,21 @@ const TicketHistory = () => {
       toast.error("Server error");
     }
   };
+
+  const getVisiblePageNumbers = () => {
+    const start = Math.floor((page - 1) / maxVisiblePages) * maxVisiblePages + 1;
+    const end = Math.min(start + maxVisiblePages - 1, totalPages);
+
+    const pages = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  };
+
+  // Move to previous page
+  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+
+  // Move to next page
+  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -202,10 +223,10 @@ const TicketHistory = () => {
 
           {/* MOBILE CARD VIEW */}
           <div className="md:hidden space-y-4 mt-4">
-            {tickets.map((t) => (
+            {tickets.map((t, index) => (
               <div key={t._id} className="border rounded-xl p-4 shadow-sm bg-white">
                 <p className="font-semibold text-gray-800">
-                  {t.subject} — {t.status}
+                  #{(page - 1) * limit + index + 1} — {t.subject} — {t.status}
                 </p>
 
                 <div className="mt-2 text-sm text-gray-600 space-y-1">
@@ -216,7 +237,7 @@ const TicketHistory = () => {
                   <p><span className="font-medium">Subject:</span> {t.subject}</p>
 
                   <p>
-                    <span className="font-medium">File:</span>
+                    <span className="font-medium">File:</span>{" "}
                     {t.doc ? (
                       <a href={t.doc} target="_blank" className="text-blue-600 underline ml-1">
                         View
@@ -229,9 +250,7 @@ const TicketHistory = () => {
                   <p>
                     <span className="font-medium">Status:</span>{" "}
                     <span
-                      className={`px-2 py-1 rounded text-sm font-semibold ${t.status === "OPEN"
-                        ? "text-yellow-600"
-                        : "text-green-600"
+                      className={`px-2 py-1 rounded text-sm font-semibold ${t.status === "OPEN" ? "text-yellow-600" : "text-green-600"
                         }`}
                     >
                       {t.status}
@@ -269,38 +288,42 @@ const TicketHistory = () => {
               </div>
             ))}
           </div>
+
         </div>
       )}
 
 
       {/* PAGINATION */}
-      <div className="flex justify-between items-center gap-4 mt-6">
+      <div className="flex justify-between items-center mt-6 gap-4 flex-wrap">
+        {/* Prev */}
         <button
           disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-          className={`px-4 py-2 rounded-lg shadow-md ${page === 1
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          onClick={handlePrevPage}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
-          <span className="md:hidden">←</span>
-          <span className="hidden md:inline">← Prev</span>
+          ← Prev
         </button>
 
-        <span className="text-gray-700 font-medium">
-          Page {page} of {totalPages}
-        </span>
+        {/* Page Numbers */}
+        <div className="flex items-center gap-1 flex-wrap">
+          {getVisiblePageNumbers().map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"}`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
 
+        {/* Next */}
         <button
-          disabled={page >= totalPages}
-          onClick={() => setPage(page + 1)}
-          className={`px-4 py-2 rounded-lg shadow-md ${page >= totalPages
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-gray-700 text-white hover:bg-gray-800"
-            }`}
+          disabled={page === totalPages}
+          onClick={handleNextPage}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
         >
-          <span className="md:hidden">→</span>
-          <span className="hidden md:inline">Next →</span>
+          Next →
         </button>
       </div>
 
