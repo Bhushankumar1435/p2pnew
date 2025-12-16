@@ -33,7 +33,8 @@ const Header = () => {
   "/income",
   "/Raiseticket",
   "/Tickethistory",
-  "/ChangePassword"
+  "/ChangePassword",
+  "/Pendingvalidations"
 ];
 
   const showBackButton = backButtonRoutes.some(route =>

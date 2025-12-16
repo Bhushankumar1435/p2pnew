@@ -117,8 +117,17 @@ const Deal = () => {
       <ToastContainer position="top-right" autoClose={3000} />
 
       {/* ================= CURRENT ACTIVE DEAL ================= */}
+      <button
+        onClick={() => navigate("/pendingvalidations")}
+        className="px-4 py-2 mb-3 rounded-lg font-semibold text-white
+                       bg-gradient-to-br from-blue-600 to-blue-400
+                       hover:brightness-100 hover:shadow-lg
+                       transition-all duration-300"
+      >
+        Pending Validations
+      </button>
       {currentDeal && (
-        <div className="border border-[var(--bg-color)] pt-2 px-4 pb-4 rounded-xl relative mb-4">
+        <div className=" pt-2 px-4 pb-4 relative mb-4 hover:border-2 hover:border-gray-600 rounded-md">
           <div className="flex justify-between items-center mb-1">
             <div className="flex items-center">
               <img src={UsdtIcon} className="w-5 h-5" alt="usdt" />
@@ -221,6 +230,36 @@ const Deal = () => {
                   {dealDetail?.seller?.name}
                 </h2>
               </div>
+              <div className="w-full flex justify-between items-center gap-3 mb-4">
+                <div className="flex items-center justify-center bg-[var(--button-light)] text-blue-600 font-medium rounded-lg px-3 py-2 text-sm flex-1 gap-2">
+                  <span className='text-[var(--text-color)] font-semibold text-sm'>From</span>
+                  <span className="text-black text-sm"><span className='text-[var(--link-color)]'>₹</span> Rupees</span>
+                </div>
+                <img src={ExchangeIcon} />
+                <div className="flex items-center justify-center gap-2  bg-[var(--button-light)] text-green-600 font-medium rounded-lg px-3 py-2 text-sm flex-1">
+                  <span className='text-[var(--text-color)] font-semibold text-sm mr-2'>To</span>
+                  <span className="text-black text-sm flex items-center gap-1"><img src={UsdtIcon} /> USDT</span>
+                </div>
+              </div>
+              {/* Amount Input */}
+              <div className="w-full flex items-center justify-between  mb-2">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Amount
+                </label>
+                <span className="text-black text-sm">
+                  <span className="text-[var(--link-color)]">₹</span>{" "}
+                  {dealDetail?.price * dealDetail?.availableAmount}
+                </span>
+              </div>
+
+              <div className="w-full mb-4 mt-4 flex justify-between text-sm text-[var(--text-color)]">
+                <p>Amount in {dealDetail.token}</p>
+                <span className="text-black text-sm flex items-center gap-1">
+                  <img src={UsdtIcon} alt="usdt" />
+                  {dealDetail?.availableAmount}
+                </span>
+              </div>
+
 
               <button
                 onClick={() => handleDeal(dealDetail._id)}
@@ -238,7 +277,7 @@ const Deal = () => {
         dealList.map((deal, index) => (
           <div
             key={index}
-            className="border-b border-[var(--border-light)] pt-1.5 px-4 pb-4"
+            className="border-b border-[var(--border-light)] pt-1.5 px-4 pb-4 "
           >
             <div className="flex justify-between items-center mb-1">
               <div className="flex items-center">

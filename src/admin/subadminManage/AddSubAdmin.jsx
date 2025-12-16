@@ -64,7 +64,7 @@ const AddSubAdmin = () => {
   return (
     <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-md mt-10">
       <ToastContainer position="top-right" autoClose={3000} />
-      <h2 className="text-2xl font-bold mb-6 text-center">Add Sub-Admin</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Add Validator</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">User ID</label>
@@ -99,7 +99,7 @@ const AddSubAdmin = () => {
               : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {loading ? "Creating..." : "Create Sub-Admin"}
+          {loading ? "Creating..." : "Create Validator"}
         </button>
       </form>
     </div>

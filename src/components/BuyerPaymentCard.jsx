@@ -31,7 +31,6 @@ const BuyerPaymentCard = ({ id, closeBuyerForm }) => {
             // console.log(' image Resp ', imageResp)
             // console.log('imageResp.data.data.message ', imageResp)
             if (imageResp.success == true) {
-
                 toast.success(imageResp.message)
                 setTimeout(() => {
                     closeBuyerForm()
@@ -61,8 +60,6 @@ const BuyerPaymentCard = ({ id, closeBuyerForm }) => {
                     console.log('we are in else case')
                 }
                 console.log('data p ', res.data)
-
-
                     , console.log('data oo', res.data.data)
             })
             .catch((err) => console.error(err));
@@ -137,7 +134,6 @@ const BuyerPaymentCard = ({ id, closeBuyerForm }) => {
                         </div>
                     </div>
                 ))}
-
 
                 {/* Receipt Upload */}
                 {preview && (

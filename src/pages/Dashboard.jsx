@@ -52,7 +52,7 @@ const Dashboard = () => {
                   <button className='relative after:absolute after:top-0 after:right-[1px] after:w-2 after:h-2 after:bg-red-500 after:rounded-full'><img src={BellIcon} /></button>
                 </div> */}
               </div>
-
+             
 
               <Filter />
               {/* Trade Card */}

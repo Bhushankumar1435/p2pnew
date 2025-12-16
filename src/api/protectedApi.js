@@ -152,3 +152,28 @@ export const raiseDisputeApi = async (id) => {
 };
 
 export default api;
+
+export const getUserOrderhistory = async (page = 1, limit = 10) => {
+  try {
+    const res = await api.get("/user/order-history", {
+      params: { page, limit },
+    });
+
+    /**
+     * Expected backend response:
+     * {
+     *   success: true,
+     *   data: [],
+     *   totalCount: number
+     * }
+     */
+    return res.data;
+  } catch (err) {
+    return (
+      err?.response?.data || {
+        success: false,
+        message: "Failed to fetch order history",
+      }
+    );
+  }
+};

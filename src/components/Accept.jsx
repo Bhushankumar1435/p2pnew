@@ -158,7 +158,9 @@ const Accept = () => {
                   View
                 </button>
               ) : (
-                <p className="text-sm text-gray-500">Processing...</p>
+                <button className="bg-[var(--success)] text-white px-4 py-1 rounded">
+                  Waiting for Validation
+                </button>
               )}
             </div>
           </div>

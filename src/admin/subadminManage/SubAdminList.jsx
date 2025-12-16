@@ -44,7 +44,7 @@ const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 mt-10 rounded-xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">Sub-Admin List</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-700">Validator List</h2>
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>

@@ -108,11 +108,10 @@ export async function getSubAdminOrderhistory(page = 1, limit = 10) {
   if (!token) return { success: false, message: "Unauthorized" };
 
   try {
-    const res = await fetch(`${API_BASE}sub-admin/order-history?page=${page}&limit=${limit}`, {
+    const res = await fetch(`${API_BASE}user/order-history?page=${page}&limit=${limit}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
     });
 

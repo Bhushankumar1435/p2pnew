@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { getSubAdminDashboard } from "../api/SubAdminapi";
 import PickOrders from "./pages/PickOrders";
+import Timer from "../components/Timer";
+
 
 const SubAdminDashboard = () => {
   const navigate = useNavigate();
@@ -334,6 +336,7 @@ const SubAdminDashboard = () => {
                           <th className="py-2 px-3 border">Token</th>
                           <th className="py-2 px-3 border">Fiat</th>
                           <th className="py-2 px-3 border">Receipt</th>
+                          <th className="py-2 px-3 border">Order Expiry</th>
                           <th className="py-2 px-3 border">Actions</th>
                         </tr>
                       </thead>
@@ -354,6 +357,11 @@ const SubAdminDashboard = () => {
                               ) : (
                                 "—"
                               )}
+                            </td>
+                            <td className="py-2 px-3 border text-center">
+                              <span className="inline-block">
+                                <Timer expireAt={deal?.timestamps?.expireAt} status={deal?.status} />
+                              </span>
                             </td>
                             <td className="py-2 px-3 border text-center">
                               <div className="flex justify-center flex-wrap gap-2">
@@ -398,6 +406,7 @@ const SubAdminDashboard = () => {
                           <h3 className="font-bold">#{(page - 1) * limit + (index + 1)}</h3>
                           <span className="px-2 py-1 text-xs rounded bg-blue-200 text-blue-700">{deal.status}</span>
                         </div>
+
                         <div className="flex justify-between items-start mb-2">
                           <div className="">
                             <p className="text-sm"><strong>Buyer:</strong> {deal.buyer?.userId || "—"}</p>
@@ -408,14 +417,22 @@ const SubAdminDashboard = () => {
                             <p className="text-sm"><strong>Fiat:</strong> {deal.fiatAmount}</p>
                           </div>
                         </div>
-                        <p className="mt-2 text-sm">
-                          <strong>Receipt:</strong>{" "}
-                          {deal.buyerReceipt ? (
-                            <a href={deal.buyerReceipt} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Receipt</a>
-                          ) : (
-                            "—"
-                          )}
-                        </p>
+                        <div className="w-full flex justify-between items-center">
+                          <p className="mt-2 text-sm">
+                            <strong>Receipt:</strong>{" "}
+                            {deal.buyerReceipt ? (
+                              <a href={deal.buyerReceipt} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Receipt</a>
+                            ) : (
+                              "—"
+                            )}
+                          </p>
+                          <div className="flex justify-center items-center mt-1">
+                            <Timer
+                              expireAt={deal?.timestamps?.expireAt}
+                              status={deal?.status}
+                            />
+                          </div>
+                        </div>
 
                         <div className="flex flex-wrap gap-2 mt-2">
                           <button
