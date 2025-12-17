@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { toast, ToastContainer } from "react-toastify";
-import { getUserOrderhistory } from "../api/protectedApi";
+import { getUserOrderhistory, getUserPercentApi } from "../api/protectedApi";
 import { useNavigate } from "react-router-dom";
 
 
@@ -27,6 +27,7 @@ const Pendingvalidations = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState(null);
+  const [profitPercent, setProfitPercent] = useState(0);
 
   const navigate = useNavigate();
 
@@ -59,8 +60,19 @@ const Pendingvalidations = () => {
   /* ================= INITIAL LOAD ================= */
   useEffect(() => {
     fetchOrders();
+    fetchProfitPercent();
     // eslint-disable-next-line
   }, []);
+
+ const fetchProfitPercent = async () => {
+  const res = await getUserPercentApi();
+
+  if (res?.success) {
+    setProfitPercent(res.percents); 
+  } else {
+    toast.error(res?.message);
+  }
+};
 
   /* ================= INFINITE SCROLL ================= */
   useEffect(() => {
@@ -122,7 +134,7 @@ const Pendingvalidations = () => {
                     className="text-center hover:bg-gray-50 transition"
                   >
                     <td className="border p-2">{index + 1}</td>
-                   <td className="border p-3">
+                    <td className="border p-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(
                           deal.status
@@ -167,14 +179,14 @@ const Pendingvalidations = () => {
                 <div className="flex justify-between mb-2">
                   <span className="font-bold">#{index + 1}</span>
                   <td className="border p-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(
-                          deal.status
-                        )}`}
-                      >
-                        {deal.status}
-                      </span>
-                    </td>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(
+                        deal.status
+                      )}`}
+                    >
+                      {deal.status}
+                    </span>
+                  </td>
                 </div>
 
                 <p className="text-sm">
@@ -224,11 +236,11 @@ const Pendingvalidations = () => {
             <h3 className="text-lg font-semibold mb-3">
               Confirm Order Pickup
             </h3>
-
             <p className="text-sm text-gray-700 mb-6">
               To manage this order, please update it to validator and earn
-              a <b>2.5% profit</b> from the order.
+              <b className="text-green-600"> {profitPercent}% profit</b> from the order.
             </p>
+
 
             <div className="flex gap-3">
               <button

@@ -82,14 +82,20 @@ const AdminSidebar = ({
                   onClick={() => handleNav("/admin/add-subadmin")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
-                  <FaUserPlus /> Add Sub-Admin
+                  <FaUserPlus /> Add Validator
                 </button>
 
                 <button
                   onClick={() => handleNav("/admin/subadmin/list")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
-                  <FaUsers /> Sub-Admin List
+                  <FaUsers /> Validator List
+                </button>
+                <button
+                  onClick={() => handleNav("/admin/subadmin/validatorpercent")}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <FaUsers /> Validator Percent
                 </button>
 
                 {/* <button

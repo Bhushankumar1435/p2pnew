@@ -254,6 +254,16 @@ export const GetCountriesApi = async () => {
   }
 };
 
+// --------------------------------------------
+// ADMIN - SET VALIDATOR PERCENT
+// --------------------------------------------
+export const SetValidatorPercentApi = (data) =>
+  adminPost("admin/set-percent", data, true);
+
+
+
+
+
 
 
 

@@ -181,9 +181,9 @@ const SubAdminLogin = () => {
           {/*  Step 1: Login Form */}
           {step === 1 && (
             <form className="w-full space-y-3 px-6" onSubmit={handleLogin}>
-              <label className="block text-left font-medium">Validator Email</label>
+              <label className="block text-left font-medium">Validator Email / User ID</label>
               <input
-                type="email"
+                type="text"
                 placeholder="Enter Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

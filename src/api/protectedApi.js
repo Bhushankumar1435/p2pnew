@@ -155,18 +155,9 @@ export default api;
 
 export const getUserOrderhistory = async (page = 1, limit = 10) => {
   try {
-    const res = await api.get("/user/order-history", {
+    const res = await api.get("user/order-history", {
       params: { page, limit },
     });
-
-    /**
-     * Expected backend response:
-     * {
-     *   success: true,
-     *   data: [],
-     *   totalCount: number
-     * }
-     */
     return res.data;
   } catch (err) {
     return (
@@ -177,3 +168,26 @@ export const getUserOrderhistory = async (page = 1, limit = 10) => {
     );
   }
 };
+
+// ================================
+// GET USER PERCENT
+// ================================
+export const getUserPercentApi = async () => {
+  try {
+    const res = await api.get("user/percents");
+
+    return {
+      success: res.data.success,
+      percents: res.data.data, 
+      message: res.data.message,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      percent: 0,
+      message: "Failed to fetch percent",
+    };
+  }
+};
+
+

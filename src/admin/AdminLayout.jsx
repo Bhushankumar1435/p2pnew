@@ -20,6 +20,7 @@ const AdminLayout = () => {
     if (path.startsWith("/admin/dashboard")) setActiveTab("dashboard");
     else if (path.startsWith("/admin/add-subadmin")) setActiveTab("add-subadmin");
     else if (path.startsWith("/admin/subadmin/list")) setActiveTab("subadmin-list");
+    else if (path.startsWith("/admin/subadmin/validatorpercent")) setActiveTab("validatorpercent");
     // else if (path.startsWith("/admin/subadmin/request")) setActiveTab("subadmin-request");
     else if (path.startsWith("/admin/subadmin/deposits")) setActiveTab("subadmin-deposits");
     else if (path.startsWith("/admin/users")) setActiveTab("user-list");

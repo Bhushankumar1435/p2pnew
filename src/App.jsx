@@ -74,6 +74,7 @@ import AdminLayout from "./admin/AdminLayout";
 import Globaldividend from "./admin/globaldividend/Globaldividend";
 import AccountActivation from "./admin/usermanage/AccountActivation";
 import ResolveDispute from "./admin/usermanage/ResolveDispute";
+import ValidatorPercent from "./admin/subadminManage/ValidatorPercent";
 
 const App = () => {
   return (
@@ -141,6 +142,7 @@ const App = () => {
         {/* Sub-Admin management */}
         <Route path="add-subadmin" element={<AddSubAdmin />} />
         <Route path="subadmin/list" element={<SubAdminList />} />
+        <Route path="subadmin/validatorpercent" element={<ValidatorPercent />} />
         {/* <Route path="subadmin/request" element={<SubAdminrequest />} /> */}
 
         {/* User management */}
