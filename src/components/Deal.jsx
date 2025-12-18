@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { getData, postData } from "../api/protectedApi";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-
 import Timer from "./Timer";
 import ExchangeIcon from "../assets/images/exchnage.png";
 import BuyerPaymentCard from "../components/BuyerPaymentCard";
@@ -120,12 +119,15 @@ const Deal = () => {
       <button
         onClick={() => navigate("/pendingvalidations")}
         className="px-4 py-2 mb-3 rounded-lg font-semibold text-white
-                       bg-gradient-to-br from-blue-600 to-blue-400
-                       hover:brightness-100 hover:shadow-lg
-                       transition-all duration-300"
+             bg-gradient-to-br from-blue-600 to-blue-400
+             hover:brightness-100 hover:shadow-lg
+             transition-all duration-300
+             inline-flex items-center justify-center group"
       >
-        Pending Validations
+        <span className="mr-2">Go to Pending Validations</span>
+        <span className="text-lg leading-none transition-transform duration-300 group-hover:translate-x-1">→</span>
       </button>
+
       {currentDeal && (
         <div className=" pt-2 px-4 pb-4 relative mb-4 hover:border-2 hover:border-gray-600 rounded-md">
           <div className="flex justify-between items-center mb-1">

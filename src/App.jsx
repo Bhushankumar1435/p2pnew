@@ -75,6 +75,7 @@ import Globaldividend from "./admin/globaldividend/Globaldividend";
 import AccountActivation from "./admin/usermanage/AccountActivation";
 import ResolveDispute from "./admin/usermanage/ResolveDispute";
 import ValidatorPercent from "./admin/subadminManage/ValidatorPercent";
+import DummyDeal from "./admin/dummydeal/DummyDeal";
 
 const App = () => {
   return (
@@ -164,6 +165,8 @@ const App = () => {
         {/* Global dividend */}
         <Route path="global-dividend" element={<Globaldividend />} />
 
+        {/* Dummy Deal */}
+        <Route path="dummy-deal" element={<DummyDeal />} />
 
 
       </Route>

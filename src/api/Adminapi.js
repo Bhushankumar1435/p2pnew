@@ -260,6 +260,11 @@ export const GetCountriesApi = async () => {
 export const SetValidatorPercentApi = (data) =>
   adminPost("admin/set-percent", data, true);
 
+// --------------------------------------------
+// ADMIN - DUMMY DEAL
+// --------------------------------------------
+export const CreateDummyDealApi = (data) =>
+  adminPost("admin/dummy-deal", data, true);
 
 
 

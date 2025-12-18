@@ -10,7 +10,7 @@ const AdminLayout = () => {
   const [showUserSubMenu, setShowUserSubMenu] = useState(false);
   const [transferFundMenu, setTransferFundMenu] = useState(false);
   const [globaldividend, setGlobaldividend] = useState(false);
-  // const [resolvedispute,setResolveDispute] = useState(false)
+  const [dummydeal,setDummydeal] = useState(false)
 
   const location = useLocation();
 
@@ -35,6 +35,7 @@ const AdminLayout = () => {
     else if (path.startsWith("/admin/withdraw-orders")) setActiveTab("withdraw-orders");
     else if (path.startsWith("/admin/deposit-history")) setActiveTab("deposit-history");
     else if (path.startsWith("/admin/global-dividend")) setActiveTab("global-dividend");
+    else if (path.startsWith("/admin/dummy-deal")) setActiveTab("dummy-deal");
 
     // Automatically open submenus
     setShowSubMenu(path.includes("/subadmin"));
@@ -42,6 +43,7 @@ const AdminLayout = () => {
     setTransferFundMenu(path.includes("/transferfund") || path.includes("/wallet-history") || path.includes("/income-history") || path.includes("/withdraw-orders") ||
       path.includes("/deposit-history"));
     setGlobaldividend(path.includes("/global-dividend"));
+    setDummydeal(path.includes("/dummy-deal"));
   }, [location]);
 
   return (
@@ -60,6 +62,8 @@ const AdminLayout = () => {
         setTransferFundMenu={setTransferFundMenu}
         globaldividend={globaldividend}
         setGlobaldividend={setGlobaldividend}
+        dummydeal={dummydeal}
+        setDummydeal={setDummydeal}
        
       />
 

@@ -345,8 +345,8 @@ const SubAdminDashboard = () => {
                           <tr key={deal._id} className="hover:bg-gray-50 text-center">
                             <td className="py-2 px-3 border font-medium">{(page - 1) * limit + (index + 1)}</td>
                             <td className="py-2 px-3 border">{deal.status}</td>
-                            <td className="py-2 px-3 border">{deal.buyer?.userId || "—"}</td>
-                            <td className="py-2 px-3 border">{deal.seller?.userId || "—"}</td>
+                            <td className="py-2 px-3 border">{deal?.type!=="DUMMY"?deal.buyer?.userId || "-" :deal.dummyBuyer?.userId|| "-" }</td>
+                            <td className="py-2 px-3 border">{deal?.type!=="DUMMY"?deal.seller?.userId || "-" :deal.dummySeller?.userId || "-" }</td>
                             <td className="py-2 px-3 border">{deal.tokenAmount}</td>
                             <td className="py-2 px-3 border">{deal.fiatAmount}</td>
                             <td className="py-2 px-3 border">
@@ -513,18 +513,18 @@ const SubAdminDashboard = () => {
             <div className="space-y-3 text-sm sm:text-base">
               <div>
                 <h3 className="font-semibold text-gray-700">Buyer Info</h3>
-                <p><strong>ID:</strong> {selectedDeal.buyer?.userId || "—"}</p>
-                <p><strong>Name:</strong> {selectedDeal.buyer?.name || "—"}</p>
-                <p><strong>Email:</strong> {selectedDeal.buyer?.email || "—"}</p>
-                <p><strong>Phone:</strong> {selectedDeal.buyer?.phoneNumber || "—"}</p>
+                <p><strong>ID:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.buyer?.userId || "-" :selectedDeal.dummyBuyer?.userId|| "-" }</p>
+                <p><strong>Name:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.buyer?.name || "-" :selectedDeal.dummyBuyer?.name|| "-"}</p>
+                <p><strong>Email:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.buyer?.email || "-" :selectedDeal.dummyBuyer?.email|| "-"}</p>
+                <p><strong>Phone:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.buyer?.phoneNumber || "-" :selectedDeal.dummyBuyer?.phoneNumber|| "-"}</p>
               </div>
 
               <div>
                 <h3 className="font-semibold text-gray-700 mt-3">Seller Info</h3>
-                <p><strong>ID:</strong> {selectedDeal.seller?.userId || "—"}</p>
-                <p><strong>Name:</strong> {selectedDeal.seller?.name || "—"}</p>
-                <p><strong>Email:</strong> {selectedDeal.seller?.email || "—"}</p>
-                <p><strong>Phone:</strong> {selectedDeal.seller?.phoneNumber || "—"}</p>
+                <p><strong>ID:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.seller?.userId || "-" :selectedDeal.dummySeller?.userId|| "-" }</p>
+                <p><strong>Name:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.seller?.name || "-" :selectedDeal.dummySeller?.name|| "-"}</p>
+                <p><strong>Email:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.seller?.email || "-" :selectedDeal.dummySeller?.email|| "-"}</p>
+                <p><strong>Phone:</strong> {selectedDeal?.type!=="DUMMY"?selectedDeal.seller?.phoneNumber || "-" :selectedDeal.dummySeller?.phoneNumber|| "-"}</p>
               </div>
 
               <div>

@@ -93,8 +93,8 @@ const PickOrders = () => {
                   <tr key={order._id} className="hover:bg-gray-50">
                     <td className="p-2 border"> {(page - 1) * limit + idx + 1} </td>
                     <td className="p-3 border">{order._id}</td>
-                    <td className="p-3 border">{order.buyer?.userId || "—"}</td>
-                    <td className="p-3 border">{order.seller?.userId || "—"}</td>
+                    <td className="p-3 border">{order?.type!=="DUMMY"?order.buyer?.userId || "-" :order.dummyBuyer?.userId|| "-" }</td>
+                    <td className="p-3 border">{order?.type!=="DUMMY"?order.seller?.userId || "-" :order.dummySeller?.userId || "-"}</td>
                     <td className="p-3 border">{order.tokenAmount ?? "—"}</td>
                     <td className="p-3 border">{order.fiatAmount ?? "—"}</td>
                     <td className="p-3 border font-semibold">{order.status ?? "—"}</td>

@@ -64,15 +64,15 @@ const Pendingvalidations = () => {
     // eslint-disable-next-line
   }, []);
 
- const fetchProfitPercent = async () => {
-  const res = await getUserPercentApi();
+  const fetchProfitPercent = async () => {
+    const res = await getUserPercentApi();
 
-  if (res?.success) {
-    setProfitPercent(res.percents); 
-  } else {
-    toast.error(res?.message);
-  }
-};
+    if (res?.success) {
+      setProfitPercent(res.percents);
+    } else {
+      toast.error(res?.message);
+    }
+  };
 
   /* ================= INFINITE SCROLL ================= */
   useEffect(() => {
@@ -178,7 +178,7 @@ const Pendingvalidations = () => {
               >
                 <div className="flex justify-between mb-2">
                   <span className="font-bold">#{index + 1}</span>
-                  <td className="border p-3">
+                  <td className="border p-0.5 rounded-md">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColor(
                         deal.status
@@ -188,20 +188,24 @@ const Pendingvalidations = () => {
                     </span>
                   </td>
                 </div>
-
-                <p className="text-sm">
-                  <b>Buyer:</b> {deal.buyer?.userId || "—"}
-                </p>
-                <p className="text-sm">
-                  <b>Seller:</b> {deal.seller?.userId || "—"}
-                </p>
-                <p className="text-sm">
-                  <b>Token:</b> {deal.tokenAmount}
-                </p>
-                <p className="text-sm">
-                  <b>Fiat:</b> {deal.fiatAmount}
-                </p>
-
+                <div className="w-full flex justify-between">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm">
+                      <b>Buyer:</b> {deal.buyer?.userId || "—"}
+                    </p>
+                    <p className="text-sm">
+                      <b>Seller:</b> {deal.seller?.userId || "—"}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm">
+                      <b>Token:</b> {deal.tokenAmount}
+                    </p>
+                    <p className="text-sm">
+                      <b>Fiat:</b> {deal.fiatAmount}
+                    </p>
+                  </div>
+                </div>
                 <button
                   onClick={() => handlePick(deal)}
                   className="mt-3 w-full bg-green-600 text-white py-2 rounded"
@@ -237,10 +241,9 @@ const Pendingvalidations = () => {
               Confirm Order Pickup
             </h3>
             <p className="text-sm text-gray-700 mb-6">
-              To manage this order, please update it to validator and earn
-              <b className="text-green-600"> {profitPercent}% profit</b> from the order.
+              To be able to validate crypto transaction and earn
+              <b className="text-green-600"> {profitPercent}% mining income</b> , please upgrade to Validator Account.
             </p>
-
 
             <div className="flex gap-3">
               <button
