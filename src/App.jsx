@@ -76,6 +76,7 @@ import AccountActivation from "./admin/usermanage/AccountActivation";
 import ResolveDispute from "./admin/usermanage/ResolveDispute";
 import ValidatorPercent from "./admin/subadminManage/ValidatorPercent";
 import DummyDeal from "./admin/dummydeal/DummyDeal";
+import DummyOrderHistory from "./admin/usermanage/dummyOrderHistory";
 
 const App = () => {
   return (
@@ -152,6 +153,7 @@ const App = () => {
         <Route path="deals" element={<ManageDeals />} />
         <Route path="tickets" element={<TicketHistory />} />
         <Route path="orders" element={<OrderHistory />} />
+        <Route path="dummy-orders" element={<DummyOrderHistory />} />
         <Route path="account-activation" element={<AccountActivation />} />
         <Route path="resolve-dispute" element={<ResolveDispute />} />
 

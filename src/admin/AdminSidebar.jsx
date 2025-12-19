@@ -157,6 +157,12 @@ const AdminSidebar = ({
                 >
                   <FaShoppingCart /> Order History
                 </button>
+                 <button
+                  onClick={() => handleNav("/admin/dummy-orders")}
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <FaShoppingCart /> Dummy Orders
+                </button>
                 <button
                   onClick={() => handleNav("/admin/account-activation")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"

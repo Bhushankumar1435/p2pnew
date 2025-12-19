@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GetOrderHistoryApi } from "../../api/Adminapi";
 
-const OrderHistory = () => {
+const DummyOrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]); // for searching
   const [page, setPage] = useState(1);
@@ -22,11 +22,11 @@ const OrderHistory = () => {
       const res = await GetOrderHistoryApi(page, limit);
 
       if (res.success) {
-        const realOrders = (res.data.orders || []).filter(
-          (o) => o.type === "REAL"
+        const dummyOrders = (res.data.orders || []).filter(
+          (o) => o.type === "DUMMY"
         );
-        setOrders(realOrders);
-        setAllOrders(realOrders); // keep a copy for search
+        setOrders(dummyOrders);
+        setAllOrders(dummyOrders); // keep a copy for search
 
         const count = res.data.count || 0;
         setTotalPages(Math.ceil(count / limit));
@@ -267,4 +267,5 @@ const OrderHistory = () => {
   );
 };
 
-export default OrderHistory;
+export default DummyOrderHistory;
+

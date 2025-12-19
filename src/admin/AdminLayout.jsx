@@ -27,6 +27,7 @@ const AdminLayout = () => {
     else if (path.startsWith("/admin/deals")) setActiveTab("manage-deals");
     else if (path.startsWith("/admin/tickets")) setActiveTab("ticket-history");
     else if (path.startsWith("/admin/orders")) setActiveTab("order-history");
+    else if (path.startsWith("/admin/dummy-orders")) setActiveTab("dummy-orders");
     else if (path.startsWith("/admin/account-activation")) setActiveTab("account-activation");
     else if (path.startsWith("/admin/resolve-dispute")) setActiveTab("resolve-dispute");
     else if (path.startsWith("/admin/transferfund")) setActiveTab("transfer-fund");
@@ -39,7 +40,7 @@ const AdminLayout = () => {
 
     // Automatically open submenus
     setShowSubMenu(path.includes("/subadmin"));
-    setShowUserSubMenu(path.includes("/users") || path.includes("/deals") || path.includes("/tickets") || path.includes("/orders") || path.includes("/account-activation") || path.includes("/resolve-dispute"));
+    setShowUserSubMenu(path.includes("/users") || path.includes("/deals") || path.includes("/tickets") || path.includes("/orders") || path.includes("/dummy-orders") || path.includes("/account-activation") || path.includes("/resolve-dispute"));
     setTransferFundMenu(path.includes("/transferfund") || path.includes("/wallet-history") || path.includes("/income-history") || path.includes("/withdraw-orders") ||
       path.includes("/deposit-history"));
     setGlobaldividend(path.includes("/global-dividend"));

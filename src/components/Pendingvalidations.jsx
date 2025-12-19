@@ -61,7 +61,6 @@ const Pendingvalidations = () => {
   useEffect(() => {
     fetchOrders();
     fetchProfitPercent();
-    // eslint-disable-next-line
   }, []);
 
   const fetchProfitPercent = async () => {
@@ -144,10 +143,10 @@ const Pendingvalidations = () => {
                       </span>
                     </td>
                     <td className="border p-2">
-                      {deal.buyer?.userId || "—"}
+                      {deal?.type!=="DUMMY"?deal.buyer?.userId || "-" :deal.dummyBuyer?.userId|| "-" }
                     </td>
                     <td className="border p-2">
-                      {deal.seller?.userId || "—"}
+                      {deal?.type!=="DUMMY"?deal.seller?.userId || "-" :deal.dummySeller?.userId || "-" }
                     </td>
                     <td className="border p-2 font-medium">
                       {deal.tokenAmount}
@@ -191,7 +190,7 @@ const Pendingvalidations = () => {
                 <div className="w-full flex justify-between">
                   <div className="flex flex-col gap-1">
                     <p className="text-sm">
-                      <b>Buyer:</b> {deal.buyer?.userId || "—"}
+                      <b>Buyer:</b> {deal?.type!=="DUMMY"?deal.buyer?.userId || "-" :deal.dummyBuyer?.userId|| "-" }
                     </p>
                     <p className="text-sm">
                       <b>Seller:</b> {deal.seller?.userId || "—"}
