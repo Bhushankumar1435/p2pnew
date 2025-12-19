@@ -4,32 +4,25 @@ import "react-toastify/dist/ReactToastify.css";
 import { GetOrderHistoryApi } from "../../api/Adminapi";
 
 const OrderHistory = () => {
-  const [orders, setOrders] = useState([]);
-  const [allOrders, setAllOrders] = useState([]); // for searching
+  const [allOrders, setAllOrders] = useState([]); // all REAL orders
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
   const [searchText, setSearchText] = useState("");
 
   // Sliding window pagination
   const maxVisiblePages = 10;
 
-
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await GetOrderHistoryApi(page, limit);
-
+      // Fetch all orders at once
+      const res = await GetOrderHistoryApi(1, 1000);
       if (res.success) {
         const realOrders = (res.data.orders || []).filter(
           (o) => o.type === "REAL"
         );
-        setOrders(realOrders);
-        setAllOrders(realOrders); // keep a copy for search
-
-        const count = res.data.count || 0;
-        setTotalPages(Math.ceil(count / limit));
+        setAllOrders(realOrders);
       } else {
         toast.error(res.message || "Failed to fetch order history");
       }
@@ -43,7 +36,7 @@ const OrderHistory = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [page]);
+  }, []);
 
   const statusColor = {
     PENDING: "text-yellow-600",
@@ -56,40 +49,33 @@ const OrderHistory = () => {
     DISPUTE: "text-red-600",
   };
 
+  // Search handler
   const handleSearch = () => {
-    if (searchText.trim() === "") {
-      setOrders(allOrders);
-      return;
-    }
-
-    const result = allOrders.filter((o) =>
-      o._id.toLowerCase().includes(searchText.toLowerCase())
-    );
-
-    // if (result.length === 0) {
-    //   toast.error("No order found with this Order ID");
-    // }
-
-    setOrders(result);
+    setPage(1);
   };
 
-  // Compute visible page numbers for sliding window
+  // Filtered + searched orders
+  const filteredOrders = allOrders.filter((o) =>
+    o._id.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredOrders.length / limit);
+  const paginatedOrders = filteredOrders.slice(
+    (page - 1) * limit,
+    page * limit
+  );
+
   const getVisiblePageNumbers = () => {
-    // calculate current block
     let start = Math.floor((page - 1) / maxVisiblePages) * maxVisiblePages + 1;
     let end = Math.min(start + maxVisiblePages - 1, totalPages);
-
     const pages = [];
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   };
 
-  // Move to previous page
-  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
-
-  // Move to next page
-  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
-
+  const handlePrevPage = () => setPage((prev) => Math.max(prev - 1, 1));
+  const handleNextPage = () => setPage((prev) => Math.min(prev + 1, totalPages));
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -115,10 +101,9 @@ const OrderHistory = () => {
         </div>
       </div>
 
-
       {loading ? (
         <p className="text-center py-6">Loading...</p>
-      ) : orders.length === 0 ? (
+      ) : paginatedOrders.length === 0 ? (
         <p className="text-center py-6">No Orders Found.</p>
       ) : (
         <>
@@ -143,10 +128,10 @@ const OrderHistory = () => {
               </thead>
 
               <tbody>
-                {orders.map((o, ind) => (
+                {paginatedOrders.map((o, ind) => (
                   <tr key={o._id} className="border-b">
                     <td className="border p-2">
-                      {(page - 1) * limit + (ind + 1)}
+                      {(page - 1) * limit + ind + 1}
                     </td>
                     <td className="p-2 border">{o._id}</td>
                     <td className="p-2 border">{o?.buyer?.userId || "-"}</td>
@@ -157,15 +142,39 @@ const OrderHistory = () => {
                     <td className="p-2 border font-semibold">₹ {o.fiatAmount}</td>
                     <td className="p-2 border">
                       {o.buyerReceipt ? (
-                        <a href={o.buyerReceipt} target="_blank" className="text-blue-600 underline" > View</a>
-                      ) : ("—")}
+                        <a
+                          href={o.buyerReceipt}
+                          target="_blank"
+                          className="text-blue-600 underline"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        "—"
+                      )}
                     </td>
-                    <td className={`p-2 border border-black font-semibold ${statusColor[o.status] || "text-gray-600"}`}>{o.status}</td>
-                    <td className="p-2 border">{o.timestamps?.requestedAt ? new Date(o.timestamps.requestedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
-                      : "—"}
+                    <td
+                      className={`p-2 border border-black font-semibold ${
+                        statusColor[o.status] || "text-gray-600"
+                      }`}
+                    >
+                      {o.status}
                     </td>
-                    <td className="p-2 border"> {o.timestamps?.completedAt ? new Date(o.timestamps.completedAt).toLocaleString("en-IN",
-                      { timeZone: "Asia/Kolkata" }) : "—"}
+                    <td className="p-2 border">
+                      {o.timestamps?.requestedAt
+                        ? new Date(o.timestamps.requestedAt).toLocaleString(
+                            "en-IN",
+                            { timeZone: "Asia/Kolkata" }
+                          )
+                        : "—"}
+                    </td>
+                    <td className="p-2 border">
+                      {o.timestamps?.completedAt
+                        ? new Date(o.timestamps.completedAt).toLocaleString(
+                            "en-IN",
+                            { timeZone: "Asia/Kolkata" }
+                          )
+                        : "—"}
                     </td>
                   </tr>
                 ))}
@@ -175,94 +184,132 @@ const OrderHistory = () => {
 
           {/* ================= Mobile Card View ================= */}
           <div className="md:hidden space-y-4 mt-4">
-            {orders.map((o, ind) => (
+            {paginatedOrders.map((o, ind) => (
               <div
                 key={o._id}
                 className="border rounded-lg p-4 shadow-sm bg-white"
               >
                 <p>
-                  <span className="font-semibold">Sr. No:</span> {(page - 1) * limit + ind + 1}
+                  <span className="font-semibold">Sr. No:</span>{" "}
+                  {(page - 1) * limit + ind + 1}
                 </p>
-                <p><span className="font-semibold">Order ID:</span> {o._id}</p>
-                <p><span className="font-semibold">Buyer:</span> {o?.buyer?.userId || "-"}</p>
-                <p><span className="font-semibold">Seller:</span> {o?.seller?.userId || "-"}</p>
-                <p><span className="font-semibold">Token:</span> {o.deal?.token || "-"}</p>
-                <p><span className="font-semibold">Fiat:</span> {o.deal?.fiat || "-"}</p>
-                <p><span className="font-semibold">Token Amount:</span> {o.tokenAmount}</p>
-                <p><span className="font-semibold">Fiat Amount:</span> ₹ {o.fiatAmount}</p>
+                <p>
+                  <span className="font-semibold">Order ID:</span> {o._id}
+                </p>
+                <p>
+                  <span className="font-semibold">Buyer:</span>{" "}
+                  {o?.buyer?.userId || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Seller:</span>{" "}
+                  {o?.seller?.userId || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Token:</span>{" "}
+                  {o.deal?.token || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Fiat:</span>{" "}
+                  {o.deal?.fiat || "-"}
+                </p>
+                <p>
+                  <span className="font-semibold">Token Amount:</span>{" "}
+                  {o.tokenAmount}
+                </p>
+                <p>
+                  <span className="font-semibold">Fiat Amount:</span> ₹{" "}
+                  {o.fiatAmount}
+                </p>
                 <p>
                   <span className="font-semibold">Receipt:</span>{" "}
                   {o.buyerReceipt ? (
-                    <a href={o.buyerReceipt} target="_blank" className="text-blue-600 underline">
+                    <a
+                      href={o.buyerReceipt}
+                      target="_blank"
+                      className="text-blue-600 underline"
+                    >
                       View
                     </a>
-                  ) : ("—")}
+                  ) : (
+                    "—"
+                  )}
                 </p>
                 <p>
                   <span className="font-semibold">Status:</span>{" "}
-                  <span className={`font-semibold ${statusColor[o.status] || "text-gray-600"}`}>
+                  <span
+                    className={`font-semibold ${
+                      statusColor[o.status] || "text-gray-600"
+                    }`}
+                  >
                     {o.status}
                   </span>
                 </p>
                 <p>
                   <span className="font-semibold">Requested:</span>{" "}
                   {o.timestamps?.requestedAt
-                    ? new Date(o.timestamps.requestedAt).toLocaleString("en-IN", {
-                      timeZone: "Asia/Kolkata",
-                    })
+                    ? new Date(o.timestamps.requestedAt).toLocaleString(
+                        "en-IN",
+                        { timeZone: "Asia/Kolkata" }
+                      )
                     : "—"}
                 </p>
                 <p>
                   <span className="font-semibold">Completed:</span>{" "}
                   {o.timestamps?.completedAt
-                    ? new Date(o.timestamps.completedAt).toLocaleString("en-IN", {
-                      timeZone: "Asia/Kolkata",
-                    })
+                    ? new Date(o.timestamps.completedAt).toLocaleString(
+                        "en-IN",
+                        { timeZone: "Asia/Kolkata" }
+                      )
                     : "—"}
                 </p>
               </div>
             ))}
           </div>
-
         </>
       )}
 
-
+      {/* ================= Pagination Buttons ================= */}
       <div className="flex justify-between items-center mt-6 gap-4 flex-wrap">
-        {/* Prev */}
         <button
           disabled={page === 1}
           onClick={handlePrevPage}
-          className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
+          className={`px-4 py-2 rounded-lg shadow-md ${
+            page === 1
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-800"
+          }`}
         >
           ← Prev
         </button>
 
-        {/* Page Numbers */}
         <div className="flex items-center gap-1 flex-wrap">
           {getVisiblePageNumbers().map((p) => (
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"}`}
+              className={`px-2 py-1 rounded-md text-sm font-medium cursor-pointer ${
+                page === p
+                  ? "text-blue-600 underline"
+                  : "text-gray-700 hover:text-blue-500"
+              }`}
             >
               {p}
             </button>
           ))}
         </div>
 
-        {/* Next */}
         <button
           disabled={page === totalPages}
           onClick={handleNextPage}
-          className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
+          className={`px-4 py-2 rounded-lg shadow-md ${
+            page === totalPages
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-800"
+          }`}
         >
           Next →
         </button>
       </div>
-
-
-
     </div>
   );
 };

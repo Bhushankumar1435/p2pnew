@@ -7,9 +7,16 @@ const API_BASE = import.meta.env.VITE_API_URL;
 // --------------------------------------------
 
 // 🔹 POST wrapper
+// 🔹 POST wrapper (JSON + FormData support)
 export async function adminPost(endpoint, data = {}, auth = false) {
   try {
-    const headers = { "Content-Type": "application/json" };
+    const headers = {};
+    const isFormData = data instanceof FormData;
+
+    // ❗ Only set JSON header when NOT FormData
+    if (!isFormData) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (auth) {
       const token = localStorage.getItem("admin_token");
@@ -20,7 +27,7 @@ export async function adminPost(endpoint, data = {}, auth = false) {
     const res = await fetch(`${API_BASE}${endpoint}`, {
       method: "POST",
       headers,
-      body: JSON.stringify(data),
+      body: isFormData ? data : JSON.stringify(data),
     });
 
     return await res.json();
@@ -28,6 +35,7 @@ export async function adminPost(endpoint, data = {}, auth = false) {
     return { success: false, message: err.message };
   }
 }
+
 
 export async function adminGet(endpoint, auth = false) {
   try {
