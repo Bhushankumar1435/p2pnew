@@ -32,7 +32,9 @@ const TicketHistory = () => {
         setTickets(res.data.ticket || []);
 
         const count = res.data.count || 0;
-        setTotalPages(Math.ceil(count / limit));
+        const pages = Math.ceil(count / limit);
+        setTotalPages(pages > 0 ? pages : 1); // ✅ always minimum 1
+
       } else {
         toast.error(res.message || "Failed to fetch tickets");
       }

@@ -63,7 +63,16 @@ const UserList = () => {
 
       if (res.success) {
         setUsers(res.data.users || []);
-        setTotalPages(Math.ceil(res.data.count / limit));
+
+        const count = res.data.count || 0;
+        const pages = Math.ceil(count / limit);
+        const safePages = pages > 0 ? pages : 1;
+
+        setTotalPages(safePages);
+        setPage((prev) => (prev > safePages ? 1 : prev));
+        setPageWindowStart(1);
+
+
       } else {
         toast.error(res.message || "Failed to fetch users");
       }
@@ -84,26 +93,34 @@ const UserList = () => {
     fetchUsers();
   }, [page, filter, searchUserId, searchCountry, searchRank]);
 
-  const openPopup = (event, userId) => {
-    const rect = event.target.getBoundingClientRect();
-    const popupWidth = 250;
-    const gap = 10;
+ const openPopup = (event, userId) => {
+  const rect = event.target.getBoundingClientRect();
+  const popupWidth = 250;
+  const popupHeight = 260;
+  const gap = 30;
 
-    if (window.innerWidth < 768) {
-      setPopupPosition({
-        x: window.innerWidth / 2 - popupWidth / 2,
-        y: rect.bottom + window.scrollY + 10,
-      });
-    } else {
-      setPopupPosition({
-        x: rect.right - popupWidth - gap,
-        y: rect.top + window.scrollY,
-      });
-    }
+  let x = rect.right - popupWidth - gap;
+  let y = rect.top + window.scrollY;
 
-    setSelectedUser(userId);
-    setModalOpen(true);
-  };
+  // 👉 Prevent right overflow
+  if (x < 20) {
+    x = rect.left + gap;
+  }
+
+  const viewportBottom = window.scrollY + window.innerHeight;
+  if (y + popupHeight > viewportBottom) {
+    y = rect.top + window.scrollY - popupHeight - gap;
+  }
+
+  if (y < window.scrollY + 10) {
+    y = window.scrollY + 10;
+  }
+
+  setPopupPosition({ x, y });
+  setSelectedUser(userId);
+  setModalOpen(true);
+};
+
 
   const goToDetailsPage = (type) => {
     navigate(`/admin/users/details?type=${type}&id=${selectedUser}`);

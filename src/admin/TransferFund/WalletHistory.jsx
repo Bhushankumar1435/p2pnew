@@ -33,7 +33,9 @@ const WalletHistory = () => {
       if (res.success) {
         setWalletData(res.data.data);
         const count = res.data.count || 0;
-        setTotalPages(Math.ceil(count / limit));
+        const pages = Math.ceil(count / limit);
+        setTotalPages(pages > 0 ? pages : 1); // ✅ always minimum 1
+
       } else {
         toast.error(res.message || "Failed to fetch wallet history");
       }
@@ -93,10 +95,10 @@ const WalletHistory = () => {
   };
 
   // Move to previous page
-const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
 
-// Move to next page
-const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+  // Move to next page
+  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="max-w-6xl mx-auto p-6">

@@ -78,7 +78,7 @@ const DisputeList = () => {
       {loading ? (
         <p className="text-center py-6">Loading...</p>
       ) : orders.length === 0 ? (
-        <p>No disputed orders found.</p>
+        <p className="text-center">No disputed orders found.</p>
       ) : (
         <>
           {/* Desktop Table */}

@@ -41,6 +41,9 @@ const UserDetails = () => {
           case "DEAL":
             setDetails(Array.isArray(data) ? data : []);
             break;
+          case "TEAM":
+            setDetails(Array.isArray(data) ? data : []);
+            break;
 
           case "WALLET":
             setWalletData(Array.isArray(data) ? data : []);
@@ -132,11 +135,12 @@ const UserDetails = () => {
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   };
-  // Move to previous page
-  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+  const handlePrevPage = () =>
+    setCurrentPage(prev => Math.max(prev - 1, 1));
 
-  // Move to next page
-  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+  const handleNextPage = () =>
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+
 
 
   return (
@@ -292,30 +296,29 @@ const UserDetails = () => {
                 {teamTotalPages > 1 && (
                   <div className="flex justify-center mt-4 gap-3 flex-wrap">
                     <button
-                      onClick={() => setTeamPage(p => Math.max(1, p - 1))}
-                      disabled={teamPage === 1}
-                      className="text-sm underline disabled:opacity-40"
+                      disabled={currentPage === 1}
+                      onClick={handlePrevPage}
                     >
-                      Prev
+                      ← Prev
                     </button>
 
-                    {getVisibleTeamPageNumbers().map(p => (
+                    {getVisiblePageNumbers().map((p) => (
                       <button
                         key={p}
-                        onClick={() => setTeamPage(p)}
-                        className={`text-sm ${teamPage === p ? "font-bold underline" : "hover:underline"}`}
+                        onClick={() => setCurrentPage(p)}
+                        className={currentPage === p ? "underline text-blue-600" : ""}
                       >
                         {p}
                       </button>
                     ))}
 
                     <button
-                      onClick={() => setTeamPage(p => Math.min(teamTotalPages, p + 1))}
-                      disabled={teamPage === teamTotalPages}
-                      className="text-sm underline disabled:opacity-40"
+                      disabled={currentPage === totalPages}
+                      onClick={handleNextPage}
                     >
-                      Next
+                      Next →
                     </button>
+
                   </div>
                 )}
 
@@ -660,7 +663,7 @@ const UserDetails = () => {
           {/* mobile */}
           <div className="md:hidden space-y-4 mt-4">
             {currentItems.map((w, idx) => (
-              <CardWrapper key={w._1 || idx}>
+              <CardWrapper key={w._id || idx}>
                 <p className="font-semibold">Withdraw #{indexOfFirstItem + idx + 1}</p>
                 <Field label="User ID" value={w.userId?.userId} />
                 <Field label="Token" value={w.token} />

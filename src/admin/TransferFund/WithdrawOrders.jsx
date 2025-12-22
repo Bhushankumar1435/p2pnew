@@ -21,7 +21,10 @@ const WithdrawOrders = () => {
       if (res.success) {
         setOrders(res.data.data);
         const count = res.data.count || 0;
-        setTotalPages(Math.ceil(count / limit));
+        const pages = Math.ceil(count / limit);
+
+        setTotalPages(pages > 0 ? pages : 1);
+
       } else {
         toast.error(res.message || "Failed to fetch withdraw orders");
       }
@@ -128,7 +131,7 @@ const WithdrawOrders = () => {
               </thead>
 
               <tbody>
-                {orders.map((order) => (
+                {orders.map((order, index) => (
                   <tr key={order._id} className="text-center">
                     <td className="p-2 border">{(page - 1) * limit + (index + 1)}</td>
                     <td className="p-2 border">{order.userId.userId}</td>
@@ -219,12 +222,16 @@ const WithdrawOrders = () => {
       <div className="flex justify-between items-center mt-6 gap-4 flex-wrap">
         {/* Prev */}
         <button
-          disabled={page === 1}
+          disabled={page === 1 || orders.length === 0}
           onClick={handlePrevPage}
-          className={`px-4 py-2 rounded-lg shadow-md ${page === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === 1 || orders.length === 0
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-gray-700 text-white hover:bg-gray-800"
+            }`}
         >
           ← Prev
         </button>
+
 
         {/* Page Numbers */}
         <div className="flex items-center gap-1 flex-wrap">
@@ -241,12 +248,16 @@ const WithdrawOrders = () => {
 
         {/* Next */}
         <button
-          disabled={page === totalPages}
+          disabled={page === totalPages || orders.length === 0}
           onClick={handleNextPage}
-          className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gray-700 text-white hover:bg-gray-800"}`}
+          className={`px-4 py-2 rounded-lg shadow-md ${page === totalPages || orders.length === 0
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-700 text-white hover:bg-gray-800"
+            }`}
         >
           Next →
         </button>
+
       </div>
 
 

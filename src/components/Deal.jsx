@@ -232,44 +232,59 @@ const Deal = () => {
                   {dealDetail?.seller?.name}
                 </h2>
               </div>
+
               <div className="w-full flex justify-between items-center gap-3 mb-4">
-                <div className="flex items-center justify-center bg-[var(--button-light)] text-blue-600 font-medium rounded-lg px-3 py-2 text-sm flex-1 gap-2">
-                  <span className='text-[var(--text-color)] font-semibold text-sm'>From</span>
-                  <span className="text-black text-sm"><span className='text-[var(--link-color)]'>₹</span> Rupees</span>
+                {/* FROM */}
+                <div className="flex items-center justify-center bg-[var(--button-light)] rounded-lg px-3 py-2 text-sm flex-1 gap-3">
+                  <span className="text-[var(--text-color)] font-semibold">
+                    From
+                  </span>
+                  <span className="text-black text-sm">
+                    {dealDetail?.fiat}
+                  </span>
                 </div>
-                <img src={ExchangeIcon} />
-                <div className="flex items-center justify-center gap-2  bg-[var(--button-light)] text-green-600 font-medium rounded-lg px-3 py-2 text-sm flex-1">
-                  <span className='text-[var(--text-color)] font-semibold text-sm mr-2'>To</span>
-                  <span className="text-black text-sm flex items-center gap-1"><img src={UsdtIcon} /> USDT</span>
+
+                <img src={ExchangeIcon} alt="exchange" />
+
+                {/* TO */}
+                <div className="flex items-center justify-center gap-4 bg-[var(--button-light)] rounded-lg px-3 py-2 text-sm flex-1 ">
+                  <span className="text-[var(--text-color)] font-semibold">
+                    To
+                  </span>
+                  <span className="text-black text-sm flex items-center gap-2">
+                    <img src={UsdtIcon} alt="token" />
+                    {dealDetail?.token}
+                  </span>
                 </div>
               </div>
-              {/* Amount Input */}
-              <div className="w-full flex items-center justify-between  mb-2">
-                <label className="block text-sm text-gray-600 mb-1">
+
+              {/* Amount */}
+              <div className="w-full flex items-center justify-between mb-2">
+                <label className="block text-sm text-gray-600">
                   Amount
                 </label>
                 <span className="text-black text-sm">
-                  <span className="text-[var(--link-color)]">₹</span>{" "}
+                  {dealDetail?.seller?.currency}{" "}
                   {dealDetail?.price * dealDetail?.availableAmount}
                 </span>
               </div>
 
               <div className="w-full mb-4 mt-4 flex justify-between text-sm text-[var(--text-color)]">
-                <p>Amount in {dealDetail.token}</p>
+                <p>Amount in {dealDetail?.token}</p>
                 <span className="text-black text-sm flex items-center gap-1">
                   <img src={UsdtIcon} alt="usdt" />
                   {dealDetail?.availableAmount}
                 </span>
               </div>
 
-
               <button
-                onClick={() => handleDeal(dealDetail._id)}
+                onClick={() => handleDeal(dealDetail?._id)}
                 className="w-full py-2 mt-6 rounded-lg bg-[var(--bg-color)] text-white"
               >
                 Pick Deal
               </button>
             </div>
+
           </div>
         </div>
       )}

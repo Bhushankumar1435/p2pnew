@@ -21,7 +21,9 @@ const DepositHistory = () => {
             if (res.success) {
                 setDeposits(res.data.data || []);
                 const count = res.data.count || 0;
-                setTotalPages(Math.ceil(count / limit));
+                const pages = Math.ceil(count / limit);
+                setTotalPages(pages > 0 ? pages : 1); // ✅ always minimum 1
+
             } else {
                 toast.error(res.message || "Failed to fetch deposit history");
             }

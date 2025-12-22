@@ -114,7 +114,7 @@ const DummyDeal = () => {
             value={form.tokenAmount}
             onChange={handleChange}
             required
-            className="w-full px-2 py-3 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-2 py-2 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Select Token Amount</option>
             {tokenAmount.map((amount) => (
@@ -128,7 +128,7 @@ const DummyDeal = () => {
             value={form.price}
             onChange={handleChange}
             required
-            className="w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 

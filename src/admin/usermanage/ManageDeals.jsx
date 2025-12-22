@@ -27,8 +27,10 @@ const ManageDeals = () => {
         // REPLACE previous deals with current page deals
         setDeals(newDeals);
 
-        const total = res.data?.count || 1;
-        setTotalPages(Math.ceil(total / limit));
+        const count = res.data.count || 0;
+        const pages = Math.ceil(count / limit);
+        setTotalPages(pages > 0 ? pages : 1); // ✅ always minimum 1
+
       }
     } catch (err) {
       console.error("Deals Error:", err);

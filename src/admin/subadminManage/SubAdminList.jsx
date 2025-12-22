@@ -22,8 +22,10 @@ const SubAdminList = () => {
     if (res.success) {
       setSubAdmins(res.data.subAdmins || []);
 
-      const total = res.data.count || 1;
-      setTotalPages(Math.ceil(total / limit));
+      const count = res.data.count || 0;
+      const pages = Math.ceil(count / limit);
+      setTotalPages(pages > 0 ? pages : 1); // ✅ always minimum 1
+
     }
 
     setLoading(false);
@@ -39,8 +41,8 @@ const SubAdminList = () => {
     return pages;
   };
   // For Next / Prev page buttons
-const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
-const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
+  const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 1));
+  const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 mt-10 rounded-xl shadow-lg">
@@ -115,7 +117,7 @@ const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages));
 
             {/* Page Numbers */}
             <div className="flex items-center gap-1 flex-wrap">
-          <span className="font-medium text-gray-700">Page</span>
+              <span className="font-medium text-gray-700">Page</span>
 
               {getVisiblePageNumbers().map(p => (
                 <button
