@@ -191,3 +191,10 @@ export const getUserPercentApi = async () => {
 };
 
 
+export const getNotificationHistory = (page = 1, limit = 5) => {
+  return api.get(
+    `/user/notificationHistory?page=${page}&limit=${limit}`
+  );
+};
+
+

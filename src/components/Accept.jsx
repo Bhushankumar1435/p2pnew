@@ -93,7 +93,7 @@ const Accept = () => {
       {acceptedDeals.map((deal) => (
         <div
           key={deal._id}
-          className="border border-[var(--bg-color)] rounded-lg p-4 shadow-sm relative overflow-hidden mb-4"
+          className="border border-gray-300 hover:border-2 hover:border-gray-500 rounded-lg p-4 shadow-sm relative overflow-hidden mb-4"
         >
           <div className="absolute top-0 right-0 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-bl-full text-[8px] font-semibold leading-4">
             Featured Deal
@@ -147,6 +147,10 @@ const Accept = () => {
                     Accept
                   </button>
                 </>
+              ) : deal.status === "ACCEPTED" ? (
+                <button className="bg-[var(--success)] text-white px-4 py-1 rounded">
+                  Waiting for Fiat Payment
+                </button>
               ) : deal.status === "PAID" ? (
                 <button
                   className="bg-[var(--button-light)] text-[var(--red)] px-4 py-1 rounded"
@@ -157,22 +161,28 @@ const Accept = () => {
                 >
                   View
                 </button>
-              ) : (
+              ) : deal.status === "CONFIRMED" ? (
                 <button className="bg-[var(--success)] text-white px-4 py-1 rounded">
                   Waiting for Validation
                 </button>
+              ) : (
+                <button className="bg-gray-400 text-white px-4 py-1 rounded">
+                  Processing
+                </button>
               )}
             </div>
+
           </div>
 
-          <div className="border-t border-dashed mt-4 pt-2">
-            {/* <Timer expireAt={deal.timestamps?.expireAt} /> */}
-            <Timer
-              expireAt={deal?.timestamps?.expireAt}
-              // label="Deal Timer"
-              status={deal?.status}
-            />
-          </div>
+          {deal.status !== "CONFIRMED" && (
+            <div className="border-t border-dashed mt-4 pt-2">
+              <Timer
+                expireAt={deal?.timestamps?.expireAt}
+                status={deal?.status}
+              />
+            </div>
+          )}
+
         </div>
       ))}
     </>

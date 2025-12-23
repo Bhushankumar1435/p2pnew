@@ -7,6 +7,7 @@ import { loginUser } from "../api/api";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getFCMToken } from "../utils/fcm";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +23,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await loginUser({ email, password });
+      const fcmToken = await getFCMToken();
+      const response = await loginUser({ email, password, fcmToken });
 
       if (!response.success) {
         toast.error(response.message || "Login failed");

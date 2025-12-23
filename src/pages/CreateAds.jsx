@@ -94,7 +94,7 @@ const CreateAds = () => {
 
                 {/* Limit Amount */}
                 <div>
-                  <label className="block mb-1 text-base font-normal">Limit amount</label>
+                  <label className="block mb-1 text-base font-normal">TetherUSD amount</label>
                   <div className="relative">
                     <div
                       className="flex justify-between items-center border border-gray-300 rounded px-3 py-2 bg-white cursor-pointer"

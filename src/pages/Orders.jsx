@@ -266,6 +266,14 @@ const handleDispute = async () => {
         <span className="text-gray-600 text-sm">Price</span>
         <span className="text-black font-medium">{order.deal?.price}</span>
       </div>
+      <div className="flex justify-between mb-1">
+        <span className="text-gray-600 text-sm">Buyer</span>
+        <span className="text-black font-medium">{order.buyer?.userId}</span>
+      </div>
+      <div className="flex justify-between mb-1">
+        <span className="text-gray-600 text-sm">Seller</span>
+        <span className="text-black font-medium">{order.seller?.userId}</span>
+      </div>
 
       <div className="flex justify-between items-center mb-1">
         <span className="text-gray-600 text-sm">Hash</span>

@@ -129,7 +129,7 @@ const Deal = () => {
       </button>
 
       {currentDeal && (
-        <div className=" pt-2 px-4 pb-4 relative mb-4 hover:border-2 hover:border-gray-600 rounded-md">
+        <div className=" pt-2 px-4 pb-4 relative mb-4 border border-gray-300 hover:border-2 hover:border-gray-600 rounded-md shadow-sm">
           <div className="flex justify-between items-center mb-1">
             <div className="flex items-center">
               <img src={UsdtIcon} className="w-5 h-5" alt="usdt" />
@@ -152,7 +152,7 @@ const Deal = () => {
               <div className="text-xs text-gray-500">
                 Quantity: {currentDeal?.deal?.availableAmount} <br />
                 Payable: {currentDeal?.fiatAmount} ₹
-                <p>UPI</p>
+                {/* <p>UPI</p> */}
               </div>
             </div>
 
@@ -182,12 +182,16 @@ const Deal = () => {
               )}
           </div>
 
-          <div className="border-t border-dashed mt-4 pt-2">
-            <Timer
-              expireAt={currentDeal?.timestamps?.expireAt}
-              status={currentDeal?.status}
-            />
-          </div>
+          {/* Timer */}
+          {currentDeal && currentDeal.status !== "CONFIRMED" && (
+            <div className="border-t border-dashed mt-4 pt-2">
+              <Timer
+                expireAt={currentDeal?.timestamps?.expireAt}
+                status={currentDeal?.status}
+              />
+            </div>
+          )}
+
         </div>
       )}
 

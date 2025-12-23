@@ -7,6 +7,7 @@ const SubAdminList = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchUserId, setSearchUserId] = useState("");
   const maxVisiblePages = 10;
 
 
@@ -31,6 +32,11 @@ const SubAdminList = () => {
     setLoading(false);
   };
 
+  const filteredSubAdmins = subAdmins.filter((sa) =>
+    sa.userId?.toLowerCase().includes(searchUserId.toLowerCase())
+  );
+
+
   const getVisiblePageNumbers = () => {
     // calculate current block
     let start = Math.floor((page - 1) / maxVisiblePages) * maxVisiblePages + 1;
@@ -46,7 +52,20 @@ const SubAdminList = () => {
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 mt-10 rounded-xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">Validator List</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold mb-6 text-gray-700">Validator List</h2>
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search by User ID (e.g. OJD5I)"
+            value={searchUserId}
+            onChange={(e) => setSearchUserId(e.target.value)}
+            className="w-full md:w-52 px-2 py-1 rounded-lg border
+               focus:outline-none focus:ring
+               transition shadow-sm"
+          />
+        </div>
+      </div>
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
@@ -66,7 +85,7 @@ const SubAdminList = () => {
               </tr>
             </thead>
             <tbody>
-              {subAdmins.map((sa, index) => (
+              {filteredSubAdmins.map((sa, index) => (
                 <tr key={sa._id} className="hover:bg-gray-50 transition">
                   <td className="p-3 border">{(page - 1) * limit + (index + 1)}</td>
                   <td className="p-3 border">{sa.userId}</td>

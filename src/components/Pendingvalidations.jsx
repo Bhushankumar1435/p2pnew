@@ -120,7 +120,7 @@ const Pendingvalidations = () => {
                   <th className="border p-2">Status</th>
                   <th className="border p-2">Buyer</th>
                   <th className="border p-2">Seller</th>
-                  <th className="border p-2">Token</th>
+                  <th className="border p-2">Tokens</th>
                   <th className="border p-2">Fiat</th>
                   <th className="border p-2">Action</th>
                 </tr>

@@ -274,6 +274,8 @@ export const SetValidatorPercentApi = (data) =>
 export const CreateDummyDealApi = (data) =>
   adminPost("admin/dummy-deal", data, true);
 
+export const GetCurrencyByCountryApi = (country) =>
+  adminGet(`user/getCurrency?country=${encodeURIComponent(country)}`, true);
 
 
 

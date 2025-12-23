@@ -81,7 +81,7 @@ const PickOrders = () => {
                   <th className="p-3 border">Order ID</th>
                   <th className="p-3 border">Buyer</th>
                   <th className="p-3 border">Seller</th>
-                  <th className="p-3 border">Token</th>
+                  <th className="p-3 border">Tokens</th>
                   <th className="p-3 border">Fiat</th>
                   <th className="p-3 border">Status</th>
                   <th className="p-3 border">Action</th>
