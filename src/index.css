@@ -161,18 +161,7 @@ input[type="number"] {
   scrollbar-width: none;
 }
 
-/* Notification card hover effect */
-.notification-card {
-  background-color: white;
-  border-radius: 0.75rem;
-  padding: 0.75rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  transition: all 0.2s ease-in-out;
-}
-.notification-card:hover {
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  transform: translateY(-2px);
-}
+
 
 
 

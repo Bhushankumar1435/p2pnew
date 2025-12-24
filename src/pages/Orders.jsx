@@ -10,6 +10,7 @@ const Orders = () => {
   const [filter, setFilter] = useState("all");
 
   const [orders, setOrders] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -59,6 +60,12 @@ const Orders = () => {
     fetchOrders(statusParam, 1);
   }, [tab]);
 
+
+useEffect(() => {
+  getData("/user/userProfile").then((res) => {
+    setCurrentUserId(res?.data?.data?.data?.userId);
+  });
+}, []);
   // Filter change load (only for all_orders)
   useEffect(() => {
     if (tab !== "all_orders") return;
@@ -168,7 +175,7 @@ const Orders = () => {
                 )}
 
                 {orders.map((order) => (
-                  <OrderCard key={order._id} order={order} />
+                  <OrderCard key={order._id} order={order} currentUserId={currentUserId} />
                 ))}
 
                 {loading && (
@@ -192,7 +199,7 @@ const Orders = () => {
 };
 
 // ======================== ORDER CARD ===========================
-const OrderCard = ({ order }) => {
+const OrderCard = ({ order, currentUserId }) => {
   const [disputeLoading, setDisputeLoading] = useState(false);
 
   const handleCopy = (text) => {
@@ -330,7 +337,7 @@ const handleDispute = async () => {
       </div>
 
       {/* DISPUTE BUTTON (ONLY FOR COMPLETED ORDERS) */}
-      {order.status === "COMPLETED" && (
+      {order.status === "COMPLETED" && order.seller?.userId === currentUserId && (
         <button
           disabled={disputeLoading}
           onClick={handleDispute}

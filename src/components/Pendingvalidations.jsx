@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { toast, ToastContainer } from "react-toastify";
-import { getUserOrderhistory, getUserPercentApi } from "../api/protectedApi";
+import { getUserOrderhistory, getUserPercentApi, getUserProfile } from "../api/protectedApi";
 import { useNavigate } from "react-router-dom";
 
 
@@ -21,13 +21,13 @@ const Pendingvalidations = () => {
   const [deals, setDeals] = useState([]);
   const [page, setPage] = useState(1);
   const limit = 10;
-
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
   const [showModal, setShowModal] = useState(false);
   const [selectedDeal, setSelectedDeal] = useState(null);
   const [profitPercent, setProfitPercent] = useState(0);
+  const [accountType, setAccountType] = useState(null);
+
 
   const navigate = useNavigate();
 
@@ -53,7 +53,6 @@ const Pendingvalidations = () => {
     } else {
       toast.error(res?.message || "Failed to fetch orders");
     }
-
     setLoading(false);
   };
 
@@ -61,6 +60,7 @@ const Pendingvalidations = () => {
   useEffect(() => {
     fetchOrders();
     fetchProfitPercent();
+    fetchUserProfile();
   }, []);
 
   const fetchProfitPercent = async () => {
@@ -70,6 +70,13 @@ const Pendingvalidations = () => {
       setProfitPercent(res.percents);
     } else {
       toast.error(res?.message);
+    }
+  };
+
+  const fetchUserProfile = async () => {
+    const res = await getUserProfile();
+    if (res?.success) {
+      setAccountType(res.data.accountType); // USER or VALIDATOR
     }
   };
 
@@ -143,10 +150,10 @@ const Pendingvalidations = () => {
                       </span>
                     </td>
                     <td className="border p-2">
-                      {deal?.type!=="DUMMY"?deal.buyer?.userId || "-" :deal.dummyBuyer?.userId|| "-" }
+                      {deal?.type !== "DUMMY" ? deal.buyer?.userId || "-" : deal.dummyBuyer?.userId || "-"}
                     </td>
                     <td className="border p-2">
-                      {deal?.type!=="DUMMY"?deal.seller?.userId || "-" :deal.dummySeller?.userId || "-" }
+                      {deal?.type !== "DUMMY" ? deal.seller?.userId || "-" : deal.dummySeller?.userId || "-"}
                     </td>
                     <td className="border p-2 font-medium">
                       {deal.tokenAmount}
@@ -190,7 +197,7 @@ const Pendingvalidations = () => {
                 <div className="w-full flex justify-between">
                   <div className="flex flex-col gap-1">
                     <p className="text-sm">
-                      <b>Buyer:</b> {deal?.type!=="DUMMY"?deal.buyer?.userId || "-" :deal.dummyBuyer?.userId|| "-" }
+                      <b>Buyer:</b> {deal?.type !== "DUMMY" ? deal.buyer?.userId || "-" : deal.dummyBuyer?.userId || "-"}
                     </p>
                     <p className="text-sm">
                       <b>Seller:</b> {deal.seller?.userId || "—"}
@@ -240,10 +247,19 @@ const Pendingvalidations = () => {
               Confirm Order Pickup
             </h3>
             <p className="text-sm text-gray-700 mb-6">
-              To be able to validate crypto transaction and earn
-              <b className="text-green-600"> {profitPercent}% mining income</b> , please upgrade to Validator Account.
+              {accountType === "VALIDATOR" ? (
+                <>
+                  You are already a <b className="text-green-600">Validator</b>.
+                  Please go to the Validator Panel to continue validating deals.
+                </>
+              ) : (
+                <>
+                  To be able to validate crypto transactions and earn
+                  <b className="text-green-600"> {profitPercent}% mining income</b>,
+                  please upgrade to a Validator Account.
+                </>
+              )}
             </p>
-
             <div className="flex gap-3">
               <button
                 onClick={() => setShowModal(false)}
@@ -253,11 +269,19 @@ const Pendingvalidations = () => {
               </button>
 
               <button
-                onClick={handleConfirm}
+                onClick={() => {
+                  setShowModal(false);
+                  if (accountType === "VALIDATOR") {
+                    navigate("/subadminauth/login"); 
+                  } else {
+                    navigate("/profile"); 
+                  }
+                }}
                 className="flex-1 py-2 bg-green-600 text-white rounded"
               >
-                Confirm
+                {accountType === "VALIDATOR" ? "Go to Validator Panel" : "Upgrade Now"}
               </button>
+
             </div>
           </div>
         </div>

@@ -149,7 +149,7 @@ export default function Teams() {
                             <th className="px-4 py-2 font-medium">User ID</th>
                             <th className="px-4 py-2 font-medium">Name</th>
                             <th className="px-4 py-2 font-medium">Email</th>
-                            <th className="px-4 py-2 font-medium">Package</th>
+                            <th className="px-4 py-2 font-medium">Rank</th>
                         </tr>
                     </thead>
                     <tbody> 

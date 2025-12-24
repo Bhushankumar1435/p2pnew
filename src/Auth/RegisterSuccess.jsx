@@ -99,7 +99,7 @@ const RegisterSuccess = () => {
             </div>
 
             <p className="text-red-600 font-semibold mb-3">
-              Please take a screenshot of this information.
+              Please take a screenshot of this information. This information has also been sent to your email.
             </p>
 
             <button
@@ -168,9 +168,9 @@ const RegisterSuccess = () => {
               disabled={loading}
               className={`w-full rounded-xl py-3 px-4 text-base leading-5 font-medium 
               ${loading
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'text-black bg-gradient-to-r from-[var(--button-gradient-1)] to-[var(--button-gradient-2)] hover:opacity-90'
-              }`}
+                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                  : 'text-black bg-gradient-to-r from-[var(--button-gradient-1)] to-[var(--button-gradient-2)] hover:opacity-90'
+                }`}
             >
               {loading ? 'Please wait...' : 'Confirm'}
             </button>

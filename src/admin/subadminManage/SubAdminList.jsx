@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { GetSubAdminListApi } from "../../api/Adminapi";
+import { GetSubAdminListApi, GetCountriesApi, GetAdminUsersApi } from "../../api/Adminapi";
 
 const SubAdminList = () => {
   const [subAdmins, setSubAdmins] = useState([]);
@@ -8,7 +8,22 @@ const SubAdminList = () => {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [searchUserId, setSearchUserId] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [searchCountry, setSearchCountry] = useState("");
   const maxVisiblePages = 10;
+
+
+
+  // Fetch countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      setLoading(true);
+      const data = await GetCountriesApi();
+      setCountries(data);
+      setLoading(false);
+    };
+    fetchCountries();
+  }, []);
 
 
   useEffect(() => {
@@ -32,9 +47,18 @@ const SubAdminList = () => {
     setLoading(false);
   };
 
-  const filteredSubAdmins = subAdmins.filter((sa) =>
-    sa.userId?.toLowerCase().includes(searchUserId.toLowerCase())
-  );
+  const filteredSubAdmins = subAdmins.filter((sa) => {
+    const matchUserId = searchUserId
+      ? sa.userId?.toLowerCase().includes(searchUserId.toLowerCase())
+      : true;
+
+    const matchCountry = searchCountry
+      ? sa.country === searchCountry
+      : true;
+
+    return matchUserId && matchCountry;
+  });
+
 
 
   const getVisiblePageNumbers = () => {
@@ -52,20 +76,40 @@ const SubAdminList = () => {
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 mt-10 rounded-xl shadow-lg">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold mb-6 text-gray-700">Validator List</h2>
-        <div className="mb-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4 md:mb-6">
+        {/* Title */}
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+          Validator List
+        </h2>
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+          {/* Country Select */}
+          <select
+            value={searchCountry}
+            onChange={(e) => setSearchCountry(e.target.value)}
+            className="w-full sm:w-44 px-3 py-2 text-sm rounded-lg
+             border border-gray-300 bg-white focus:outline-none  transition"
+          >
+            <option value="">All Countries</option>
+            {countries.map((c) => (
+              <option key={c.code} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Search Input */}
           <input
             type="text"
-            placeholder="Search by User ID (e.g. OJD5I)"
+            placeholder="Search by User ID"
             value={searchUserId}
             onChange={(e) => setSearchUserId(e.target.value)}
-            className="w-full md:w-52 px-2 py-1 rounded-lg border
-               focus:outline-none focus:ring
-               transition shadow-sm"
+            className="w-full sm:w-52 px-3 py-2 text-sm rounded-lg
+                  border border-gray-300 focus:outline-none transition"
           />
         </div>
       </div>
+
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
@@ -102,7 +146,7 @@ const SubAdminList = () => {
 
           {/* 👉 Mobile Card View */}
           <div className="md:hidden space-y-4 p-2">
-            {subAdmins.map((sa, index) => (
+            {filteredSubAdmins.map((sa, index) => (
               <div key={sa._id} className="border rounded-xl p-4 shadow-sm bg-white">
                 <p className="text-gray-800 font-semibold">
                   #{(page - 1) * limit + (index + 1)} — {sa.name}
