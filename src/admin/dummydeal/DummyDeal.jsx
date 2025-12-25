@@ -1,4 +1,4 @@
-import React, { useState,useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
@@ -63,27 +63,27 @@ const DummyDeal = () => {
       toast.error("Currency fetch failed");
     }
   };
-  
- useEffect(() => {
-  const fetchCountries = async () => {
-    try {
-      const res = await GetCountriesApi();
 
-      if (Array.isArray(res)) {
-        setCountries(res);
-      } else if (res?.success && Array.isArray(res.data)) {
-        setCountries(res.data);
-      } else {
-        toast.error("Invalid countries response");
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const res = await GetCountriesApi();
+
+        if (Array.isArray(res)) {
+          setCountries(res);
+        } else if (res?.success && Array.isArray(res.data)) {
+          setCountries(res.data);
+        } else {
+          toast.error("Invalid countries response");
+        }
+
+      } catch (error) {
+        toast.error("Country fetch failed");
       }
+    };
 
-    } catch (error) {
-      toast.error("Country fetch failed");
-    }
-  };
-
-  fetchCountries();
-}, []);
+    fetchCountries();
+  }, []);
 
 
 
@@ -96,7 +96,7 @@ const DummyDeal = () => {
     }
 
     const formData = new FormData();
-    const countryCode = countries.find((c)=>c.name===country);
+    const countryCode = countries.find((c) => c.name === country);
     formData.append("tokenAmount", Number(form.tokenAmount));
     formData.append("price", Number(form.price));
     formData.append("status", form.status);
@@ -104,14 +104,14 @@ const DummyDeal = () => {
     formData.append("buyer[userId]", form.buyerUserId);
     formData.append("buyer[name]", form.buyerName);
     formData.append("buyer[email]", form.buyerEmail);
-    formData.append("buyer[phoneNumber]", countryCode?.code+form.buyerPhone);
+    formData.append("buyer[phoneNumber]", countryCode?.code + form.buyerPhone);
     formData.append("buyer[country]", country);
     formData.append("buyer[currency]", currency);
 
     formData.append("seller[userId]", form.sellerUserId);
     formData.append("seller[name]", form.sellerName);
     formData.append("seller[email]", form.sellerEmail);
-    formData.append("seller[phoneNumber]", countryCode?.code+form.sellerPhone);
+    formData.append("seller[phoneNumber]", countryCode?.code + form.sellerPhone);
     formData.append("seller[country]", country);
     formData.append("seller[currency]", currency)
 
@@ -152,14 +152,14 @@ const DummyDeal = () => {
   const tokenAmount = [100, 200, 500, 1000];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-md mt-4">
+    <div className="max-w-4xl mx-auto p-4 bg-white rounded-2xl shadow-md mt-2">
       <ToastContainer />
 
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">
         Create Dummy Deal
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Deal Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <select
@@ -167,7 +167,7 @@ const DummyDeal = () => {
             value={form.tokenAmount}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-xl bg-white  "
           >
             <option value="">Select Token Amount</option>
             {tokenAmount.map((amount) => (
@@ -178,12 +178,13 @@ const DummyDeal = () => {
           </select>
 
           <input
+            // type="number"
             name="price"
             placeholder="Price"
             value={form.price}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-xl  "
           />
         </div>
 
@@ -216,8 +217,8 @@ const DummyDeal = () => {
 
         {/* Buyer Section */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            Seller Details
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            Buyer Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
@@ -257,8 +258,8 @@ const DummyDeal = () => {
 
         {/* Seller Section */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            Buyer Details
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            Seller Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input
@@ -298,22 +299,29 @@ const DummyDeal = () => {
 
         {/* Receipt */}
         <div>
-          <label className="block mb-1 font-medium text-gray-700">
+          <label className="block mb-1 text-sm font-semibold text-gray-700">
             Upload Receipt
           </label>
+
           <input
             type="file"
             name="receiptImage"
             accept="image/*"
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-xl"
+            key={receipt ? receipt.name : "empty"}
+            className="w-full px-4 py-2 border rounded-xl
+               bg-white text-sm
+               focus:outline-none focus:ring-2 focus:ring-blue-500
+               hover:border-blue-400 transition"
           />
+
           {receipt && (
-            <p className="text-sm text-green-600 mt-1">
-              Selected: {receipt.name}
+            <p className="text-xs text-green-600 mt-1 truncate">
+              ✔ Selected: {receipt.name}
             </p>
           )}
         </div>
+
 
         {/* Status */}
         <select

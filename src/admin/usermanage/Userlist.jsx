@@ -5,8 +5,11 @@ import {
   GetAdminUsersApi,
   HoldUnholdUserApi,
   GetCountriesApi,
+  UpdateUserProfileApi,
 } from "../../api/Adminapi";
 import { ToastContainer, toast } from "react-toastify";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -27,10 +30,31 @@ const UserList = () => {
   const [countries, setCountries] = useState([]);
   const [searchCountry, setSearchCountry] = useState("");
   const [searchRank, setSearchRank] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [pageWindowStart, setPageWindowStart] = useState(1);
   const PAGE_WINDOW_SIZE = 10;
 
-  const TABS = ["BANK", "INCOME", "WALLET", "DEPOSIT", "WITHDRAW", "DEAL", "ORDER", "TEAM"];
+  const TABS = [
+    "BANK",
+    "INCOME",
+    "WALLET",
+    "DEPOSIT",
+    "WITHDRAW",
+    "DEAL",
+    "ORDER",
+    "TEAM",
+  ];
+
+  const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+  const [editUserData, setEditUserData] = useState({
+    _id: "",
+    name: "",
+    email: "",
+    phoneNumber: "",
+    countryCode: "",
+    country: "",
+    password: "",
+  });
 
   // Fetch countries
   useEffect(() => {
@@ -63,16 +87,12 @@ const UserList = () => {
 
       if (res.success) {
         setUsers(res.data.users || []);
-
         const count = res.data.count || 0;
         const pages = Math.ceil(count / limit);
         const safePages = pages > 0 ? pages : 1;
-
         setTotalPages(safePages);
         setPage((prev) => (prev > safePages ? 1 : prev));
         setPageWindowStart(1);
-
-
       } else {
         toast.error(res.message || "Failed to fetch users");
       }
@@ -82,6 +102,21 @@ const UserList = () => {
     }
     setLoading(false);
   };
+
+  // Open edit modal with user data
+  const openEditUser = (user) => {
+    setEditUserData({
+      _id: user._id,   // REQUIRED for update
+      name: "",
+      email: "",
+      phoneNumber: "",
+      countryCode: "",
+      country: "",
+      password: "",
+    });
+    setEditUserModalOpen(true);
+  };
+
 
   // Reset page when filters change
   useEffect(() => {
@@ -93,34 +128,26 @@ const UserList = () => {
     fetchUsers();
   }, [page, filter, searchUserId, searchCountry, searchRank]);
 
- const openPopup = (event, userId) => {
-  const rect = event.target.getBoundingClientRect();
-  const popupWidth = 250;
-  const popupHeight = 260;
-  const gap = 30;
+  const openPopup = (event, userId) => {
+    const rect = event.target.getBoundingClientRect();
+    const popupWidth = 250;
+    const popupHeight = 260;
+    const gap = 30;
 
-  let x = rect.right - popupWidth - gap;
-  let y = rect.top + window.scrollY;
+    let x = rect.right - popupWidth - gap;
+    let y = rect.top + window.scrollY;
 
-  // 👉 Prevent right overflow
-  if (x < 20) {
-    x = rect.left + gap;
-  }
+    if (x < 20) x = rect.left + gap;
 
-  const viewportBottom = window.scrollY + window.innerHeight;
-  if (y + popupHeight > viewportBottom) {
-    y = rect.top + window.scrollY - popupHeight - gap;
-  }
+    const viewportBottom = window.scrollY + window.innerHeight;
+    if (y + popupHeight > viewportBottom) y = rect.top + window.scrollY - popupHeight - gap;
 
-  if (y < window.scrollY + 10) {
-    y = window.scrollY + 10;
-  }
+    if (y < window.scrollY + 10) y = window.scrollY + 10;
 
-  setPopupPosition({ x, y });
-  setSelectedUser(userId);
-  setModalOpen(true);
-};
-
+    setPopupPosition({ x, y });
+    setSelectedUser(userId);
+    setModalOpen(true);
+  };
 
   const goToDetailsPage = (type) => {
     navigate(`/admin/users/details?type=${type}&id=${selectedUser}`);
@@ -179,15 +206,15 @@ const UserList = () => {
     setPage(newStart);
   };
 
-  // Static rank options
   const ranks = ["T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8"];
+
   return (
     <div className="max-w-6xl mx-auto bg-white p-6 mt-8 rounded-xl shadow">
       <ToastContainer position="top-right" autoClose={3000} />
       <h2 className="text-2xl font-bold mb-4">User List</h2>
 
+      {/* ---------------- Filters ---------------- */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-end gap-4 mb-6 flex-wrap">
-        {/* ---------------- Search Input ---------------- */}
         <div className="flex items-center gap-2 flex-1 md:flex-none w-full md:w-auto">
           <input
             type="text"
@@ -206,7 +233,6 @@ const UserList = () => {
           )}
         </div>
 
-        {/* ---------------- Status Filter Buttons ---------------- */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setFilter("all")}
@@ -237,15 +263,11 @@ const UserList = () => {
           </button>
         </div>
 
-        {/* ---------------- Country Filter ---------------- */}
         <div className="flex items-center gap-2">
           <select
             value={searchCountry}
             onChange={(e) => setSearchCountry(e.target.value)}
-            className="border border-gray-300 px-1 py-2 text-sm
-             rounded-md shadow-sm
-             focus:outline-none focus:ring-2 focus:ring-blue-500
-             transition"
+            className="border border-gray-300 px-1 py-2 text-sm rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           >
             <option value="">All Countries</option>
             {countries.map((c) => (
@@ -255,17 +277,10 @@ const UserList = () => {
             ))}
           </select>
 
-        </div>
-
-        {/* ---------------- Rank Filter ---------------- */}
-        <div className="flex items-center gap-2">
           <select
             value={searchRank}
             onChange={(e) => setSearchRank(e.target.value)}
-            className="border border-gray-300 px-2 py-2 text-sm
-             rounded-md shadow-sm
-             focus:outline-none focus:ring-2 focus:ring-blue-500
-             transition"
+            className="border border-gray-300 px-2 py-2 text-sm rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           >
             <option value="">All Ranks</option>
             {ranks.map((r) => (
@@ -274,23 +289,21 @@ const UserList = () => {
               </option>
             ))}
           </select>
-
         </div>
       </div>
 
-
+      {/* ---------------- User Table ---------------- */}
       {loading ? (
         <p className="text-2xl font-semibold">Loading List…</p>
       ) : (
         <div className="w-full">
-          {/* ---------------- Desktop Table ---------------- */}
           <div className="overflow-x-auto hidden md:block">
             <table className="min-w-full border text-sm">
               <thead className="bg-gray-100 text-center">
                 <tr>
                   <th className="py-2 px-3 border">S.No</th>
                   <th className="py-2 px-3 border">User ID</th>
-                  <th className="py-2 px-3 border">Sponser ID</th>
+                  <th className="py-2 px-3 border">Sponsor ID</th>
                   <th className="py-2 px-3 border">Rank</th>
                   <th className="py-2 px-3 border">Name</th>
                   <th className="py-2 px-3 border">Email</th>
@@ -311,7 +324,6 @@ const UserList = () => {
                     <td className="border py-2">{u.email}</td>
                     <td className="border py-2">{u.phoneNumber}</td>
                     <td className="border py-2">{u.country}</td>
-
                     <td className="border py-2">
                       <div className="flex justify-center gap-2">
                         {u.isBlocked ? (
@@ -329,7 +341,6 @@ const UserList = () => {
                             Block
                           </button>
                         )}
-
                         {u.hold ? (
                           <button
                             onClick={() => toggleHoldUser(u._id, true)}
@@ -347,14 +358,21 @@ const UserList = () => {
                         )}
                       </div>
                     </td>
-
                     <td className="border py-2">
-                      <button
-                        onClick={(e) => openPopup(e, u._id)}
-                        className="bg-blue-600 text-white px-3 py-1 rounded"
-                      >
-                        View
-                      </button>
+                      <div className="flex justify-center gap-2">
+                        <button
+                          onClick={(e) => openPopup(e, u._id)}
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-xs"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => openEditUser(u)}
+                          className="bg-yellow-500 text-white px-3 py-1 rounded text-xs"
+                        >
+                          Edit
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -362,25 +380,32 @@ const UserList = () => {
             </table>
           </div>
 
-          {/* ---------------- Mobile Card View ---------------- */}
+          {/* ---------------- Mobile View ---------------- */}
           <div className="md:hidden space-y-4 mt-4">
             {users.map((u, index) => (
-              <div
-                key={u._id}
-                className="border rounded-xl p-4 shadow-sm bg-white"
-              >
+              <div key={u._id} className="border rounded-xl p-4 shadow-sm bg-white">
                 <p className="font-semibold text-gray-800">
                   #{(page - 1) * limit + index + 1} — {u.name}
                 </p>
-
                 <div className="text-sm text-gray-600 mt-2 space-y-1">
-                  <p><span className="font-medium">User ID:</span> {u.userId}</p>
-                  <p><span className="font-medium">Sponsor ID:</span> {u.sponsorId?.userId}</p>
-                  <p><span className="font-medium">Rank:</span> {u.rank || "No Rank"}</p>
-                  <p><span className="font-medium">Email:</span> {u.email}</p>
-                  <p><span className="font-medium">Phone:</span> {u.phoneNumber}</p>
-                  <p><span className="font-medium">Country:</span> {u.country}</p>
-
+                  <p>
+                    <span className="font-medium">User ID:</span> {u.userId}
+                  </p>
+                  <p>
+                    <span className="font-medium">Sponsor ID:</span> {u.sponsorId?.userId}
+                  </p>
+                  <p>
+                    <span className="font-medium">Rank:</span> {u.rank || "No Rank"}
+                  </p>
+                  <p>
+                    <span className="font-medium">Email:</span> {u.email}
+                  </p>
+                  <p>
+                    <span className="font-medium">Phone:</span> {u.phoneNumber}
+                  </p>
+                  <p>
+                    <span className="font-medium">Country:</span> {u.country}
+                  </p>
                   <p className="flex items-center gap-2">
                     <span className="font-medium">Status:</span>
                     {u.isBlocked ? (
@@ -398,7 +423,6 @@ const UserList = () => {
                         Block
                       </button>
                     )}
-
                     {u.hold ? (
                       <button
                         onClick={() => toggleHoldUser(u._id, true)}
@@ -415,12 +439,11 @@ const UserList = () => {
                       </button>
                     )}
                   </p>
-
                   <button
-                    onClick={(e) => openPopup(e, u._id)}
-                    className="mt-2 w-full bg-blue-600 text-white py-1 rounded text-sm"
+                    onClick={() => openEditUser(u)}
+                    className="mt-2 w-full bg-yellow-500 text-white py-1 rounded text-sm"
                   >
-                    View Details
+                    Edit
                   </button>
                 </div>
               </div>
@@ -435,15 +458,8 @@ const UserList = () => {
           className="fixed z-50 w-56"
           style={
             window.innerWidth >= 768
-              ? {
-                top: popupPosition.y,
-                left: popupPosition.x,
-              }
-              : {
-                left: "50%",
-                bottom: "20%",
-                transform: "translateX(-50%)",
-              }
+              ? { top: popupPosition.y, left: popupPosition.x }
+              : { left: "50%", bottom: "20%", transform: "translateX(-50%)" }
           }
         >
           <div className="bg-white rounded-xl p-3 shadow-xl border relative">
@@ -453,9 +469,7 @@ const UserList = () => {
             >
               ✕
             </button>
-
             <h3 className="text-sm font-bold mb-2">Select Details</h3>
-
             <div className="flex flex-col gap-2">
               {TABS.map((t) => (
                 <button
@@ -483,23 +497,19 @@ const UserList = () => {
         >
           ← Prev
         </button>
-
         <div className="flex items-center gap-0.5 flex-wrap">
           <span className="font-medium text-gray-700">Page</span>
           {getPageNumbers().map((p) => (
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`px-1 text-sm font-medium cursor-pointer ${page === p
-                ? "text-blue-600 underline"
-                : "text-gray-700 hover:text-blue-500"
+              className={`px-1 text-sm font-medium cursor-pointer ${page === p ? "text-blue-600 underline" : "text-gray-700 hover:text-blue-500"
                 }`}
             >
               {p}
             </button>
           ))}
         </div>
-
         <button
           disabled={pageWindowStart + PAGE_WINDOW_SIZE > totalPages}
           onClick={handleNextBlock}
@@ -511,6 +521,112 @@ const UserList = () => {
           Next →
         </button>
       </div>
+
+      {/* ---------------- Edit User Modal ---------------- */}
+      {editUserModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-96 relative shadow-lg">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-black"
+              onClick={() => setEditUserModalOpen(false)}
+            >
+              ✕
+            </button>
+            <h3 className="text-lg font-bold mb-4">Edit User Details</h3>
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Name (optional)"
+                value={editUserData.name}
+                onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="email"
+                placeholder="Email (optional)"
+                value={editUserData.email}
+                onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Phone (optional)"
+                value={editUserData.phoneNumber}
+                onChange={(e) =>
+                  setEditUserData({ ...editUserData, phoneNumber: e.target.value })
+                }
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Country Code (optional)"
+                value={editUserData.countryCode ?? ""}
+                onChange={(e) =>
+                  setEditUserData(prev => ({
+                    ...prev,
+                    countryCode: e.target.value,
+                  }))
+                }
+
+                className="w-full border px-3 py-2 rounded"
+              />
+              <input
+                type="text"
+                placeholder="Country (optional)"
+                value={editUserData.country}
+                onChange={(e) => setEditUserData({ ...editUserData, country: e.target.value })}
+                className="w-full border px-3 py-2 rounded"
+              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password (optional)"
+                  value={editUserData.password}
+                  autoComplete="new-password"
+                  onChange={(e) =>
+                    setEditUserData({ ...editUserData, password: e.target.value })
+                  }
+                  className="w-full border px-3 py-2 rounded pr-10"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+
+              <button
+                className="w-full bg-yellow-500 text-white py-2 rounded"
+                onClick={async () => {
+                  try {
+                    const payload = { ...editUserData };
+                    Object.keys(payload).forEach((key) => {
+                      if (!payload[key] && key !== "_id") delete payload[key];
+                    });
+
+                    const res = await UpdateUserProfileApi(payload);
+                    if (res.success) {
+                      toast.success("User updated successfully!");
+                      setEditUserModalOpen(false);
+                      fetchUsers();
+                    } else {
+                      toast.error(res.message || "Update failed");
+                    }
+                  } catch (err) {
+                    toast.error("Something went wrong");
+                  }
+                }}
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

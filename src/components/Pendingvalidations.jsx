@@ -249,8 +249,7 @@ const Pendingvalidations = () => {
             <p className="text-sm text-gray-700 mb-6">
               {accountType === "VALIDATOR" ? (
                 <>
-                  You are already a <b className="text-green-600">Validator</b>.
-                  Please go to the Validator Panel to continue validating deals.
+                  Please go to the Validator panel on your profile page to continue validating deals
                 </>
               ) : (
                 <>

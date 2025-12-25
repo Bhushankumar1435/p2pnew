@@ -277,6 +277,12 @@ export const CreateDummyDealApi = (data) =>
 export const GetCurrencyByCountryApi = (country) =>
   adminGet(`user/getCurrency?country=${encodeURIComponent(country)}`, true);
 
+export const UpdateUserProfileApi = (data) => {
+  const payload = { ...data, id: data._id };
+  delete payload._id;
+
+  return adminPost("admin/update-profile", payload, true);
+};
 
 
 

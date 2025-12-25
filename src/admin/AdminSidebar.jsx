@@ -1,6 +1,6 @@
 import React from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
-import { FaMoneyCheckAlt, FaWallet, FaChartLine, FaUsers, FaHandshake, FaTicketAlt, FaUserPlus, FaCogs, FaMoneyBillWave, FaBalanceScale, FaUserCheck, FaShoppingCart, } from "react-icons/fa";
+import { FaMoneyCheckAlt, FaWallet, FaChartLine, FaUsers, FaHandshake, FaTicketAlt, FaUserPlus, FaCogs, FaMoneyBillWave, FaBalanceScale, FaUserCheck, FaShoppingCart,FaPercent ,FaVial  } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const AdminSidebar = ({
@@ -18,7 +18,6 @@ const AdminSidebar = ({
   setGlobaldividend,
   dummydeal,
   setDummydeal
-
 }) => {
   const navigate = useNavigate();
 
@@ -31,7 +30,6 @@ const AdminSidebar = ({
     navigate(path);
     setSidebarOpen(false);
   };
-
 
   return (
     <div
@@ -98,7 +96,7 @@ const AdminSidebar = ({
                   onClick={() => handleNav("/admin/subadmin/validatorpercent")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
-                  <FaUsers /> Validator Percent
+                  <FaPercent  /> Validator Percent
                 </button>
 
                 {/* <button
@@ -137,6 +135,7 @@ const AdminSidebar = ({
                 >
                   <FaUsers /> User List
                 </button>
+                
 
                 <button
                   onClick={() => handleNav("/admin/deals")}
@@ -287,7 +286,7 @@ const AdminSidebar = ({
                   onClick={() => handleNav("/admin/dummy-deal")}
                   className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 flex items-center gap-2"
                 >
-                  <FaMoneyCheckAlt /> Dummy Deal
+                  <FaVial  /> Dummy Deal
                 </button>
               </div>
             )}

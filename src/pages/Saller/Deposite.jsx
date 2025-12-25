@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import CopyIcon from '../../assets/images/copy_icon.png';
 import { getWalletAddress } from '../../api/api';
 import { ToastContainer, toast } from 'react-toastify';
@@ -17,22 +17,18 @@ const Deposite = ({ isOpen, onClose, onUploadConfirm }) => {
     onClose();             // Close modal
     onUploadConfirm();     // Tell parent to show PaymentHistory
   };
-  const checkNewDeposit = async() => {
-        try{
-         const res = await postData('/user/checkDeposit', {address:walletValue});
-             if(res.data.success == true)
-                toast.success(res.data.message)
-              else
-                toast.error(res.data.message)
-              // .then((res) => { 
-              //    console.log('data ', res) 
-              
-              //   })
-              // .catch((err) => toast.error(err));
-        }catch(e){
-         toast.error(e.message);
-        }
-         
+  const checkNewDeposit = async () => {
+    try {
+      const res = await postData('user/checkDeposit', { address: walletValue });
+      if (res?.data?.success === true)
+        toast.success(res.data.message)
+      else
+        toast.error(res.data.message)
+
+    } catch (e) {
+      toast.error(e.message);
+    }
+
   }
   const getWalletAmount = async () => {
     try {
@@ -78,18 +74,22 @@ const Deposite = ({ isOpen, onClose, onUploadConfirm }) => {
                 Address
                 <span className='mb-2 text-black'>Deposit BEP20 USDT only</span>
                 <div className='flex items-center gap-2 relative border border-[var(--border-light)] py-2 px-3 cursor-default rounded-lg bg-transparent text-left shadow-none focus:outline-none sm:text-sm justify-between'>
-                  <span className='text-ellipsis overflow-hidden text-nowrap'>{walletValue}</span>
-                  
-                  <button onClick={() => {
-                    if (walletValue) {
-                      navigator.clipboard.writeText(walletValue);
-                      toast.success('Copied to clipboard');
-                    } else {
-                      toast.error('Nothing to copy');
-                    }
-                  }} className='shrink-0'>
-                    <img src={CopyIcon} alt="Copy" />
+                  <span className="break-all text-xs">{walletValue}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (walletValue) {
+                        navigator.clipboard.writeText(walletValue);
+                        toast.success('Copied to clipboard');
+                      } else {
+                        toast.error('Nothing to copy');
+                      }
+                    }}
+                    className="shrink-0 hover:scale-105 transition"
+                  >
+                    <img src={CopyIcon} alt="Copy address" />
                   </button>
+
                 </div>
               </div>
             </div>
@@ -107,7 +107,7 @@ const Deposite = ({ isOpen, onClose, onUploadConfirm }) => {
                 {/* <FaHistory /> */}
                 Payment History
               </Link>
-            </div> 
+            </div>
           </div>
         </div>
       </div>
